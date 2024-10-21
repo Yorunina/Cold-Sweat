@@ -1,6 +1,6 @@
 package com.momosoftworks.coldsweat.mixin;
 
-import com.momosoftworks.coldsweat.api.event.common.EntityPickEvent;
+import com.momosoftworks.coldsweat.api.event.vanilla.EntityPickEvent;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.RayTraceResult;

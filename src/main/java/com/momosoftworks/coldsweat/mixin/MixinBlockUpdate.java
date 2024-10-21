@@ -1,7 +1,6 @@
 package com.momosoftworks.coldsweat.mixin;
 
-import com.momosoftworks.coldsweat.ColdSweat;
-import com.momosoftworks.coldsweat.api.event.common.BlockStateChangedEvent;
+import com.momosoftworks.coldsweat.api.event.vanilla.BlockStateChangedEvent;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;

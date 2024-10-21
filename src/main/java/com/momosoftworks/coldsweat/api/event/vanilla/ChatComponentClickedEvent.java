@@ -1,4 +1,4 @@
-package com.momosoftworks.coldsweat.api.event.common;
+package com.momosoftworks.coldsweat.api.event.vanilla;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.text.Style;

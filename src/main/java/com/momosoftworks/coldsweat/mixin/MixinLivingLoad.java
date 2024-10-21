@@ -1,6 +1,6 @@
 package com.momosoftworks.coldsweat.mixin;
 
-import com.momosoftworks.coldsweat.api.event.common.LivingEntityLoadAdditionalEvent;
+import com.momosoftworks.coldsweat.api.event.vanilla.LivingEntityLoadAdditionalEvent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.MinecraftForge;
