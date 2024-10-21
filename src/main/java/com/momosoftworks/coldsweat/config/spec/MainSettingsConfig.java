@@ -11,6 +11,7 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainSettingsConfig
@@ -187,7 +188,7 @@ public class MainSettingsConfig
                          " armorunder:lining - Disables the temperature effects of armor linings from Armor Underwear",
                          " weather2:storm - Disables the temperature effects of storms & weather from Weather 2",
                          " curios:curios - Disables the temperature effects of equipped curios")
-                .defineListAllowEmpty("Disabled Temperature Modifiers", List.of(), o -> o instanceof String);
+                .defineListAllowEmpty(Arrays.asList("Disabled Temperature Modifiers"), () -> Arrays.asList(), o -> o instanceof String);
 
         BUILDER.pop();
 
