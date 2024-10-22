@@ -57,7 +57,6 @@
     ]
   },
   "immune_temp_modifiers": {
-    "cold_sweat:blocks": 1.0,
     "cold_sweat:water": 1.0
   }
 }
