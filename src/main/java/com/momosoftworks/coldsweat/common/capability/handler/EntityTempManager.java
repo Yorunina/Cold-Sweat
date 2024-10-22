@@ -78,7 +78,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Mod.EventBusSubscriber
@@ -498,7 +497,8 @@ public class EntityTempManager
             Double immunity = insulator.immuneTempModifiers.get(modifierKey);
             if (immunity != null && insulator.test(event.getEntity(), stack))
             {
-                event.setFunction(temp -> CSMath.blend(event.getFunction().apply(temp), lastInput, immunity, 0, 1));
+                Function<Double, Double> func = event.getFunction();
+                event.setFunction(temp -> CSMath.blend(func.apply(temp), lastInput, immunity, 0, 1));
             }
         }
     }
