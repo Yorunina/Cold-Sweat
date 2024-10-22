@@ -2531,17 +2531,22 @@ Technical Changes:
       - TempModifiers control how temperature affects the player, so this will hopefully provide some more granular control over that
 - Removed the "Cave Insulation Strength" config setting, as it is no longer used
 - Reduced the underground temperature near y -64 so the player no longer overheats
+- Removed the total resistance to block temperature provided by the Create netherite diving suit
 
 Fixes:
 * (1.21) Fixed crash when saving insulated armor items
 * (1.20) Fixed crash when Serene Seasons 9.1 or newer is installed
       - Serene Seasons support now requires version 9.1 or newer to be enabled
 * Fixed crash when "Insulation Strength" is set to 0
+* Fixed dynamic dimension_type tags not loading properly on servers
+* Fixed feeding a chemeleon dropping the entire item stack from the player's hand
 - Fixed insulation from mounts ignoring the "Insulation Strength" setting
 - Fixed the world temperature indicator briefly displaying incorrectly when changing preferred units
 - Fixed spectators getting wet in water
 - Fixed being underwater counting as "underground" when calculating world temperature
 - Fixed the "condition" field of JSON BlockTemp config files not supporting checking block states
+- Fixed TOML-based block temperatures not checking NBT properly
+- Fixed air not being consumed from Create's netherite backtank when in a sweltering environment
 - (1.20 - 1.21) Fixed debug message showing when a tooltip containing adaptive insulation is displayed
 - (1.16) Fixed the hearth debug visualizer rendering red outlines around solid blocks
 
@@ -2554,7 +2559,7 @@ Technical Changes:
       - These events are functionally similar, but Pre has some changes:
             - The event now has getFunction() and setFunction() methods for setting the resulting function before it is calculated
             - The event must be cancelled for the function to be overwritten
-* Changed the packages of some events:
+* Changed the packages of some events for better organization:
      - TempModifierEvent: api.event.common.temperature
      - EnableTemperatureEvent: api.event.core.init
      - GatherDefaultTempModifiersEvent: api.event.core.init
