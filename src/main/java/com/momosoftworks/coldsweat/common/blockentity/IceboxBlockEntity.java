@@ -85,20 +85,21 @@ public class IceboxBlockEntity extends HearthBlockEntity implements MenuProvider
     {   return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    public boolean triggerEvent(int pId, int pType)
+    @Override
+    public boolean triggerEvent(int id, int type)
     {
-        if (pId == 1)
-        {   this.lidController.shouldBeOpen(pType > 0);
+        if (id == 1)
+        {   this.lidController.shouldBeOpen(type > 0);
             return true;
         }
         else
-        {   return super.triggerEvent(pId, pType);
+        {   return super.triggerEvent(id, type);
         }
     }
 
-    protected void signalOpenCount(Level pLevel, BlockPos pPos, BlockState pState, int pEventId, int pEventParam)
-    {   Block block = pState.getBlock();
-        pLevel.blockEvent(pPos, block, 1, pEventParam);
+    protected void signalOpenCount(Level level, BlockPos pos, BlockState state, int eventId, int eventParam)
+    {   Block block = state.getBlock();
+        level.blockEvent(pos, block, eventId, eventParam);
     }
 
     private void sendUpdatePacket()
