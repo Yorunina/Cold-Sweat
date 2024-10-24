@@ -79,14 +79,12 @@ public class FilledWaterskinItem extends Item
                     SoundSource.PLAYERS, 1, (float) ((Math.random() / 5) + 0.9), false);
 
             // Spawn particles
-            ParticleStatus status = Minecraft.getInstance().options.particles;
             Random rand = new Random();
-            if (status != ParticleStatus.MINIMAL)
             for (int i = 0; i < 6; i++)
             {
                 TaskScheduler.scheduleServer(() ->
                 {
-                    ParticleBatchMessage particles = new ParticleBatchMessage();
+                    ParticleBatchMessage particles = new ParticleBatchMessage(2);
                     for (int p = 0; p < rand.nextInt(5) + 5; p++)
                     {
                         particles.addParticle(ParticleTypes.FALLING_WATER,
@@ -94,7 +92,7 @@ public class FilledWaterskinItem extends Item
                                                                            pos.getY() + rand.nextDouble(),
                                                                            pos.getZ() + rand.nextDouble(), 0, 0, 0));
                     }
-                    ColdSweatPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> (LevelChunk) chunk), particles);
+                    particles.sendWorld(level);
                 }, i);
             }
 
@@ -192,21 +190,21 @@ public class FilledWaterskinItem extends Item
 
         // spawn falling water particles
         Random rand = new Random();
-        ParticleStatus status = Minecraft.getInstance().options.particles;
-        if (status != ParticleStatus.MINIMAL)
         for (int i = 0; i < 6; i++)
         {
             TaskScheduler.scheduleClient(() ->
             {
+                ParticleBatchMessage particleBatch = new ParticleBatchMessage(2);
                 for (int p = 0; p < 10; p++)
                 {
                     AABB playerBB = player.getDimensions(player.getPose()).makeBoundingBox(player.position()).inflate(0.2);
-                    level.addParticle(ParticleTypes.FALLING_WATER,
-                                      Mth.lerp(rand.nextFloat(), playerBB.minX, playerBB.maxX),
-                                      playerBB.maxY,
-                                      Mth.lerp(rand.nextFloat(), playerBB.minZ, playerBB.maxZ),
-                                      0.3, 0.3, 0.3);
+                    particleBatch.addParticle(ParticleTypes.FALLING_WATER,
+                                              Mth.lerp(rand.nextFloat(), playerBB.minX, playerBB.maxX),
+                                              playerBB.maxY,
+                                              Mth.lerp(rand.nextFloat(), playerBB.minZ, playerBB.maxZ),
+                                              0.3, 0.3, 0.3);
                 }
+                particleBatch.sendEntity(player);
             }, i);
         }
         player.clearFire();
