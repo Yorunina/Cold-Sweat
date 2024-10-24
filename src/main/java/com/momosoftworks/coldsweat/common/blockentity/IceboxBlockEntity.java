@@ -110,20 +110,21 @@ public class IceboxBlockEntity extends HearthBlockEntity implements ITickableTil
     {   return new SUpdateTileEntityPacket(this.worldPosition, 0, this.getUpdateTag());
     }
 
-    public boolean triggerEvent(int pId, int pType)
+    @Override
+    public boolean triggerEvent(int id, int type)
     {
-        if (pId == 1)
-        {   this.lidController.shouldBeOpen(pType > 0);
+        if (id == 1)
+        {   this.lidController.shouldBeOpen(type > 0);
             return true;
         }
         else
-        {   return super.triggerEvent(pId, pType);
+        {   return super.triggerEvent(id, type);
         }
     }
 
-    protected void signalOpenCount(World pLevel, BlockPos pPos, BlockState pState, int pEventId, int pEventParam)
-    {   Block block = pState.getBlock();
-        pLevel.blockEvent(pPos, block, 1, pEventParam);
+    protected void signalOpenCount(World level, BlockPos pos, BlockState state, int eventId, int eventParam)
+    {   Block block = state.getBlock();
+        level.blockEvent(pos, block, eventId, eventParam);
     }
 
     private void sendUpdatePacket()

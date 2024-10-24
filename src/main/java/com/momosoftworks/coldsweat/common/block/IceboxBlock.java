@@ -83,12 +83,12 @@ public class IceboxBlock extends Block
     }
 
     @Override
-    public boolean triggerEvent(BlockState pState, World pLevel, BlockPos pPos, int pId, int pParam)
+    public boolean triggerEvent(BlockState state, World level, BlockPos pos, int id, int param)
     {
-        super.triggerEvent(pState, pLevel, pPos, pId, pParam);
-        TileEntity blockentity = pLevel.getBlockEntity(pPos);
+        super.triggerEvent(state, level, pos, id, param);
+        TileEntity blockentity = level.getBlockEntity(pos);
 
-        return blockentity != null && blockentity.triggerEvent(pId, pParam);
+        return blockentity != null && blockentity.triggerEvent(id, param);
     }
 
     @SuppressWarnings("deprecation")
