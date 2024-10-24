@@ -33,6 +33,8 @@ import net.minecraft.world.level.block.entity.ChestLidController;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
@@ -306,6 +308,7 @@ public class IceboxBlockEntity extends HearthBlockEntity implements MenuProvider
     {   return ModParticleTypes.GROUND_MIST.get();
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void spawnAirParticle(int x, int y, int z, Random rand)
     {

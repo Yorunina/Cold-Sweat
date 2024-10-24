@@ -63,6 +63,8 @@ import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.material.Fluids;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.util.ObfuscationReflectionHelper;
 import net.neoforged.neoforge.common.NeoForge;
@@ -895,6 +897,7 @@ public class HearthBlockEntity extends RandomizableContainerBlockEntity
         return this.hasSmokestack;
     }
 
+    @OnlyIn(Dist.CLIENT)
     protected void tickParticles()
     {
         ParticleStatus status = Minecraft.getInstance().options.particles().get();
@@ -944,6 +947,7 @@ public class HearthBlockEntity extends RandomizableContainerBlockEntity
     {   return ModParticleTypes.HEARTH_AIR.get();
     }
 
+    @OnlyIn(Dist.CLIENT)
     public void spawnAirParticle(int x, int y, int z, Random rand)
     {
         if (rand.nextFloat() > (spreading ? 0.016f : 0.032f)) return;
@@ -1022,6 +1026,7 @@ public class HearthBlockEntity extends RandomizableContainerBlockEntity
         tag.putInt("InsulationLevel", insulationLevel);
         tag.putBoolean("IsSidePowered", this.isSidePowered);
         tag.putBoolean("IsBackPowered", this.isBackPowered);
+        tag.putBoolean("HasSmokestack", this.hasSmokestack);
         this.saveEffects(tag);
 
         return tag;
@@ -1036,6 +1041,7 @@ public class HearthBlockEntity extends RandomizableContainerBlockEntity
         this.insulationLevel = tag.getInt("InsulationLevel");
         this.isSidePowered = tag.getBoolean("IsSidePowered");
         this.isBackPowered = tag.getBoolean("IsBackPowered");
+        this.hasSmokestack = tag.getBoolean("HasSmokestack");
         this.loadEffects(tag);
     }
 
