@@ -42,6 +42,8 @@ import net.minecraft.world.level.block.entity.ChestLidController;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -328,6 +330,7 @@ public class IceboxBlockEntity extends HearthBlockEntity implements MenuProvider
     {   return ParticleTypesInit.GROUND_MIST.get();
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void spawnAirParticle(int x, int y, int z, Random rand)
     {

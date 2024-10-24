@@ -8,13 +8,12 @@ import com.momosoftworks.coldsweat.core.advancement.trigger.ModAdvancementTrigge
 import com.momosoftworks.coldsweat.common.capability.handler.EntityTempManager;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
 import com.momosoftworks.coldsweat.config.type.PredicateItem;
+import com.momosoftworks.coldsweat.core.network.message.ParticleBatchMessage;
 import com.momosoftworks.coldsweat.util.serialization.ConfigHelper;
 import com.momosoftworks.coldsweat.util.serialization.NBTHelper;
 import com.momosoftworks.coldsweat.util.math.CSMath;
 import com.momosoftworks.coldsweat.util.registries.ModSounds;
 import com.momosoftworks.coldsweat.util.world.WorldHelper;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.ParticleStatus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -85,10 +84,8 @@ public class SoulspringLampItem extends Item
                         double z = bb2.minZ + (bb2.maxZ - bb2.minZ) * Math.random();
                         double xSpeed = (Math.random() - 0.5) * 0.02;
                         double zSpeed = (Math.random() - 0.5) * 0.02;
-                        ParticleStatus status = Minecraft.getInstance().options.particles().get();
-                        if (status == ParticleStatus.ALL)
-                        {   level.addParticle(ParticleTypes.SOUL_FIRE_FLAME, x, y, z, xSpeed, 0, zSpeed);
-                        }
+                        new ParticleBatchMessage(0).addParticle(ParticleTypes.SOUL_FIRE_FLAME, x, y, z, xSpeed, 0, zSpeed)
+                                                   .sendEntity(living);
                     }
 
                     for (LivingEntity ent : level.getEntitiesOfClass(LivingEntity.class, bb))

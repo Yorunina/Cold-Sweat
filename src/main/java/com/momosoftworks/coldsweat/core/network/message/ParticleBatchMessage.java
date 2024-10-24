@@ -1,31 +1,77 @@
 package com.momosoftworks.coldsweat.core.network.message;
 
 import com.mojang.datafixers.util.Pair;
+import com.momosoftworks.coldsweat.core.network.ColdSweatPacketHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BinaryOperator;
 import java.util.function.Supplier;
 
 public class ParticleBatchMessage
 {
-    Set<Pair<ParticleOptions, ParticlePlacement>> particles = new HashSet<>();
+    private static final BinaryOperator<Vec3> MIN_POS_COMPARATOR = (a, b) -> new Vec3(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.min(a.z, b.z));
+    private static final BinaryOperator<Vec3> MAX_POS_COMPARATOR = (a, b) -> new Vec3(Math.max(a.x, b.x), Math.max(a.y, b.y), Math.max(a.z, b.z));
 
-    public void addParticle(ParticleOptions particle, ParticlePlacement placement)
+    Set<Pair<ParticleOptions, ParticlePlacement>> particles = new HashSet<>();
+    int minSetting;
+
+    /**
+     * @param minSetting The minimum particle setting for the particles to render.<br>
+     * 0: All<br>
+     * 1: Decreased<br>
+     * 2: Minimal<br>
+     */
+    public ParticleBatchMessage(int minSetting)
+    {   this.minSetting = minSetting;
+    }
+
+    public ParticleBatchMessage()
+    {   this(-1);
+    }
+
+    public ParticleBatchMessage addParticle(ParticleOptions particle, ParticlePlacement placement)
+    {   particles.add(Pair.of(particle, placement));
+        return this;
+    }
+
+    public ParticleBatchMessage addParticle(ParticleOptions particle, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed)
+    {   addParticle(particle, new ParticlePlacement(x, y, z, xSpeed, ySpeed, zSpeed));
+        return this;
+    }
+
+    public void sendEntity(Entity entity)
     {
-        particles.add(Pair.of(particle, placement));
+        if (particles.isEmpty() || entity.level().isClientSide()) return;
+        ColdSweatPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), this);
+    }
+
+    public void sendWorld(Level level)
+    {
+        if (particles.isEmpty() || level.isClientSide()) return;
+        Vec3 minPos = particles.stream().map(Pair::getSecond).map(p -> new Vec3(p.x, p.y, p.z)).reduce(MIN_POS_COMPARATOR).get();
+        Vec3 maxPos = particles.stream().map(Pair::getSecond).map(p -> new Vec3(p.x, p.y, p.z)).reduce(MAX_POS_COMPARATOR).get();
+        Vec3 midPos = minPos.add(maxPos).scale(0.5);
+        PacketDistributor.TargetPoint target =  new PacketDistributor.TargetPoint(midPos.x, midPos.y, midPos.z, minPos.distanceTo(maxPos) + 32, level.dimension());
+        ColdSweatPacketHandler.INSTANCE.send(PacketDistributor.NEAR.with(() -> target), this);
     }
 
     public static void encode(ParticleBatchMessage message, FriendlyByteBuf buffer)
     {
+        buffer.writeInt(message.minSetting);
         buffer.writeInt(message.particles.size());
         for (Pair<ParticleOptions, ParticlePlacement> entry : message.particles)
         {
@@ -39,7 +85,7 @@ public class ParticleBatchMessage
 
     public static ParticleBatchMessage decode(FriendlyByteBuf buffer)
     {
-        ParticleBatchMessage message = new ParticleBatchMessage();
+        ParticleBatchMessage message = new ParticleBatchMessage(buffer.readInt());
         int size = buffer.readInt();
         for (int i = 0; i < size; i++)
         {
@@ -63,7 +109,11 @@ public class ParticleBatchMessage
             {
                 ParticleOptions particle = entry.getFirst();
                 ParticlePlacement placement = entry.getSecond();
-                Minecraft.getInstance().level.addParticle(particle, placement.x, placement.y, placement.z, placement.vx, placement.vy, placement.vz);
+
+                if (message.minSetting == -1 || Minecraft.getInstance().options.particles().get().getId() <= message.minSetting)
+                {
+                    Minecraft.getInstance().level.addParticle(particle, placement.x, placement.y, placement.z, placement.vx, placement.vy, placement.vz);
+                }
             }
         });
         context.setPacketHandled(true);

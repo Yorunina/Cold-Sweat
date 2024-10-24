@@ -1,11 +1,10 @@
 package com.momosoftworks.coldsweat.api.temperature.modifier;
 
 import com.momosoftworks.coldsweat.api.util.Temperature;
+import com.momosoftworks.coldsweat.core.network.message.ParticleBatchMessage;
 import com.momosoftworks.coldsweat.util.math.CSMath;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
 import com.momosoftworks.coldsweat.util.world.WorldHelper;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.ParticleStatus;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -56,14 +55,15 @@ public class WaterTempModifier extends TempModifier
 
         return temp ->
         {
-            ParticleStatus status = Minecraft.getInstance().options.particles().get();
-            if (!entity.isInWater() && status != ParticleStatus.MINIMAL)
+            if (!entity.isInWater())
             {
                 if (Math.random() < strength * 2)
-                {   double randX = entity.getBbWidth() * (Math.random() - 0.5);
+                {
+                    double randX = entity.getBbWidth() * (Math.random() - 0.5);
                     double randY = entity.getBbHeight() * Math.random();
                     double randZ = entity.getBbWidth() * (Math.random() - 0.5);
-                    entity.level().addParticle(ParticleTypes.FALLING_WATER, entity.getX() + randX, entity.getY() + randY, entity.getZ() + randZ, 0, 0, 0);
+                    new ParticleBatchMessage(2).addParticle(ParticleTypes.FALLING_WATER, entity.getX() + randX, entity.getY() + randY, entity.getZ() + randZ, 0, 0, 0)
+                                               .sendEntity(entity);
                 }
             }
             return temp - newStrength;
