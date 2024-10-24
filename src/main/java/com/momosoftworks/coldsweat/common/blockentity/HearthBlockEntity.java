@@ -65,6 +65,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -905,6 +907,7 @@ public class HearthBlockEntity extends LockableLootTileEntity implements ITickab
         return this.hasSmokestack;
     }
 
+    @OnlyIn(Dist.CLIENT)
     protected void tickParticles()
     {
         ParticleStatus status = Minecraft.getInstance().options.particles;
@@ -954,6 +957,7 @@ public class HearthBlockEntity extends LockableLootTileEntity implements ITickab
     {   return ParticleTypesInit.HEARTH_AIR.get();
     }
 
+    @OnlyIn(Dist.CLIENT)
     public void spawnAirParticle(int x, int y, int z, Random rand)
     {
         if (rand.nextFloat() > (spreading ? 0.016f : 0.032f)) return;
@@ -1032,6 +1036,7 @@ public class HearthBlockEntity extends LockableLootTileEntity implements ITickab
         tag.putInt("InsulationLevel", insulationLevel);
         tag.putBoolean("IsSidePowered", this.isSidePowered);
         tag.putBoolean("IsBackPowered", this.isBackPowered);
+        tag.putBoolean("HasSmokestack", this.hasSmokestack);
         this.saveEffects(tag);
 
         return tag;
@@ -1046,6 +1051,7 @@ public class HearthBlockEntity extends LockableLootTileEntity implements ITickab
         this.insulationLevel = tag.getInt("InsulationLevel");
         this.isSidePowered = tag.getBoolean("IsSidePowered");
         this.isBackPowered = tag.getBoolean("IsBackPowered");
+        this.hasSmokestack = tag.getBoolean("HasSmokestack");
         this.loadEffects(tag);
     }
 

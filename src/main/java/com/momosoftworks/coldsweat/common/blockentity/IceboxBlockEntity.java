@@ -42,6 +42,8 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -320,6 +322,7 @@ public class IceboxBlockEntity extends HearthBlockEntity implements ITickableTil
     {   return ParticleTypesInit.GROUND_MIST.get();
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void spawnAirParticle(int x, int y, int z, Random rand)
     {
