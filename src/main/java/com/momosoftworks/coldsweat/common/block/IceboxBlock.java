@@ -91,12 +91,11 @@ public class IceboxBlock extends Block implements EntityBlock
         return SHAPE;
     }
 
-    public boolean triggerEvent(BlockState pState, Level pLevel, BlockPos pPos, int pId, int pParam)
+    @Override
+    public boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int param)
     {
-        super.triggerEvent(pState, pLevel, pPos, pId, pParam);
-        BlockEntity blockentity = pLevel.getBlockEntity(pPos);
-
-        return blockentity != null && blockentity.triggerEvent(pId, pParam);
+        BlockEntity blockentity = level.getBlockEntity(pos);
+        return blockentity != null && blockentity.triggerEvent(id, param);
     }
 
     @SuppressWarnings("deprecation")
