@@ -64,6 +64,7 @@ public class CompatManager
     private static final boolean SPIRIT_LOADED = modLoaded("spirit");
     private static final boolean ARMOR_UNDERWEAR_LOADED = modLoaded("armorunder");
     private static final boolean BYG_LOADED = modLoaded("byg");
+    private static final boolean BWG_LOADED = modLoaded("biomeswevegone");
     private static final boolean CREATE_LOADED = modLoaded("create", "0.5.1");
     private static final boolean ATMOSPHERIC_LOADED = modLoaded("atmospheric");
     private static final boolean ENVIRONMENTAL_LOADED = modLoaded("environmental");
@@ -136,6 +137,9 @@ public class CompatManager
     }
     public static boolean isBiomesYoullGoLoaded()
     {   return BYG_LOADED;
+    }
+    public static boolean isBiomesWeveGoneLoaded()
+    {   return BWG_LOADED;
     }
     public static boolean isCreateLoaded()
     {   return CREATE_LOADED;
