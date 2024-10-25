@@ -7,8 +7,10 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.momosoftworks.coldsweat.ColdSweat;
+import com.momosoftworks.coldsweat.api.event.vanilla.RenderLevelEvent;
 import com.momosoftworks.coldsweat.api.util.Temperature;
 import com.momosoftworks.coldsweat.client.gui.Overlays;
+import com.momosoftworks.coldsweat.client.renderer.PostProcessShaderManager;
 import com.momosoftworks.coldsweat.common.capability.handler.EntityTempManager;
 import com.momosoftworks.coldsweat.common.event.TempEffectsCommon;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
@@ -16,24 +18,16 @@ import com.momosoftworks.coldsweat.util.math.CSMath;
 import com.momosoftworks.coldsweat.util.registries.ModEffects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.PostChain;
-import net.minecraft.client.renderer.PostPass;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.client.event.ViewportEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-
-import java.lang.reflect.Field;
-import java.util.List;
 
 @Mod.EventBusSubscriber(Dist.CLIENT)
 public class TempEffectsClient
@@ -215,58 +209,29 @@ public class TempEffectsClient
         }
     }
 
-    static Uniform BLUR_RADIUS = null;
-    static Field POST_PASSES = null;
-    static boolean BLUR_APPLIED = false;
-    static PostChain OLD_EFFECT = null;
-    static final String BLOBS_EFFECT = "minecraft:shaders/post/blobs2.json";
-
-    static
-    {
-        try
-        {
-            POST_PASSES = ObfuscationReflectionHelper.findField(PostChain.class, "f_110009_");
-        } catch (Exception e) { e.printStackTrace(); }
-    }
-
     @SubscribeEvent
-    public static void onRenderBlur(RenderLevelStageEvent event)
+    public static void onRenderBlur(RenderLevelEvent.Post event)
     {
-        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_WEATHER)
+        Minecraft mc = Minecraft.getInstance();
+        PostProcessShaderManager shaderManager = PostProcessShaderManager.getInstance();
+
+        float playerTemp = (float) Overlays.BODY_TEMP;
+        if (ConfigSettings.DISTORTION_EFFECTS.get() && playerTemp >= 50 && HOT_IMMUNITY < 4
+        && mc.player != null && !EntityTempManager.immuneToTempEffects(mc.player))
         {
-            Minecraft mc = Minecraft.getInstance();
-            PostChain effect = mc.gameRenderer.currentEffect();
-            try
-            {
-                float playerTemp = (float) Overlays.BODY_TEMP;
-                if (ConfigSettings.DISTORTION_EFFECTS.get() && playerTemp >= 50 && HOT_IMMUNITY < 4
-                && mc.player != null && !EntityTempManager.immuneToTempEffects(mc.player))
-                {
-                    float blur = CSMath.blend(0f, 7f, playerTemp, 50, 100) / (HOT_IMMUNITY + 1);
-                    if (effect != OLD_EFFECT && (effect == null || !effect.getName().equals(BLOBS_EFFECT)))
-                    {   OLD_EFFECT = mc.gameRenderer.currentEffect();
-                        BLUR_APPLIED = false;
-                    }
-                    if (!BLUR_APPLIED)
-                    {
-                        mc.gameRenderer.loadEffect(new ResourceLocation(BLOBS_EFFECT));
-                        effect = mc.gameRenderer.currentEffect();
-                        BLUR_RADIUS = ((List<PostPass>) POST_PASSES.get(effect)).get(0).getEffect().getUniform("Radius");
-                        BLUR_APPLIED = true;
-                    }
-                    if (BLUR_RADIUS != null)
-                    {   BLUR_RADIUS.set(blur);
-                    }
-                }
-                else if (BLUR_APPLIED)
-                {
-                    BLUR_RADIUS.set(0f);
-                    BLUR_APPLIED = false;
-                    if (OLD_EFFECT != null)
-                    {   mc.gameRenderer.loadEffect(new ResourceLocation(OLD_EFFECT.getName()));
-                    }
-                }
-            } catch (Exception ignored) {}
+            float blur = CSMath.blend(0f, 7f, playerTemp, 50, 100) / (HOT_IMMUNITY + 1);
+            if (!shaderManager.hasEffect("heat_blur"))
+            {   shaderManager.loadEffect("heat_blur", PostProcessShaderManager.BLOBS);
+            }
+            Uniform blurRadius = shaderManager.getPostPasses("heat_blur").get(0).getEffect().getUniform("Radius");
+            if (blurRadius != null)
+            {   blurRadius.set(blur);
+            }
         }
+        else if (shaderManager.hasEffect("heat_blur"))
+        {   shaderManager.closeEffect("heat_blur");
+        }
+
+        shaderManager.process(event.getPartialTick());
     }
 }
