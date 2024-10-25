@@ -157,26 +157,6 @@ public class Temperature
         return null;
     }
 
-    @Deprecated(since = "2.3-b03g", forRemoval = true)
-    public static void addOrReplaceModifier(LivingEntity entity, TempModifier modifier, Trait trait, boolean allowDupes)
-    {   addOrReplaceModifier(entity, modifier, trait, allowDupes ? Placement.Duplicates.ALLOW : Placement.Duplicates.BY_CLASS);
-    }
-
-    @Deprecated(since = "2.3-b03g", forRemoval = true)
-    public static void replaceModifier(LivingEntity entity, TempModifier modifier, Trait trait)
-    {   replaceModifier(entity, modifier, trait, Placement.Duplicates.BY_CLASS);
-    }
-
-    @Deprecated(since = "2.3-b03g", forRemoval = true)
-    public static void addModifier(LivingEntity entity, TempModifier modifier, Trait trait, boolean allowDupes, int times, Placement placement)
-    {   addModifier(entity, modifier, trait, allowDupes ? Placement.Duplicates.ALLOW : Placement.Duplicates.BY_CLASS, times, placement);
-    }
-
-    @Deprecated(since = "2.3-b03g", forRemoval = true)
-    public static void addModifier(LivingEntity entity, TempModifier modifier, Trait trait, boolean allowDupes)
-    {   addModifier(entity, modifier, trait, allowDupes ? Placement.Duplicates.ALLOW : Placement.Duplicates.BY_CLASS);
-    }
-
     /**
      * Invokes addModifier() in a way that replaces the first occurrence of the modifier, if it exists.<br>
      * Otherwise, it will add the modifier.<br>
