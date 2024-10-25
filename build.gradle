@@ -107,6 +107,23 @@ repositories {
         url = 'https://maven.tterrag.com'
     }
     mavenCentral()
+
+    maven {
+        name = 'MinecraftForge'
+        url = 'https://maven.minecraftforge.net/'
+    }
+
+    // Add KFF Maven repository
+    maven {
+        name = 'Kotlin for Forge'
+        url = 'https://thedarkcolour.github.io/KotlinForForge/'
+    }
+
+    maven {
+        name = "Valkyrien Skies Internal"
+        url = 'https://maven.valkyrienskies.org'
+    }
+
 }
 
 dependencies {
@@ -129,6 +146,15 @@ dependencies {
     implementation fg.deobf("curse.maven:glitchcore-955399:5787839")
     implementation fg.deobf("curse.maven:serene-seasons-291874:5790653")
     implementation fg.deobf("curse.maven:spoiled-364918:4803042")
+
+    implementation         ("org.valkyrienskies.core:api:1.1.0+b19b27c4a4")
+    implementation         ("org.valkyrienskies.core:impl:1.1.0+b19b27c4a4")
+    implementation         ("org.valkyrienskies.core:api-game:1.1.0+b19b27c4a4")
+    implementation         ("org.valkyrienskies.core:util:1.1.0+b19b27c4a4")
+    implementation fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:2.3.0-beta.5+bcda04a482")
+    implementation fg.deobf("curse.maven:eureka-ships-654384:5321630")
+
+    implementation 'thedarkcolour:kotlinforforge:4.10.0'
 
     runtimeOnly fg.deobf("curse.maven:spark-361579:4738952")
     runtimeOnly fg.deobf("curse.maven:biomes-o-plenty-220318:4764804")

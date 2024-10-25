@@ -1,13 +1,16 @@
 package com.momosoftworks.coldsweat.api.event.core.init;
 
+import com.momosoftworks.coldsweat.api.registry.TempModifierRegistry;
 import com.momosoftworks.coldsweat.api.temperature.modifier.TempModifier;
 import com.momosoftworks.coldsweat.api.util.Placement;
 import com.momosoftworks.coldsweat.api.util.Temperature;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.eventbus.api.Event;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Determines the default {@link TempModifier}s that will be applied to an entity upon spawning.<br>
@@ -50,13 +53,12 @@ public class GatherDefaultTempModifiersEvent extends Event
     {   Temperature.addModifier(modifiers, modifier, duplicatePolicy, 1, params);
     }
 
-    @Deprecated(since = "2.3-b03g", forRemoval = true)
-    public void addModifier(TempModifier modifier, boolean allowDupes, Placement params)
-    {   Temperature.addModifier(modifiers, modifier, allowDupes ? Placement.Duplicates.ALLOW : Placement.Duplicates.BY_CLASS, 1, params);
-    }
-
-    @Deprecated(since = "2.3-b03g", forRemoval = true)
-    public void addModifier(TempModifier modifier, boolean allowDupes, int maxDupes, Placement params)
-    {   Temperature.addModifier(modifiers, modifier, allowDupes ? Placement.Duplicates.ALLOW : Placement.Duplicates.BY_CLASS, maxDupes, params);
+    public void addModifierById(ResourceLocation id, Consumer<TempModifier> modifierConsumer, Placement.Duplicates duplicatePolicy, Placement params)
+    {
+        TempModifierRegistry.getValue(id).ifPresent(mod ->
+        {
+            modifierConsumer.accept(mod);
+            addModifier(mod, duplicatePolicy, params);
+        });
     }
 }
