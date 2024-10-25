@@ -3,8 +3,6 @@
   "values":
   [
     "cold_sweat:cold",
-    "cold_sweat:cold_scaling",
-    "cold_sweat:hot",
-    "cold_sweat:hot_scaling"
+    "cold_sweat:hot"
   ]
 }
