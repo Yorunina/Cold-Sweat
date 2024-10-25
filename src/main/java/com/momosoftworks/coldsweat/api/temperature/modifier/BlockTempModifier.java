@@ -43,10 +43,11 @@ public class BlockTempModifier extends TempModifier
 
         World world = entity.level;
         int range = this.getNBT().contains("RangeOverride", 3) ? this.getNBT().getInt("RangeOverride") : ConfigSettings.BLOCK_RANGE.get();
+        BlockPos blockPos = entity.blockPosition();
 
-        int entX = entity.blockPosition().getX();
-        int entY = entity.blockPosition().getY();
-        int entZ = entity.blockPosition().getZ();
+        int entX = blockPos.getX();
+        int entY = blockPos.getY();
+        int entZ = blockPos.getZ();
         BlockPos.Mutable blockpos = new BlockPos.Mutable();
 
         // Only tick advancements every second, because Minecraft advancements are not performant at all
