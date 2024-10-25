@@ -2579,3 +2579,24 @@ Technical Changes:
      - Fired when the player's equipment insulation is processed
      - Allows for granular control over the insulation being provided by sources like armor, insulators, curios, and protection
      - The event can be cancelled to prevent the insulation from applying to the player
+
+
+------------------------------------------------------------------------------------------------------------------------
+2.3.7
+* Added compat for "Oh the Biomes We've Gone"
+      - Tweaked the temperatures for 39 biomes from the mod
+      ! world_settings.toml will need to be reset for these new temperature to apply
+* Added (partial) compat for Vaklyrien Skies
+      - Temperature emitted from blocks placed on a ship will now properly affect the player
+      - More compatibility will be added in future updates
+
+Fixes:
+* Fixed crash on servers when rendering particles in some cases
+- Fixed crash when updating configs from pre-2.3 versions if "Block Temperatures" is configured in a particular way
+- Fixed the icebox's opening animation not synchronizing to all players on a server
+- Fixed some particles not spawning for all players on a server when they should
+
+Technical Changes:
+* Implemented a new rendering manager (PostProcessShaderManager) to handle Cold Sweat's shaders
+      - Circumvents Minecraft's normal post-processing shader system to improve compat and allow for stacking of shader effects
+* Removed deprecated methods from the Temperature and GatherDefaultTempModifiersEvent classes
