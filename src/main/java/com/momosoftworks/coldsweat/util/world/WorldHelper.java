@@ -573,8 +573,6 @@ public abstract class WorldHelper
              + CSMath.blend(0, Math.min(-0.6, (min - mid) * 2), pos.getY(), level.getSeaLevel(), level.getMaxBuildHeight());
     }
 
-    private static TempModifier DUMMY_SEASON_MODIFIER = null;
-
     /**
      * Gets the temperature of the world at the specified position, including non-biome temperature sources.<br>
      * Does not include block temperature!
@@ -584,18 +582,7 @@ public abstract class WorldHelper
     {
         Biome biome = level.getBiome(pos).value(); // Can't use getNoiseBiomeAtPosition because it's client-only for some reason
         // Get biome temperature
-        double temp = getBiomeTemperatureAt(level, biome, pos);
-        // Get season temperature (if available)
-        if (CompatManager.isSereneSeasonsLoaded())
-        {
-            if (DUMMY_SEASON_MODIFIER == null)
-            {   DUMMY_SEASON_MODIFIER = TempModifierRegistry.getValue(new ResourceLocation("sereneseasons", "season")).orElse(null);
-            }
-            DummyPlayer dummy = getDummyPlayer(level);
-            temp = Temperature.apply(temp, dummy, Temperature.Trait.WORLD, DUMMY_SEASON_MODIFIER);
-        }
-
-        return temp;
+        return getBiomeTemperatureAt(level, biome, pos);
     }
 
     public static DummyPlayer getDummyPlayer(Level level)
