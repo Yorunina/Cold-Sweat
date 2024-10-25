@@ -20,6 +20,7 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
@@ -200,10 +201,10 @@ public class Temperature
         MinecraftForge.EVENT_BUS.post(event);
         if (!event.isCanceled())
         {
-            Optional<ITemperatureCap> optCap = EntityTempManager.getTemperatureCap(entity);
+            LazyOptional<ITemperatureCap> optCap = EntityTempManager.getTemperatureCap(entity);
             if (optCap.isPresent())
             {
-                ITemperatureCap cap = optCap.get();
+                ITemperatureCap cap = optCap.resolve().get();
                 if (addModifier(cap.getModifiers(trait), event.getModifier(), duplicates, maxCount, placement))
                 {
                     updateModifiers(entity, cap);
