@@ -62,8 +62,8 @@ public class ConfigUpdater
         {
             // Update magma block temperature
             replaceConfigSetting(WorldSettingsConfig.BLOCK_TEMPERATURES, "minecraft:magma_block", blockTemp -> {
-                blockTemp.set(1, 0.25);
-                blockTemp.set(4, 1.0);
+                blockTemp.clear();
+                blockTemp.addAll(List.of("minecraft:magma_block", 0.25, 3, 1.0));
             });
 
             // Update ice fuel value
