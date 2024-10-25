@@ -107,6 +107,22 @@ repositories {
         url = 'https://maven.tterrag.com'
     }
     mavenCentral()
+
+    maven {
+        name = 'MinecraftForge'
+        url = 'https://maven.minecraftforge.net/'
+    }
+
+    // Add KFF Maven repository
+    maven {
+        name = 'Kotlin for Forge'
+        url = 'https://thedarkcolour.github.io/KotlinForForge/'
+    }
+
+    maven {
+        name = "Valkyrien Skies Internal"
+        url = 'https://maven.valkyrienskies.org'
+    }
 }
 
 dependencies {
@@ -132,6 +148,15 @@ dependencies {
     implementation fg.deobf("curse.maven:thirst-was-taken-679270:5071551")
     implementation fg.deobf("curse.maven:create-328085:4625533")
     implementation fg.deobf("curse.maven:spoiled-364918:4614781")
+
+    implementation         ("org.valkyrienskies.core:api:1.1.0+b19b27c4a4")
+    implementation         ("org.valkyrienskies.core:impl:1.1.0+b19b27c4a4")
+    implementation         ("org.valkyrienskies.core:api-game:1.1.0+b19b27c4a4")
+    implementation         ("org.valkyrienskies.core:util:1.1.0+b19b27c4a4")
+    implementation fg.deobf("org.valkyrienskies:valkyrienskies-118-forge:2.1.1-beta.5+72fac3232e")
+    implementation fg.deobf("curse.maven:eureka-ships-654384:5321597")
+
+    implementation 'thedarkcolour:kotlinforforge:3.12.0'
 
     compileOnly fg.deobf("curse.maven:tinkers-construct-74072:4509008")
     compileOnly fg.deobf("curse.maven:constructs-armory-1-18-2-port-867883:4559247")

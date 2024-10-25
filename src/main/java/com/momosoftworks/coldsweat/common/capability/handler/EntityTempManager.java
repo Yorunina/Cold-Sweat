@@ -375,25 +375,20 @@ public class EntityTempManager
                 event.addModifier(new EntitiesTempModifier().tickRate(10), Placement.Duplicates.BY_CLASS, Placement.AFTER_LAST);
 
                 // Serene Seasons compat
-                if (CompatManager.isSereneSeasonsLoaded())
-                {
-                    TempModifierRegistry.getValue(new ResourceLocation("sereneseasons:season")).ifPresent(mod ->
-                    {
-                        event.addModifier(mod.tickRate(60),
-                                          Placement.Duplicates.BY_CLASS,
-                                          Placement.of(Mode.BEFORE, Order.FIRST, mod2 -> mod2 instanceof UndergroundTempModifier));
-                    });
-                }
+                event.addModifierById(new ResourceLocation("sereneseasons:season"),
+                                      mod -> mod.tickRate(60),
+                                      Placement.Duplicates.BY_CLASS,
+                                      Placement.of(Mode.BEFORE, Order.FIRST, mod2 -> mod2 instanceof UndergroundTempModifier));
                 // Weather2 Compat
-                if (CompatManager.isWeather2Loaded())
-                {
-                    TempModifierRegistry.getValue(new ResourceLocation("weather2:storm")).ifPresent(mod ->
-                    {
-                        event.addModifier(mod.tickRate(60),
-                                          Placement.Duplicates.BY_CLASS,
-                                          Placement.of(Mode.BEFORE, Order.FIRST, mod2 -> mod2 instanceof UndergroundTempModifier));
-                    });
-                }
+                event.addModifierById(new ResourceLocation("weather2:storm"),
+                                      mod -> mod.tickRate(60),
+                                      Placement.Duplicates.BY_CLASS,
+                                      Placement.of(Mode.BEFORE, Order.FIRST, mod2 -> mod2 instanceof UndergroundTempModifier));
+                // Valkyrien Skies Compat
+                event.addModifierById(new ResourceLocation("valkyrienskies:ship_blocks"),
+                                      mod -> mod.tickRate(10),
+                                      Placement.Duplicates.BY_CLASS,
+                                      Placement.of(Mode.AFTER, Order.FIRST, mod2 -> mod2 instanceof BlockTempModifier));
             }
             if (event.getTrait().isForModifiers())
             {   event.addModifier(new InventoryItemsTempModifier(), Placement.Duplicates.BY_CLASS, Placement.AFTER_LAST);

@@ -81,6 +81,7 @@ public class CompatManager
     private static final boolean ICEBERG_LOADED = modLoaded("iceberg");
     private static final boolean SPOILED_LOADED = modLoaded("spoiled");
     private static final boolean SUPPLEMENTARIES_LOADED = modLoaded("supplementaries");
+    private static final boolean VALKYRIEN_SKIES_LOADED = modLoaded("valkyrienskies");
 
     public static boolean modLoaded(String modID, String minVersion, String maxVersion)
     {
@@ -177,6 +178,9 @@ public class CompatManager
     }
     public static boolean isSupplementariesLoaded()
     {   return SUPPLEMENTARIES_LOADED;
+    }
+    public static boolean isValkyrienSkiesLoaded()
+    {   return VALKYRIEN_SKIES_LOADED;
     }
 
     public static boolean hasCurio(Player player, Item curio)

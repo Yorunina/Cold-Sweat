@@ -175,6 +175,7 @@ public class TempModifierInit
         String armorUnder = compatPath + "ArmorUnderTempModifier";
         String weatherStorms = compatPath + "StormTempModifier";
         String curios = compatPath + "CuriosTempModifier";
+        String valkyrienSkies = compatPath + "ValkShipBlockTempModifier";
 
         event.register(new ResourceLocation(ColdSweat.MOD_ID, "blocks"), BlockTempModifier::new);
         event.register(new ResourceLocation(ColdSweat.MOD_ID, "biomes"), BiomeTempModifier::new);
@@ -196,17 +197,17 @@ public class TempModifierInit
         if (CompatManager.isSereneSeasonsLoaded())
         {   event.registerByClassName(new ResourceLocation("sereneseasons", "season"), sereneSeasons);
         }
-
         if (CompatManager.isArmorUnderwearLoaded())
         {   event.registerByClassName(new ResourceLocation("armorunder", "lining"), armorUnder);
         }
-
         if (CompatManager.isWeather2Loaded())
         {   event.registerByClassName(new ResourceLocation("weather2", "storm"), weatherStorms);
         }
-
         if (CompatManager.isCuriosLoaded())
         {   event.registerByClassName(new ResourceLocation("curios", "curios"), curios);
+        }
+        if (CompatManager.isValkyrienSkiesLoaded())
+        {   event.registerByClassName(new ResourceLocation("valkyrienskies", "ship_blocks"), valkyrienSkies);
         }
 
         ColdSweat.LOGGER.debug("Registered TempModifiers in {}ms", System.currentTimeMillis() - startMS);
