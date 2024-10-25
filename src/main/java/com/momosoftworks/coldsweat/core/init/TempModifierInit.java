@@ -176,15 +176,12 @@ public class TempModifierInit
         if (CompatManager.isSereneSeasonsLoaded())
         {   event.registerByClassName(ResourceLocation.fromNamespaceAndPath("sereneseasons", "season"), sereneSeasons);
         }
-
         if (CompatManager.isArmorUnderwearLoaded())
         {   event.registerByClassName(ResourceLocation.fromNamespaceAndPath("armorunder", "lining"), armorUnder);
         }
-
         if (CompatManager.isWeather2Loaded())
         {   event.registerByClassName(ResourceLocation.fromNamespaceAndPath("weather2", "storm"), weatherStorms);
         }
-
         if (CompatManager.isCuriosLoaded())
         {   event.registerByClassName(ResourceLocation.fromNamespaceAndPath("curios", "curios"), curios);
         }

@@ -309,25 +309,15 @@ public class EntityTempManager
                 event.addModifier(new EntitiesTempModifier().tickRate(10), Placement.Duplicates.BY_CLASS, Placement.AFTER_LAST);
 
                 // Serene Seasons compat
-                if (CompatManager.isSereneSeasonsLoaded())
-                {
-                    TempModifierRegistry.getValue(ResourceLocation.parse("sereneseasons:season")).ifPresent(mod ->
-                    {
-                        event.addModifier(mod.tickRate(60),
-                                          Placement.Duplicates.BY_CLASS,
-                                          Placement.of(Mode.BEFORE, Order.FIRST, mod2 -> mod2 instanceof UndergroundTempModifier));
-                    });
-                }
+                event.addModifierById(ResourceLocation.parse("sereneseasons:season"),
+                                      mod -> mod.tickRate(60),
+                                      Placement.Duplicates.BY_CLASS,
+                                      Placement.of(Mode.BEFORE, Order.FIRST, mod2 -> mod2 instanceof UndergroundTempModifier));
                 // Weather2 Compat
-                if (CompatManager.isWeather2Loaded())
-                {
-                    TempModifierRegistry.getValue(ResourceLocation.parse("weather2:storm")).ifPresent(mod ->
-                    {
-                        event.addModifier(mod.tickRate(60),
-                                          Placement.Duplicates.BY_CLASS,
-                                          Placement.of(Mode.BEFORE, Order.FIRST, mod2 -> mod2 instanceof UndergroundTempModifier));
-                    });
-                }
+                event.addModifierById(ResourceLocation.parse("weather2:storm"),
+                                      mod -> mod.tickRate(60),
+                                      Placement.Duplicates.BY_CLASS,
+                                      Placement.of(Mode.BEFORE, Order.FIRST, mod2 -> mod2 instanceof UndergroundTempModifier));
             }
             if (event.getTrait().isForModifiers())
             {   event.addModifier(new InventoryItemsTempModifier(), Placement.Duplicates.BY_CLASS, Placement.AFTER_LAST);
