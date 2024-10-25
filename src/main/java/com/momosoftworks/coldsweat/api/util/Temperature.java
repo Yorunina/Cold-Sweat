@@ -22,6 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 import javax.annotation.Nullable;
@@ -204,10 +205,10 @@ public class Temperature
         MinecraftForge.EVENT_BUS.post(event);
         if (!event.isCanceled())
         {
-            Optional<ITemperatureCap> optCap = EntityTempManager.getTemperatureCap(entity);
+            LazyOptional<ITemperatureCap> optCap = EntityTempManager.getTemperatureCap(entity);
             if (optCap.isPresent())
             {
-                ITemperatureCap cap = optCap.get();
+                ITemperatureCap cap = optCap.resolve().get();
                 if (addModifier(cap.getModifiers(trait), event.getModifier(), duplicates, maxCount, placement))
                 {
                     updateModifiers(entity, cap);
