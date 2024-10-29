@@ -1,6 +1,6 @@
 package com.momosoftworks.coldsweat.common.event;
 
-import com.momosoftworks.coldsweat.api.event.core.EdiblesRegisterEvent;
+import com.momosoftworks.coldsweat.api.event.core.registry.EdiblesRegisterEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

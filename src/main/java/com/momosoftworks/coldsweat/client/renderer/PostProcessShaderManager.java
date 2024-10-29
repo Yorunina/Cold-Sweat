@@ -106,7 +106,7 @@ public class PostProcessShaderManager implements AutoCloseable
     }
 
     private static final Field POST_PASSES = ObfuscationReflectionHelper.findField(ShaderGroup.class, "field_148031_d");
-    private static final Field ORTHO_MATRIX = ObfuscationReflectionHelper.findField(ShaderGroup.class, "field_148030_g");
+    private static final Field ORTHO_MATRIX = ObfuscationReflectionHelper.findField(Shader.class, "field_148053_h");
     static
     {   POST_PASSES.setAccessible(true);
         ORTHO_MATRIX.setAccessible(true);
