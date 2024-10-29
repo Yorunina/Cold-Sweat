@@ -2578,6 +2578,7 @@ Technical Changes:
 * Added (partial) compat for Vaklyrien Skies
       - Temperature emitted from blocks placed on a ship will now properly affect the player
       - More compatibility will be added in future updates
+- (1.16) Goats now drop 1-2 mutton when killed
 
 Fixes:
 * Fixed crash on servers when rendering particles in some cases
