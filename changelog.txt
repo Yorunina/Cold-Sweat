@@ -2596,6 +2596,7 @@ Fixes:
 - Fixed crash when updating configs from pre-2.3 versions if "Block Temperatures" is configured in a particular way
 - Fixed the icebox's opening animation not synchronizing to all players on a server
 - Fixed some particles not spawning for all players on a server when they should
+* (1.16) Fixed custom mob spawning not working
 - (1.21) Fixed damage from freezing/overheating dealing knockback
 
 Technical Changes:
