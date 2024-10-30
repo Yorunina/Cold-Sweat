@@ -16,14 +16,15 @@ public class FurnaceBlockTemp extends BlockTemp
 {
     public FurnaceBlockTemp()
     {
-        super(StreamSupport.stream(BuiltInRegistries.BLOCK.spliterator(), true).filter(block -> block instanceof AbstractFurnaceBlock).toArray(Block[]::new));
+        super(0, 0.88, -Double.MAX_VALUE, 12.6, 7, true,
+              StreamSupport.stream(BuiltInRegistries.BLOCK.spliterator(), true).filter(block -> block instanceof AbstractFurnaceBlock).toArray(Block[]::new));
     }
 
     @Override
     public double getTemperature(Level level, LivingEntity entity, BlockState state, BlockPos pos, double distance)
     {
         if (state.hasProperty(AbstractFurnaceBlock.LIT) && state.getValue(AbstractFurnaceBlock.LIT))
-        {   return CSMath.blend(Temperature.convert(15, Temperature.Units.F, Temperature.Units.MC, false), 0, distance, 0.5, 7);
+        {   return 0.33;
         }
         return 0;
     }
@@ -32,15 +33,5 @@ public class FurnaceBlockTemp extends BlockTemp
     public boolean hasBlock(Block block)
     {
         return block instanceof AbstractFurnaceBlock;
-    }
-
-    @Override
-    public double maxEffect() {
-        return Temperature.convert(40, Temperature.Units.F, Temperature.Units.MC, false);
-    }
-
-    @Override
-    public double maxTemperature() {
-        return Temperature.convert(600, Temperature.Units.F, Temperature.Units.MC, true);
     }
 }

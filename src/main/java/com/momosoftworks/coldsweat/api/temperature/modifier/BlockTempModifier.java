@@ -111,7 +111,10 @@ public class BlockTempModifier extends TempModifier
                             for (BlockTemp blockTemp : blockTemps)
                             {
                                 if (!blockTemp.isValid(level, blockpos, state)) continue;
-                                double tempToAdd = blockTemp.getTemperature(level, entity, state, blockpos, distance);
+                                double temperature = blockTemp.getTemperature(level, entity, state, blockpos, distance);
+                                double tempToAdd = blockTemp.fade()
+                                                   ? CSMath.blend(temperature, 0, distance, 0, blockTemp.range())
+                                                   : temperature;
 
                                 // Store this block type's total effect on the player
                                 // Dampen the effect with each block between the player and the block
