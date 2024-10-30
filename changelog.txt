@@ -2583,8 +2583,9 @@ Technical Changes:
 
 ------------------------------------------------------------------------------------------------------------------------
 2.3.7
-* Added compat for "Oh the Biomes We've Gone"
+* (1.20 - 1.21) Added compat for "Oh the Biomes We've Gone"
       - Tweaked the temperatures for 39 biomes from the mod
+      - Chameleons now spawn in appropriate biomes from the mod
       ! world_settings.toml will need to be reset for these new temperature to apply
 * Added (partial) compat for Vaklyrien Skies
       - Temperature emitted from blocks placed on a ship will now properly affect the player
@@ -2597,6 +2598,7 @@ Fixes:
 - Fixed the icebox's opening animation not synchronizing to all players on a server
 - Fixed some particles not spawning for all players on a server when they should
 * (1.16) Fixed custom mob spawning not working
+- (1.18) Fixed chameleons spawning on invalid blocks
 - (1.21) Fixed damage from freezing/overheating dealing knockback
 
 Technical Changes:
