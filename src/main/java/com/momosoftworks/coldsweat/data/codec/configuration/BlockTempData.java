@@ -45,8 +45,8 @@ public class BlockTempData
     public static final Codec<BlockTempData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ConfigHelper.tagOrBuiltinCodec(Registry.BLOCK_REGISTRY, Registry.BLOCK).listOf().fieldOf("blocks").forGetter(data -> data.blocks),
             Codec.DOUBLE.fieldOf("temperature").forGetter(data -> data.temperature),
-            Codec.DOUBLE.optionalFieldOf("max_effect", Double.MAX_VALUE).forGetter(data -> data.maxEffect),
             Codec.DOUBLE.optionalFieldOf("range", Double.MAX_VALUE).forGetter(data -> data.range),
+            Codec.DOUBLE.optionalFieldOf("max_effect", Double.MAX_VALUE).forGetter(data -> data.maxEffect),
             Codec.BOOL.optionalFieldOf("fade", true).forGetter(data -> data.fade),
             Codec.DOUBLE.optionalFieldOf("max_temp", Double.MAX_VALUE).forGetter(data -> data.maxTemp),
             Codec.DOUBLE.optionalFieldOf("min_temp", -Double.MAX_VALUE).forGetter(data -> data.minTemp),

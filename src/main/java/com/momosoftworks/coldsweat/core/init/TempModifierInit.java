@@ -107,7 +107,7 @@ public class TempModifierInit
                 double maxTemperature = blockTemp > 0 ? tempLimit : Double.MAX_VALUE;
                 double minTemperature = blockTemp < 0 ? tempLimit : -Double.MAX_VALUE;
 
-                BlockTempRegistry.register(new BlockTempConfig(blockPredicates, effectBlocks)
+                BlockTempRegistry.register(new BlockTempConfig(minEffect, maxEffect, minTemperature, maxTemperature, blockRange, true, blockPredicates, effectBlocks)
                 {
                     @Override
                     public double getTemperature(World level, LivingEntity entity, BlockState state, BlockPos pos, double distance)
@@ -121,27 +121,7 @@ public class TempModifierInit
                             {   return 0;
                             }
                         }
-                        return CSMath.blend(blockTemp, 0, distance, 0.5, blockRange);
-                    }
-
-                    @Override
-                    public double maxEffect()
-                    {   return maxEffect;
-                    }
-
-                    @Override
-                    public double minEffect()
-                    {   return minEffect;
-                    }
-
-                    @Override
-                    public double minTemperature()
-                    {   return minTemperature;
-                    }
-
-                    @Override
-                    public double maxTemperature()
-                    {   return maxTemperature;
+                        return blockTemp;
                     }
                 });
             }

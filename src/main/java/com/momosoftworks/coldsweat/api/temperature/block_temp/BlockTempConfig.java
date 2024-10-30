@@ -13,8 +13,10 @@ public abstract class BlockTempConfig extends BlockTemp
 {
     Map<String, Predicate<BlockState>> predicates;
 
-    public BlockTempConfig(Map<String, Predicate<BlockState>> predicates, Block... blocks)
-    {   super(blocks);
+    public BlockTempConfig(double minEffect, double maxEffect, double minTemp, double maxTemp, double range, boolean fade,
+                           Map<String, Predicate<BlockState>> predicates, Block... blocks)
+    {
+        super(minEffect, maxEffect, minTemp, maxTemp, range, fade, blocks);
         this.predicates = predicates;
     }
 
