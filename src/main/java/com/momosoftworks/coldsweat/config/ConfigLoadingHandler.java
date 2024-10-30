@@ -446,16 +446,17 @@ public class ConfigLoadingHandler
                 }
             }
             Block[] blocks = RegistryHelper.mapForgeRegistryTagList(ForgeRegistries.BLOCKS, blockTempData.blocks()).toArray(Block[]::new);
-            BlockTemp blockTemp = new BlockTemp(blocks)
+            BlockTemp blockTemp = new BlockTemp(blockTempData.temperature() < 0 ? -blockTempData.maxEffect() : -Double.MAX_VALUE,
+                                                blockTempData.temperature() > 0 ? blockTempData.maxEffect() : Double.MAX_VALUE,
+                                                blockTempData.minTemp(),
+                                                blockTempData.maxTemp(),
+                                                blockTempData.range(),
+                                                blockTempData.fade(),
+                                                blocks)
             {
                 final double temperature = blockTempData.temperature();
-                final double maxEffect = blockTempData.maxEffect();
-                final double minTemp = blockTempData.minTemp();
-                final double maxTemp = blockTempData.maxTemp();
-                final boolean fade = blockTempData.fade();
                 final List<BlockRequirement> conditions = blockTempData.conditions();
                 final CompoundTag tag = blockTempData.nbt().orElse(null);
-                final double range = blockTempData.range();
 
                 @Override
                 public double getTemperature(Level level, LivingEntity entity, BlockState state, BlockPos pos, double distance)
@@ -483,29 +484,7 @@ public class ConfigLoadingHandler
                             }
                         }
                     }
-                    return fade
-                         ? CSMath.blend(temperature, 0, distance, 0, Math.min(range, ConfigSettings.BLOCK_RANGE.get()))
-                         : temperature;
-                }
-
-                @Override
-                public double maxEffect()
-                {   return temperature > 0 ? maxEffect : super.maxEffect();
-                }
-
-                @Override
-                public double minEffect()
-                {   return temperature < 0 ? -maxEffect : super.minEffect();
-                }
-
-                @Override
-                public double minTemperature()
-                {   return minTemp;
-                }
-
-                @Override
-                public double maxTemperature()
-                {   return maxTemp;
+                    return temperature;
                 }
             };
 
