@@ -2591,3 +2591,12 @@ Technical Changes:
 * Implemented a new rendering manager (PostProcessShaderManager) to handle Cold Sweat's shaders
       - Circumvents Minecraft's normal post-processing shader system to improve compat and allow for stacking of shader effects
 * Removed deprecated methods from the Temperature and GatherDefaultTempModifiersEvent classes
+* Java-based BlockTemps' min/max effect, min/max temp, range, and fade are now fields instead of just method return values
+      - These fields are now part of the constructor
+      - The existing methods will return the values of these fields by default, but can still be overridden with no additional changes necessary
+      - The old BlockTemp(Block... blocks) constructor is still present, and will initialize all other fields to a default value
+* BlockTemp fading over distance is now handled outside the getTemperature() method, in BlockTempModifier
+      - This means you will no longer need to calculate the fade yourself and can simply return the temperature of the block
+      ! For BlockTemps that still calculate the fade in the old way, the new fade will still be applied on top of the old one
+            - This isn't too bad, but it means the block will weaken exponentially
+
