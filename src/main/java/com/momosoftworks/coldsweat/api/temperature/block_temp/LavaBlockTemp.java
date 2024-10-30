@@ -13,23 +13,14 @@ import net.minecraft.world.level.material.FluidState;
 public class LavaBlockTemp extends BlockTemp
 {
     public LavaBlockTemp()
-    {   super(Blocks.LAVA);
+    {
+        super(0, 6.66, -Double.MAX_VALUE, 21.5, 7, true, Blocks.LAVA);
     }
 
     @Override
     public double getTemperature(Level level, LivingEntity entity, BlockState state, BlockPos pos, double distance)
-    {   FluidState fluidState = state.getFluidState();
-        double temp = (fluidState.getAmount()/7f) / (entity.getVehicle() instanceof Strider ? 50d : 3d);
-        return CSMath.blend(temp, 0, distance, 0.5, 7);
-    }
-
-    @Override
-    public double maxEffect() {
-        return Temperature.convert(300, Temperature.Units.F, Temperature.Units.MC, false);
-    }
-
-    @Override
-    public double maxTemperature() {
-        return Temperature.convert(1000, Temperature.Units.F, Temperature.Units.MC, true);
+    {
+        int height = state.getFluidState().getAmount();
+        return (height / 7f) / (entity.getVehicle() instanceof Strider ? 50d : 3d);
     }
 }
