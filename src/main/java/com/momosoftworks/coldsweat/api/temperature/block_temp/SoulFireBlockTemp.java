@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class SoulFireBlockTemp extends BlockTemp
 {
     public SoulFireBlockTemp()
-    {   super(Blocks.SOUL_FIRE, Blocks.SOUL_CAMPFIRE);
+    {   super(-Double.MAX_VALUE, Double.MAX_VALUE, -Double.MAX_VALUE, Double.MAX_VALUE, 7, true, Blocks.SOUL_FIRE, Blocks.SOUL_CAMPFIRE);
     }
 
     @Override
@@ -21,7 +21,7 @@ public class SoulFireBlockTemp extends BlockTemp
         if (state.is(Blocks.SOUL_FIRE) || state.getValue(CampfireBlock.LIT))
         {
             int coldness = ConfigSettings.COLD_SOUL_FIRE.get() ? -1 : 1;
-            return CSMath.blend(0.476 * coldness, 0, distance, 0.5, 7);
+            return 0.476 * coldness;
         }
         return 0;
     }
