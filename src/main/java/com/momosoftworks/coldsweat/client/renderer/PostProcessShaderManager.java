@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.PostPass;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import org.joml.Matrix4f;
+import com.mojang.math.Matrix4f;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
