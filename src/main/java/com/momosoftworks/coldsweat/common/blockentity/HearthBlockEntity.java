@@ -17,6 +17,7 @@ import com.momosoftworks.coldsweat.config.ConfigSettings;
 import com.momosoftworks.coldsweat.config.type.PredicateItem;
 import com.momosoftworks.coldsweat.core.init.*;
 import com.momosoftworks.coldsweat.core.network.message.HearthResetMessage;
+import com.momosoftworks.coldsweat.data.tag.ModFluidTags;
 import com.momosoftworks.coldsweat.util.ClientOnlyHelper;
 import com.momosoftworks.coldsweat.util.compat.CompatManager;
 import com.momosoftworks.coldsweat.util.math.CSMath;
@@ -1160,8 +1161,9 @@ public class HearthBlockEntity extends RandomizableContainerBlockEntity
         @Override
         public int fill(FluidStack fluidStack, FluidAction fluidAction)
         {
-            if (fluidStack.getFluid() == Fluids.WATER)
-            {   int amount = Math.min(fluidStack.getAmount(), this.getTankCapacity(0) - hearth.coldFuel.getAmount());
+            if (fluidStack.getFluid().is(ModFluidTags.COLD))
+            {
+                int amount = Math.min(fluidStack.getAmount(), this.getTankCapacity(0) - hearth.coldFuel.getAmount());
                 if (fluidAction.execute())
                 {
                     if (hearth.coldFuel.isEmpty())
@@ -1171,8 +1173,9 @@ public class HearthBlockEntity extends RandomizableContainerBlockEntity
                 }
                 return amount;
             }
-            else if (fluidStack.getFluid() == Fluids.LAVA)
-            {   int amount = Math.min(fluidStack.getAmount(), this.getTankCapacity(1) - hearth.hotFuel.getAmount());
+            else if (fluidStack.getFluid().is(ModFluidTags.HOT))
+            {
+                int amount = Math.min(fluidStack.getAmount(), this.getTankCapacity(1) - hearth.hotFuel.getAmount());
                 if (fluidAction.execute())
                 {
                     if (hearth.hotFuel.isEmpty())
