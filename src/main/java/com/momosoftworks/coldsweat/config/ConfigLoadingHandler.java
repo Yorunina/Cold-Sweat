@@ -22,7 +22,6 @@ import com.momosoftworks.coldsweat.data.codec.requirement.ItemRequirement;
 import com.momosoftworks.coldsweat.data.codec.requirement.NbtRequirement;
 import com.momosoftworks.coldsweat.data.codec.util.AttributeModifierMap;
 import com.momosoftworks.coldsweat.data.tag.ModBlockTags;
-import com.momosoftworks.coldsweat.data.tag.ModEffectTags;
 import com.momosoftworks.coldsweat.data.tag.ModItemTags;
 import com.momosoftworks.coldsweat.util.compat.CompatManager;
 import com.momosoftworks.coldsweat.util.math.CSMath;
@@ -118,9 +117,6 @@ public class ConfigLoadingHandler
         ConfigSettings.INSULATION_BLACKLIST.get().addAll(ModItemTags.NOT_INSULATABLE.getValues().stream().peek(holder ->
                                                            {   ColdSweat.LOGGER.info("Adding item {} to insulation blacklist", holder);
                                                            }).collect(Collectors.toSet()));
-        ConfigSettings.HEARTH_POTION_BLACKLIST.get().addAll(ModEffectTags.HEARTH_BLACKLISTED.getValues().stream().peek(holder ->
-                                                                                  {   ColdSweat.LOGGER.info("Adding effect {} to hearth potion blacklist", holder);
-                                                                                  }).collect(Collectors.toSet()));
 
         /*
          Fetch JSON registries
