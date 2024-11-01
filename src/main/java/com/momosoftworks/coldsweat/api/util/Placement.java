@@ -36,11 +36,11 @@ public record Placement(Mode mode, Order order, Predicate<TempModifier> predicat
 
     public enum Duplicates
     {
-        // Allow duplicate TempModifiers
+        // Do not check for duplicate TempModifiers
         ALLOW,
-        // Disallow duplicate TempModifiers (ignores NBT)
+        // Checks if the TempModifier has the same class
         BY_CLASS,
-        // Disallow duplicate TempModifiers only if they have the same NBT
+        // Checks if the TempModifier has the same class and NBT data
         EXACT;
 
         public static boolean check(Duplicates policy, TempModifier modA, TempModifier modB)
