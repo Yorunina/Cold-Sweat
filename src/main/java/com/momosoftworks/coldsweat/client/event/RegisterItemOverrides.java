@@ -4,6 +4,7 @@ import com.momosoftworks.coldsweat.ColdSweat;
 import com.momosoftworks.coldsweat.api.util.Temperature;
 import com.momosoftworks.coldsweat.client.gui.Overlays;
 import com.momosoftworks.coldsweat.common.capability.handler.EntityTempManager;
+import com.momosoftworks.coldsweat.common.item.FilledWaterskinItem;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
 import com.momosoftworks.coldsweat.core.init.ItemInit;
 import net.minecraft.client.Minecraft;
@@ -38,6 +39,11 @@ public class RegisterItemOverrides
                            tag.getInt("Fuel") > 22 ? 2 : 1;
                 }
                 return 0;
+            });
+
+            ItemModelsProperties.register(ItemInit.FILLED_WATERSKIN.get(), new ResourceLocation(ColdSweat.MOD_ID, "water_temperature"), (stack, level, entity) ->
+            {
+                return stack.getOrCreateTag().getFloat(FilledWaterskinItem.NBT_TEMPERATURE);
             });
 
             ItemModelsProperties.register(ItemInit.THERMOMETER.get(), new ResourceLocation(ColdSweat.MOD_ID, "temperature"), (stack, level, livingEntity) ->
