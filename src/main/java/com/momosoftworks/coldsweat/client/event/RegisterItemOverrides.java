@@ -44,6 +44,11 @@ public class RegisterItemOverrides
                 return 0;
             });
 
+            ItemProperties.register(ModItems.FILLED_WATERSKIN.get(), ResourceLocation.fromNamespaceAndPath(ColdSweat.MOD_ID, "water_temperature"), (stack, level, entity, id) ->
+            {
+                return stack.getOrDefault(ModItemComponents.WATER_TEMPERATURE, 0d).floatValue();
+            });
+
             ItemProperties.register(ModItems.THERMOMETER.get(), ResourceLocation.fromNamespaceAndPath(ColdSweat.MOD_ID, "temperature"), (stack, level, livingEntity, id) ->
             {
                 Entity entity = (livingEntity != null ? livingEntity : stack.getEntityRepresentation());
