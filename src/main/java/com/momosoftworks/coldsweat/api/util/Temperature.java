@@ -164,40 +164,41 @@ public class Temperature
 
     /**
      * Invokes addModifier() in a way that replaces the first occurrence of the modifier, if it exists.<br>
-     * Otherwise, it will add the modifier.<br>
+     * Otherwise, it will add the modifier to the end of the list.<br>
      * @param entity The player to apply the modifier to
      * @param modifier The modifier to apply
      * @param trait The type of temperature to apply the modifier to
+     * * @param matchPolicy The strictness of the check for finding the TempModifier to replace.
      */
-    public static void addOrReplaceModifier(LivingEntity entity, TempModifier modifier, Trait trait, Placement.Duplicates duplicatePolicy)
-    {   addModifier(entity, modifier, trait, duplicatePolicy, 1, Placement.of(Placement.Mode.REPLACE_OR_ADD, Placement.Order.FIRST, mod -> mod.equals(modifier)));
+    public static void addOrReplaceModifier(LivingEntity entity, TempModifier modifier, Trait trait, Placement.Duplicates matchPolicy)
+    {   addModifier(entity, modifier, trait, Placement.Duplicates.ALLOW, 1, Placement.of(Placement.Mode.REPLACE_OR_ADD, Placement.Order.FIRST, mod -> Placement.Duplicates.check(matchPolicy, modifier, mod)));
     }
 
     /**
      * Invokes addModifier() in a way that replaces the first occurrence of the modifier, if it exists.<br>
-     * It will not add the modifier if an existing instance of the same TempModifier class is not found.<br>
+     * It will not add the modifier if a suitable match is not found.<br>
      * @param entity The player to apply the modifier to
      * @param modifier The modifier to apply
      * @param trait The type of temperature to apply the modifier to
+     * @param matchPolicy The strictness of the check for finding the TempModifier to replace.
      */
-    public static void replaceModifier(LivingEntity entity, TempModifier modifier, Trait trait, Placement.Duplicates duplicates)
-    {   addModifier(entity, modifier, trait, Placement.Duplicates.ALLOW, 1, Placement.of(Placement.Mode.REPLACE, Placement.Order.FIRST, mod -> Placement.Duplicates.check(duplicates, modifier, mod)));
+    public static void replaceModifier(LivingEntity entity, TempModifier modifier, Trait trait, Placement.Duplicates matchPolicy)
+    {   addModifier(entity, modifier, trait, Placement.Duplicates.ALLOW, 1, Placement.of(Placement.Mode.REPLACE, Placement.Order.FIRST, mod -> Placement.Duplicates.check(matchPolicy, modifier, mod)));
     }
 
     /**
      * Adds the given modifier to the entity.<br>
      * If duplicates are disabled and the modifier already exists, this action will fail.
-     * @param duplicatePolicy allows or disallows duplicate TempModifiers to be applied
-     * (You might use this for things that have stacking effects, for example)
+     * @param duplicates Disallow duplicates of the same modifier if they match this policy
      */
-    public static void addModifier(LivingEntity entity, TempModifier modifier, Trait trait, Placement.Duplicates duplicatePolicy)
-    {   addModifier(entity, modifier, trait, duplicatePolicy, 1, Placement.AFTER_LAST);
+    public static void addModifier(LivingEntity entity, TempModifier modifier, Trait trait, Placement.Duplicates duplicates)
+    {   addModifier(entity, modifier, trait, duplicates, 1, Placement.AFTER_LAST);
     }
 
     /**
      * Adds the given modifier to the entity, with a custom placement.<br>
      */
-    public static void addModifier(LivingEntity entity, TempModifier modifier, Trait trait, Placement.Duplicates duplicatePolicy, int times, Placement placement)
+    public static void addModifier(LivingEntity entity, TempModifier modifier, Trait trait, Placement.Duplicates duplicates, int maxCount, Placement placement)
     {
         TempModifierEvent.Add event = new TempModifierEvent.Add(entity, trait, modifier);
         MinecraftForge.EVENT_BUS.post(event);
@@ -205,7 +206,7 @@ public class Temperature
         {
             EntityTempManager.getTemperatureCap(entity).ifPresent(cap ->
             {
-                if (addModifier(cap.getModifiers(trait), event.getModifier(), duplicatePolicy, times, placement))
+                if (addModifier(cap.getModifiers(trait), event.getModifier(), duplicates, maxCount, placement))
                 {   updateModifiers(entity, cap);
                 }
             });
