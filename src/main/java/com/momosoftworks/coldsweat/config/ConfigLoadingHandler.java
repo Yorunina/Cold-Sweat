@@ -453,7 +453,6 @@ public class ConfigLoadingHandler
             {
                 final double temperature = blockTempData.temperature();
                 final List<BlockRequirement> conditions = blockTempData.conditions();
-                final CompoundTag tag = blockTempData.nbt().orElse(null);
 
                 @Override
                 public double getTemperature(Level level, LivingEntity entity, BlockState state, BlockPos pos, double distance)
@@ -464,20 +463,6 @@ public class ConfigLoadingHandler
                         {
                             if (!conditions.get(i).test(serverLevel, pos))
                             {   return 0;
-                            }
-                        }
-                    }
-                    if (tag != null)
-                    {
-                        BlockEntity blockEntity = level.getBlockEntity(pos);
-                        if (blockEntity != null)
-                        {
-                            CompoundTag blockTag = blockEntity.saveWithFullMetadata();
-                            for (String key : tag.getAllKeys())
-                            {
-                                if (!NbtRequirement.compareNbt(tag.get(key), blockTag.get(key), true))
-                                {   return 0;
-                                }
                             }
                         }
                     }
