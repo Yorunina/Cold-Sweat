@@ -57,7 +57,7 @@ public class FluidRequirement
         {   return false;
         }
         else
-        {   return !this.state.isPresent() || state.get().matches(pState);
+        {   return !this.state.isPresent() || state.get().test(pState);
         }
     }
 
