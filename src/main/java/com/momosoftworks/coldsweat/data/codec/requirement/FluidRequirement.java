@@ -2,12 +2,10 @@ package com.momosoftworks.coldsweat.data.codec.requirement;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.momosoftworks.coldsweat.util.serialization.NBTHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
@@ -16,7 +14,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public record FluidRequirement(Optional<List<Fluid>> fluids, Optional<TagKey<Fluid>> tag, Optional<BlockRequirement.StateRequirement> state, Optional<NbtRequirement> nbt)
 {
@@ -47,7 +44,7 @@ public record FluidRequirement(Optional<List<Fluid>> fluids, Optional<TagKey<Flu
         {   return false;
         }
         else
-        {   return this.state.isEmpty() || state.get().matches(pState);
+        {   return this.state.isEmpty() || state.get().test(pState);
         }
     }
 
