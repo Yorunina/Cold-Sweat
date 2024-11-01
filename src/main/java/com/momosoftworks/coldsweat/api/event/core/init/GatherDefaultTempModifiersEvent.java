@@ -59,4 +59,8 @@ public class GatherDefaultTempModifiersEvent extends Event
     public void addModifier(TempModifier modifier, boolean allowDupes, int maxDupes, Placement params)
     {   Temperature.addModifier(modifiers, modifier, allowDupes ? Placement.Duplicates.ALLOW : Placement.Duplicates.BY_CLASS, maxDupes, params);
     }
+
+    public void removeModifiers(TempModifier modifier, Placement.Duplicates duplicatePolicy)
+    {   modifiers.removeIf(mod -> Placement.Duplicates.check(duplicatePolicy, mod, modifier));
+    }
 }
