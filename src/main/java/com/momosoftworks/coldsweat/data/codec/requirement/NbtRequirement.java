@@ -123,11 +123,7 @@ public class NbtRequirement
             try
             {
                 // Parse value ranges in to min and max values
-                String[] ranges = string.getAsString().split("-");
-                Double[] range = new Double[ranges.length];
-                for (int i = 0; i < ranges.length; i++)
-                {   range[i] = Double.parseDouble(ranges[i]);
-                }
+                Double[] range = Arrays.stream(string.getAsString().split("-")).map(Double::parseDouble).toArray(Double[]::new);
                 if (range.length == 2)
                 {   return CSMath.betweenInclusive(otherNumber.getAsDouble(), range[0], range[1]);
                 }
