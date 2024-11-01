@@ -1,17 +1,17 @@
 package com.momosoftworks.coldsweat.data.codec.requirement;
 
+import com.google.gson.JsonElement;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.momosoftworks.coldsweat.util.serialization.ConfigHelper;
-import com.momosoftworks.coldsweat.util.serialization.NBTHelper;
 import com.momosoftworks.coldsweat.util.serialization.RegistryHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
@@ -19,7 +19,6 @@ import net.minecraft.world.level.material.FluidState;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public record FluidRequirement(Optional<List<Either<TagKey<Fluid>, Fluid>>> fluids, Optional<TagKey<Fluid>> tag, Optional<BlockRequirement.StateRequirement> state, Optional<NbtRequirement> nbt)
 {
@@ -49,7 +48,7 @@ public record FluidRequirement(Optional<List<Either<TagKey<Fluid>, Fluid>>> flui
             {   return false;
             }
             else
-            {   return this.state.isEmpty() || state.get().matches(flState);
+            {   return this.state.isEmpty() || state.get().test(flState);
             }
         }
     }
@@ -86,15 +85,9 @@ public record FluidRequirement(Optional<List<Either<TagKey<Fluid>, Fluid>>> flui
         return nbt.equals(that.nbt);
     }
 
-    /*@Override
+    @Override
     public String toString()
     {
-        StringBuilder lBuilder = new StringBuilder();
-        this.fluids.ifPresent(fluids -> lBuilder.append("Fluids: ").append(fluids.toString()));
-        this.tag.ifPresent(tag -> lBuilder.append("Tag: ").append(tag.toString()));
-        this.state.ifPresent(state -> lBuilder.append("State: ").append(state.toString()));
-        this.nbt.ifPresent(nbt -> lBuilder.append("NBT: ").append(nbt.toString()));
-
-        return lBuilder.toString();
-    }*/
+        return CODEC.encodeStart(JsonOps.INSTANCE, this).mapOrElse(JsonElement::toString, err -> "Could not serialize object");
+    }
 }

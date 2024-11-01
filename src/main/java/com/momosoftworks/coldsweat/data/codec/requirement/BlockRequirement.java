@@ -4,6 +4,8 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.momosoftworks.coldsweat.data.codec.util.ExtraCodecs;
+import com.momosoftworks.coldsweat.data.codec.util.IntegerBounds;
 import com.momosoftworks.coldsweat.util.serialization.ConfigHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,6 +24,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.FluidState;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public record BlockRequirement(Optional<List<Either<TagKey<Block>, Block>>> blocks, Optional<StateRequirement> state,
@@ -54,7 +57,7 @@ public record BlockRequirement(Optional<List<Either<TagKey<Block>, Block>>> bloc
             if (this.blocks.isPresent() && this.blocks.get().stream().noneMatch(either -> either.map(blockstate::is, blockstate::is)))
             {   return false ^ this.negate;
             }
-            else if (this.state.isPresent() && !this.state.get().matches(blockstate))
+            else if (this.state.isPresent() && !this.state.get().test(blockstate))
             {   return false ^ this.negate;
             }
             else if (this.nbt.isPresent())
@@ -118,11 +121,14 @@ public record BlockRequirement(Optional<List<Either<TagKey<Block>, Block>>> bloc
         return negate == that.negate;
     }
 
-    public record StateRequirement(List<Either<StateProperty, RangedProperty>> properties)
+    public record StateRequirement(Map<String, Object> properties)
     {
-        public static final Codec<StateRequirement> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.either(StateProperty.CODEC, RangedProperty.CODEC).listOf().fieldOf("properties").forGetter(StateRequirement::properties)
-        ).apply(instance, StateRequirement::new));
+        public static final Codec<StateRequirement> CODEC = Codec.unboundedMap(Codec.STRING, ExtraCodecs.anyOf(Codec.BOOL, Codec.INT, Codec.STRING, IntegerBounds.CODEC))
+                                                                 .xmap(map ->
+                                                                       {
+                                                                           System.out.println("Map of properties: " + map);
+                                                                           return new StateRequirement(map);
+                                                                       }, StateRequirement::properties);
 
         public CompoundTag serialize()
         {   return (CompoundTag) CODEC.encodeStart(NbtOps.INSTANCE, this).result().orElseGet(CompoundTag::new);
@@ -132,22 +138,40 @@ public record BlockRequirement(Optional<List<Either<TagKey<Block>, Block>>> bloc
         {   return CODEC.decode(NbtOps.INSTANCE, tag).result().orElseThrow(() -> new IllegalArgumentException("Could not deserialize BlockRequirement")).getFirst();
         }
 
-        public boolean matches(BlockState pState)
-        {   return this.matches(pState.getBlock().getStateDefinition(), pState);
+        public boolean test(BlockState state)
+        {   return this.test(state.getBlock().getStateDefinition(), state);
         }
 
-        public boolean matches(FluidState pState)
-        {   return this.matches(pState.getType().getStateDefinition(), pState);
+        public boolean test(FluidState state)
+        {   return this.test(state.getType().getStateDefinition(), state);
         }
 
-        public <S extends StateHolder<?, S>> boolean matches(StateDefinition<?, S> pProperties, S pTargetProperty)
+        public <S extends StateHolder<?, S>> boolean test(StateDefinition<?, S> stateDefinition, S state)
         {
-            for(Either<StateProperty, RangedProperty> property : this.properties)
+            for (Map.Entry<String, Object> entry : this.properties.entrySet())
             {
-                if (!property.map(
-                    stateProperty -> stateProperty.match(pProperties, pTargetProperty),
-                    rangedProperty -> rangedProperty.match(pProperties, pTargetProperty)))
+                String key = entry.getKey();
+                Object value = entry.getValue();
+
+                Property<?> property = stateDefinition.getProperty(key);
+
+                if (property == null)
                 {   return false;
+                }
+                if (value instanceof IntegerBounds bounds)
+                {
+                    if (!property.getPossibleValues().contains(bounds.min())
+                    || !property.getPossibleValues().contains(bounds.max())
+                    || !bounds.test((Integer) state.getValue(property)))
+                    {   return false;
+                    }
+                }
+                else
+                {
+                    if (!property.getPossibleValues().contains(value)
+                    || !state.getValue(property).toString().equals(value.toString()))
+                    {   return false;
+                    }
                 }
             }
             return true;
@@ -166,114 +190,6 @@ public record BlockRequirement(Optional<List<Either<TagKey<Block>, Block>>> bloc
             StateRequirement that = (StateRequirement) obj;
 
             return properties.equals(that.properties);
-        }
-    }
-
-    public record StateProperty(String name, String value)
-    {
-        public static final Codec<StateProperty> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.STRING.fieldOf("name").forGetter(property -> property.name),
-                Codec.STRING.fieldOf("value").forGetter(property -> property.value)
-        ).apply(instance, StateProperty::new));
-
-        public CompoundTag serialize()
-        {   return (CompoundTag) CODEC.encodeStart(NbtOps.INSTANCE, this).result().orElseGet(CompoundTag::new);
-        }
-
-        public static StateProperty deserialize(CompoundTag tag)
-        {   return CODEC.decode(NbtOps.INSTANCE, tag).result().orElseThrow(() -> new IllegalArgumentException("Could not deserialize StateProperty")).getFirst();
-        }
-
-        public <S extends StateHolder<?, S>> boolean match(StateDefinition<?, S> pProperties, S pPropertyToMatch)
-        {   Property<?> property = pProperties.getProperty(this.name);
-            return property != null && this.match(pPropertyToMatch, property);
-        }
-
-        private <V extends Comparable<V>> boolean match(StateHolder<?, ?> properties, Property<V> property)
-        {   V stateValue = properties.getValue(property);
-            Optional<V> propValue = property.getValue(this.value);
-            return propValue.isPresent() && stateValue.compareTo(propValue.get()) == 0;
-        }
-
-        @Override
-        public boolean equals(Object obj)
-        {
-            if (this == obj)
-            {   return true;
-            }
-            if (obj == null || getClass() != obj.getClass())
-            {   return false;
-            }
-
-            StateProperty that = (StateProperty) obj;
-
-            if (!name.equals(that.name))
-            {   return false;
-            }
-            return value.equals(that.value);
-        }
-    }
-
-    public record RangedProperty(String name, String min, String max)
-    {
-        public static final Codec<RangedProperty> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.STRING.fieldOf("name").forGetter(property -> property.name),
-                Codec.STRING.fieldOf("min").forGetter(property -> property.min),
-                Codec.STRING.fieldOf("max").forGetter(property -> property.max)
-        ).apply(instance, RangedProperty::new));
-
-        public CompoundTag serialize()
-        {   return (CompoundTag) CODEC.encodeStart(NbtOps.INSTANCE, this).result().orElseGet(CompoundTag::new);
-        }
-
-        public static RangedProperty deserialize(CompoundTag tag)
-        {   return CODEC.decode(NbtOps.INSTANCE, tag).result().orElseThrow(() -> new IllegalArgumentException("Could not deserialize RangedProperty")).getFirst();
-        }
-
-        public <S extends StateHolder<?, S>> boolean match(StateDefinition<?, S> pProperties, S pTargetProperty)
-        {   Property<?> property = pProperties.getProperty(this.name);
-            return property != null && this.match(pTargetProperty, property);
-        }
-
-        private <T extends Comparable<T>> boolean match(StateHolder<?, ?> pProperties, Property<T> pPropertyTarget)
-        {
-            T t = pProperties.getValue(pPropertyTarget);
-
-            if (this.min != null)
-            {   Optional<T> optional = pPropertyTarget.getValue(this.min);
-                if (optional.isEmpty() || t.compareTo(optional.get()) < 0)
-                {   return false;
-                }
-            }
-            if (this.max != null)
-            {   Optional<T> optional1 = pPropertyTarget.getValue(this.max);
-                if (optional1.isEmpty() || t.compareTo(optional1.get()) > 0)
-                {   return false;
-                }
-            }
-
-            return true;
-        }
-
-        @Override
-        public boolean equals(Object obj)
-        {
-            if (this == obj)
-            {   return true;
-            }
-            if (obj == null || getClass() != obj.getClass())
-            {   return false;
-            }
-
-            RangedProperty that = (RangedProperty) obj;
-
-            if (!name.equals(that.name))
-            {   return false;
-            }
-            if (!min.equals(that.min))
-            {   return false;
-            }
-            return max.equals(that.max);
         }
     }
 
