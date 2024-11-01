@@ -61,4 +61,8 @@ public class GatherDefaultTempModifiersEvent extends Event
             addModifier(mod, duplicatePolicy, params);
         });
     }
+
+    public void removeModifiers(TempModifier modifier, Placement.Duplicates duplicatePolicy)
+    {   modifiers.removeIf(mod -> Placement.Duplicates.check(duplicatePolicy, mod, modifier));
+    }
 }
