@@ -309,7 +309,7 @@ public class FilledWaterskinItem extends Item
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag advanced)
     {
         double temp = CSMath.round(stack.getOrCreateTag().getDouble(FilledWaterskinItem.NBT_TEMPERATURE), 2);
-        if (Screen.hasShiftDown())
+        if (TooltipHandler.isShiftDown())
         {
             // Info tooltip for hotbar functionality
             String perSecond = Component.translatable("tooltip.cold_sweat.per_second").getString();
