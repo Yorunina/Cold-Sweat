@@ -44,6 +44,7 @@ public class ClientSettingsConfig
     public static final ModConfigSpec.BooleanValue ENABLE_CREATIVE_WARNING;
 
     public static final ModConfigSpec.BooleanValue HIDE_INSULATION_TOOLTIPS;
+    public static final ModConfigSpec.BooleanValue EXPAND_TOOLTIPS;
 
     public static final ModConfigSpec.BooleanValue SHOW_WATER_EFFECT;
 
@@ -128,6 +129,9 @@ public class ClientSettingsConfig
             HIDE_INSULATION_TOOLTIPS = BUILDER
                     .comment("Hides insulation tooltips for items, armor, and curios unless SHIFT is held")
                     .define("Hide Tooltips", false);
+            EXPAND_TOOLTIPS = BUILDER
+                    .comment("Automatically expands all collapsible tooltips")
+                    .define("Expand Tooltips", false);
         BUILDER.pop();
 
         SPEC = BUILDER.build();

@@ -1,6 +1,7 @@
 package com.momosoftworks.coldsweat.client.gui.config;
 
 import com.momosoftworks.coldsweat.api.util.Temperature;
+import com.momosoftworks.coldsweat.client.event.TooltipHandler;
 import com.momosoftworks.coldsweat.client.gui.config.pages.ConfigPageDifficulty;
 import com.momosoftworks.coldsweat.client.gui.config.pages.ConfigPageOne;
 import com.momosoftworks.coldsweat.client.gui.config.pages.ConfigPageThree;
@@ -50,7 +51,7 @@ public class ConfigScreen
     public static int LAST_PAGE = PAGES.size() - 1;
     public static int CURRENT_PAGE = 0;
 
-    public static final Supplier<Integer> SHIFT_AMOUNT = () -> Screen.hasShiftDown() && Screen.hasControlDown() ? 100 : Screen.hasShiftDown() ? 10 : 1;
+    public static final Supplier<Integer> SHIFT_AMOUNT = () -> TooltipHandler.isShiftDown() ? Screen.hasControlDown() ? 100 : 10 : 1;
 
     public static Screen getPage(int index, Screen parentScreen)
     {   return PAGES.get(CSMath.clamp(index, FIRST_PAGE, LAST_PAGE)).apply(parentScreen);
