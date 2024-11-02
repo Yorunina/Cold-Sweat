@@ -55,6 +55,10 @@ public class TooltipHandler
 
     private static int TOOLTIP_BACKGROUND_COLOR = 0;
 
+    public static boolean isShiftDown()
+    {   return Screen.hasShiftDown() || ConfigSettings.EXPAND_TOOLTIPS.get();
+    }
+
     public static int getTooltipTitleIndex(List<ITextComponent> tooltip, ItemStack stack)
     {
         if (tooltip.isEmpty()) return 0;
@@ -178,7 +182,7 @@ public class TooltipHandler
         ItemStack stack = event.getItemStack();
         Item item = stack.getItem();
         List<ITextComponent> elements = event.getToolTip();
-        boolean hideTooltips = ConfigSettings.HIDE_TOOLTIPS.get() && !Screen.hasShiftDown();
+        boolean hideTooltips = ConfigSettings.HIDE_TOOLTIPS.get() && !isShiftDown();
         if (stack.isEmpty()) return;
 
         TOOLTIP_INSERTIONS.clear();
@@ -196,7 +200,7 @@ public class TooltipHandler
          Tooltips for soulspring lamp
          */
         if (stack.getItem() instanceof SoulspringLampItem)
-        {   if (!Screen.hasShiftDown())
+        {   if (!isShiftDown())
             {   elements.add(tooltipStartIndex, EXPAND_TOOLTIP);
             }
             else for (int i = 0; i < CSMath.ceil(ConfigSettings.SOULSPRING_LAMP_FUEL.get().size() / 6d) + 1; i++)

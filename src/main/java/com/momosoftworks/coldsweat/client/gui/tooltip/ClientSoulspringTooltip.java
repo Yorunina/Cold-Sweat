@@ -1,13 +1,13 @@
 package com.momosoftworks.coldsweat.client.gui.tooltip;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.momosoftworks.coldsweat.client.event.TooltipHandler;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
 import com.momosoftworks.coldsweat.config.type.PredicateItem;
 import com.momosoftworks.coldsweat.util.math.CSMath;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -15,7 +15,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.util.Map;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
@@ -36,12 +35,12 @@ public class ClientSoulspringTooltip extends Tooltip
 
     @Override
     public int getHeight()
-    {   return Screen.hasShiftDown() ? CSMath.ceil(ConfigSettings.SOULSPRING_LAMP_FUEL.get().size() / 6d) * 16 + 14 : 12;
+    {   return TooltipHandler.isShiftDown() ? CSMath.ceil(ConfigSettings.SOULSPRING_LAMP_FUEL.get().size() / 6d) * 16 + 14 : 12;
     }
 
     @Override
     public int getWidth(FontRenderer font)
-    {   return Screen.hasShiftDown() ? Math.min(6, ConfigSettings.SOULSPRING_LAMP_FUEL.get().size()) * 16 : 32;
+    {   return TooltipHandler.isShiftDown() ? Math.min(6, ConfigSettings.SOULSPRING_LAMP_FUEL.get().size()) * 16 : 32;
     }
 
     @Override
@@ -52,7 +51,7 @@ public class ClientSoulspringTooltip extends Tooltip
         Minecraft.getInstance().textureManager.bind(TOOLTIP_LOCATION.get());
         AbstractGui.blit(poseStack, x, y, 401, 0, 0, 30, 8, 34, 30);
         AbstractGui.blit(poseStack, x, y, 401, 0, 16, (int) (fuel / 2.1333), 8, 34, 30);
-        if (Screen.hasShiftDown())
+        if (TooltipHandler.isShiftDown())
         {
             AbstractGui.blit(poseStack, x + 34, y, 401, 0, 24, 16, 10, 34, 30);
             float oldBlitOffset = itemRenderer.blitOffset;

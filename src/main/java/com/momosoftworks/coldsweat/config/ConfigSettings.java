@@ -179,6 +179,7 @@ public class ConfigSettings
 
     public static final DynamicHolder<Boolean> SHOW_CREATIVE_WARNING;
     public static final DynamicHolder<Boolean> HIDE_TOOLTIPS;
+    public static final DynamicHolder<Boolean> EXPAND_TOOLTIPS;
 
     public static final DynamicHolder<Boolean> SHOW_WATER_EFFECT;
 
@@ -837,6 +838,7 @@ public class ConfigSettings
         SHOW_CREATIVE_WARNING = addClientSetting("show_creative_warning", () -> true, holder -> holder.set(ClientSettingsConfig.getInstance().isCreativeWarningEnabled()));
 
         HIDE_TOOLTIPS = addClientSetting("hide_tooltips", () -> false, holder -> holder.set(ClientSettingsConfig.getInstance().hideTooltips()));
+        EXPAND_TOOLTIPS = addClientSetting("expand_tooltips", () -> true, holder -> holder.set(ClientSettingsConfig.EXPAND_TOOLTIPS.get()));
 
         SHOW_WATER_EFFECT = addClientSetting("show_water_effect", () -> true, holder -> holder.set(ClientSettingsConfig.getInstance().isWaterEffectEnabled()));
 
