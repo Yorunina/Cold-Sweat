@@ -1,4 +1,4 @@
-2.0.3:
+﻿2.0.3:
 - Fixed the player's body temperature sometimes resetting when exiting the world
 - Addressed a minor issue related to configs resetting when changing some settings (please delete the main.toml config file)
 - Addressed an issue with capabilities that caused incompatibilities with some mods
@@ -2614,3 +2614,24 @@ Technical Changes:
       ! For BlockTemps that still calculate the fade in the old way, the new fade will still be applied on top of the old one
             - This isn't too bad, but it means the block will weaken exponentially
 
+
+------------------------------------------------------------------------------------------------------------------------
+2.3.8
+* Added new textures for when a filled waterskin is hot or cold
+- Removed the Far Lands and Modulo custom music tracks
+- Added option to expand all collapsible tooltips by default
+
+Fixes:
+- (1.18 - 1.19) Fixed crash when rendering the heatstroke blur effect
+
+Translation Updates:
+- Updated Russian translation (Heimdallr-1 on GitHub)
+
+Technical Changes:
+* Several major changes have been made to how block requirements and block_temps work in JSON
+      - Much better support for blockstates and a slight change to NBT
+      - See the online documentation for the new syntax
+* Added removeModifiers() method to GatherDefaultTempModifiersEvent
+- The hearth, icebox, and boiler now use fluid tags for fueling:
+      - cold_sweat:hot
+      - cold_sweat:cold
