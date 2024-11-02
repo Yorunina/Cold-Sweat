@@ -59,6 +59,10 @@ public class TooltipHandler
     public static final Component EXPAND_TOOLTIP = Component.literal("?").withStyle(Style.EMPTY.withColor(ChatFormatting.BLUE).withUnderlined(true))
                                            .append(Component.literal(" 'Shift'").withStyle(Style.EMPTY.withColor(ChatFormatting.GRAY).withUnderlined(false)));
 
+    public static boolean isShiftDown()
+    {   return Screen.hasShiftDown() || ConfigSettings.EXPAND_TOOLTIPS.get();
+    }
+
     public static int getTooltipTitleIndex(List<Either<FormattedText, TooltipComponent>> tooltip, ItemStack stack)
     {
         if (tooltip.isEmpty()) return 0;
@@ -165,7 +169,7 @@ public class TooltipHandler
         ItemStack stack = event.getItemStack();
         Item item = stack.getItem();
         var elements = event.getTooltipElements();
-        boolean hideTooltips = ConfigSettings.HIDE_TOOLTIPS.get() && !Screen.hasShiftDown();
+        boolean hideTooltips = ConfigSettings.HIDE_TOOLTIPS.get() && !isShiftDown();
         if (stack.isEmpty()) return;
 
         // Get the index at which the tooltip should be inserted
@@ -179,7 +183,7 @@ public class TooltipHandler
          Tooltips for soulspring lamp
          */
         if (stack.getItem() instanceof SoulspringLampItem)
-        {   if (!Screen.hasShiftDown())
+        {   if (!isShiftDown())
             {   elements.add(tooltipStartIndex, Either.left(EXPAND_TOOLTIP));
             }
             elements.add(tooltipStartIndex, Either.right(new SoulspringTooltip(stack.getOrCreateTag().getDouble("Fuel"))));

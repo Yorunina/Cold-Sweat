@@ -1,6 +1,7 @@
 package com.momosoftworks.coldsweat.client.gui.tooltip;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.momosoftworks.coldsweat.client.event.TooltipHandler;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
 import com.momosoftworks.coldsweat.config.type.PredicateItem;
 import com.momosoftworks.coldsweat.util.math.CSMath;
@@ -34,12 +35,12 @@ public class ClientSoulspringTooltip implements ClientTooltipComponent
 
     @Override
     public int getHeight()
-    {   return Screen.hasShiftDown() ? CSMath.ceil(ConfigSettings.SOULSPRING_LAMP_FUEL.get().size() / 6d) * 16 + 14 : 12;
+    {   return TooltipHandler.isShiftDown() ? CSMath.ceil(ConfigSettings.SOULSPRING_LAMP_FUEL.get().size() / 6d) * 16 + 14 : 12;
     }
 
     @Override
     public int getWidth(Font font)
-    {   return Screen.hasShiftDown() ? Math.min(6, ConfigSettings.SOULSPRING_LAMP_FUEL.get().size()) * 16 : 32;
+    {   return TooltipHandler.isShiftDown() ? Math.min(6, ConfigSettings.SOULSPRING_LAMP_FUEL.get().size()) * 16 : 32;
     }
 
     @Override
@@ -48,7 +49,7 @@ public class ClientSoulspringTooltip implements ClientTooltipComponent
         RenderSystem.setShaderTexture(0, new ResourceLocation("cold_sweat:textures/gui/tooltip/soulspring_lamp_fuel.png"));
         graphics.blit(TOOLTIP_LOCATION.get(), x, y, 0, 0, 0, 30, 8, 30, 34);
         graphics.blit(TOOLTIP_LOCATION.get(), x, y, 0, 0, 16, (int) (fuel / 2.1333), 8, 30, 34);
-        if (Screen.hasShiftDown())
+        if (TooltipHandler.isShiftDown())
         {
             graphics.blit(TOOLTIP_LOCATION.get(), x + 34, y, 0, 0, 24, 16, 10, 30, 34);
 
