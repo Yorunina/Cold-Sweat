@@ -124,11 +124,7 @@ public record BlockRequirement(Optional<List<Either<TagKey<Block>, Block>>> bloc
     public record StateRequirement(Map<String, Object> properties)
     {
         public static final Codec<StateRequirement> CODEC = Codec.unboundedMap(Codec.STRING, ExtraCodecs.anyOf(Codec.BOOL, Codec.INT, Codec.STRING, IntegerBounds.CODEC))
-                                                                 .xmap(map ->
-                                                                       {
-                                                                           System.out.println("Map of properties: " + map);
-                                                                           return new StateRequirement(map);
-                                                                       }, StateRequirement::properties);
+                                                                 .xmap(StateRequirement::new, StateRequirement::properties);
 
         public CompoundTag serialize()
         {   return (CompoundTag) CODEC.encodeStart(NbtOps.INSTANCE, this).result().orElseGet(CompoundTag::new);
