@@ -20,7 +20,7 @@ public class SoulSproutTempModifier extends FoodTempModifier
     @Override
     public Function<Double, Double> calculate(LivingEntity entity, Temperature.Trait trait)
     {
-        if (Math.random() < 0.3 && entity.tickCount % 5 == 0)
+        if (Math.random() < 0.3 && entity.tickCount % 5 == 0 && entity.level.isClientSide)
         {
             WorldHelper.spawnParticleBatch(entity.level, ParticleTypes.SOUL, entity.getX(), entity.getY() + entity.getBbHeight() / 2, entity.getZ(),
                                            entity.getBbWidth() / 2, entity.getBbHeight() / 2, entity.getBbWidth() / 2, 1, 0.02);
