@@ -77,7 +77,9 @@
   "cold_sweat.config.temp_readout_location.name":   "Przesunięcie odczytu*",
 
 
-  "commands.cold_sweat.temperature.set.single.result": "Ustaw temperaturę %d na %d",
-  "commands.cold_sweat.temperature.set.many.result":   "Ustaw temperaturę %d graczy na %d",
-  "commands.cold_sweat.temperature.get.result":        "Temperatura ciała %d wynosi %d"
+  "commands.cold_sweat.temperature.set.single.result": "Ustawiono %s temperaturę %s na %d",
+  "commands.cold_sweat.temperature.set.many.result":   "Ustawiono %s temperaturę dla %d jednostek na %d",
+  "commands.cold_sweat.temperature.get.result":        "%s ma %s temperaturę równą %d",
+  "commands.cold_sweat.temperature.get.world.result":  "Temperatura w punkcie %d, %d, %d wynosi %d %s",
+  "commands.cold_sweat.temperature.invalid":           "Selektor zawiera jednostki nieposiadające temperatury"
 }

@@ -192,11 +192,11 @@
   "cold_sweat.message.sleep.world.cold":   "你現在不能休息；外面太冷了。",
 
 
-  "commands.cold_sweat.temperature.set.single.result":    "已將 %d 的溫度設定為 %d",
-  "commands.cold_sweat.temperature.set.many.result":      "已將 %d 個玩家的溫度設定為 %d",
-  "commands.cold_sweat.temperature.get.result":           "%d 的體溫為 %d",
-  "commands.cold_sweat.temperature.get.world.result":     "%d, %d, %d 的溫度為 %d %d",
-  "commands.cold_sweat.temperature.invalid":              "選擇器包含沒有溫度的實體",
+  "commands.cold_sweat.temperature.set.single.result": "已將%s溫度設定給%s為%d",
+  "commands.cold_sweat.temperature.set.many.result": "已將%s溫度設定給%d個實體為%d",
+  "commands.cold_sweat.temperature.get.result": "%s的%s溫度為%d",
+  "commands.cold_sweat.temperature.get.world.result": "在%d、%d、%d處的溫度為%d%s",
+  "commands.cold_sweat.temperature.invalid": "選擇器包含沒有溫度的實體",
   "commands.cold_sweat.temperature.debug":            "影響 %d 的「%d」特性的修改器和屬性：",
   "commands.cold_sweat.temperature.debug_hover_note": "懸停以獲取更多資訊",
   "commands.cold_sweat.temperature.modify.set.single.result": "已將 %d 的溫度屬性「%d」設定為 %d",

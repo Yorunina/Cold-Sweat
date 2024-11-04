@@ -197,11 +197,11 @@
   "cold_sweat.message.sleep.world.cold":   "你现在不能休息。外面太冷了！",
 
 
-  "commands.cold_sweat.temperature.set.single.result":    "将%d的温度设置为%d",
-  "commands.cold_sweat.temperature.set.many.result":      "设置%d玩家的温度为%d",
-  "commands.cold_sweat.temperature.get.result":           "%d的体温是%d",
-  "commands.cold_sweat.temperature.get.world.result":     "%d, %d, %d 处的温度为 %d %d",
-  "commands.cold_sweat.temperature.invalid":              "选择器所选是没有温度的实体",
+  "commands.cold_sweat.temperature.set.single.result": "已将%s温度设置给%s为%d",
+  "commands.cold_sweat.temperature.set.many.result": "已将%s温度设置给%d个实体为%d",
+  "commands.cold_sweat.temperature.get.result": "%s的%s温度为%d",
+  "commands.cold_sweat.temperature.get.world.result": "在%d、%d、%d处的温度为%d%s",
+  "commands.cold_sweat.temperature.invalid": "选择器所选是没有温度的实体",
   "commands.cold_sweat.temperature.debug":            "影响的修改器和属性 %d 的 \"%d\" 特征:",
   "commands.cold_sweat.temperature.debug_hover_note": "悬停以获取更多信息",
   "commands.cold_sweat.temperature.modify.set.single.result": "设置温度属性 \"%d\" 为 %d 到 %d",
