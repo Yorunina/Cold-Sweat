@@ -53,6 +53,13 @@ public class GatherDefaultTempModifiersEvent extends Event
     {   Temperature.addModifier(modifiers, modifier, duplicatePolicy, 1, params);
     }
 
+    public void addModifiers(List<TempModifier> modifiers, Placement.Duplicates duplicatePolicy, Placement params)
+    {
+        for (int i = modifiers.size() - 1; i >= 0; i--)
+        {   this.addModifier(modifiers.get(i), duplicatePolicy, params);
+        }
+    }
+
     public void addModifierById(ResourceLocation id, Consumer<TempModifier> modifierConsumer, Placement.Duplicates duplicatePolicy, Placement params)
     {
         TempModifierRegistry.getValue(id).ifPresent(mod ->
@@ -62,7 +69,7 @@ public class GatherDefaultTempModifiersEvent extends Event
         });
     }
 
-    public void removeModifiers(TempModifier modifier, Placement.Duplicates duplicatePolicy)
-    {   modifiers.removeIf(mod -> Placement.Duplicates.check(duplicatePolicy, mod, modifier));
+    public void removeModifiers(TempModifier modifier, Placement.Duplicates matchPolicy)
+    {   modifiers.removeIf(mod -> Placement.Duplicates.check(matchPolicy, mod, modifier));
     }
 }
