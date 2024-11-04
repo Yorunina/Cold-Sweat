@@ -73,6 +73,14 @@ public class Temperature
         return value;
     }
 
+    public static double convertIfNeeded(double value, Trait trait, Units units)
+    {
+        if (trait.isForWorld())
+        {   return convert(value, Units.MC, units, true);
+        }
+        return value;
+    }
+
     /**
      * Returns the player's temperature of the specified type.
      */
@@ -461,6 +469,10 @@ public class Temperature
 
         public boolean isForAttributes()
         {   return forAttributes;
+        }
+
+        public boolean isForWorld()
+        {   return this == WORLD || this == BURNING_POINT || this == FREEZING_POINT;
         }
 
         public static Trait fromID(String id)
