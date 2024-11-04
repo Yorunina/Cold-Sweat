@@ -60,7 +60,7 @@ public class ParticleBatchMessage implements CustomPacketPayload
     public void sendEntity(Entity entity)
     {
         if (particles.isEmpty() || entity.level().isClientSide()) return;
-        PacketDistributor.sendToPlayersTrackingEntity(entity, this);
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, this);
     }
 
     public void sendWorld(Level level)
