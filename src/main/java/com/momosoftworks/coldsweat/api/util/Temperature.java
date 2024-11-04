@@ -165,8 +165,8 @@ public class Temperature
      * @param trait The type of temperature to apply the modifier to
      * * @param matchPolicy The strictness of the check for finding the TempModifier to replace.
      */
-    public static void addOrReplaceModifier(LivingEntity entity, TempModifier modifier, Trait trait, Placement.Duplicates matchPolicy)
-    {   addModifier(entity, modifier, trait, Placement.Duplicates.ALLOW, 1, Placement.of(Placement.Mode.REPLACE_OR_ADD, Placement.Order.FIRST, mod -> Placement.Duplicates.check(matchPolicy, modifier, mod)));
+    public static boolean addOrReplaceModifier(LivingEntity entity, TempModifier modifier, Trait trait, Placement.Duplicates matchPolicy)
+    {   return addModifier(entity, modifier, trait, Placement.Duplicates.ALLOW, 1, Placement.of(Placement.Mode.REPLACE_OR_ADD, Placement.Order.FIRST, mod -> Placement.Duplicates.check(matchPolicy, modifier, mod)));
     }
 
     /**
@@ -177,8 +177,8 @@ public class Temperature
      * @param trait The type of temperature to apply the modifier to
      * @param matchPolicy The strictness of the check for finding the TempModifier to replace.
      */
-    public static void replaceModifier(LivingEntity entity, TempModifier modifier, Trait trait, Placement.Duplicates matchPolicy)
-    {   addModifier(entity, modifier, trait, Placement.Duplicates.ALLOW, 1, Placement.of(Placement.Mode.REPLACE, Placement.Order.FIRST, mod -> Placement.Duplicates.check(matchPolicy, modifier, mod)));
+    public static boolean replaceModifier(LivingEntity entity, TempModifier modifier, Trait trait, Placement.Duplicates matchPolicy)
+    {   return addModifier(entity, modifier, trait, Placement.Duplicates.ALLOW, 1, Placement.of(Placement.Mode.REPLACE, Placement.Order.FIRST, mod -> Placement.Duplicates.check(matchPolicy, modifier, mod)));
     }
 
     /**
@@ -186,26 +186,32 @@ public class Temperature
      * If duplicates are disabled and the modifier already exists, this action will fail.
      * @param duplicates Disallow duplicates of the same modifier if they match this policy
      */
-    public static void addModifier(LivingEntity entity, TempModifier modifier, Trait trait, Placement.Duplicates duplicates)
-    {   addModifier(entity, modifier, trait, duplicates, 1, Placement.AFTER_LAST);
+    public static boolean addModifier(LivingEntity entity, TempModifier modifier, Trait trait, Placement.Duplicates duplicates)
+    {   return addModifier(entity, modifier, trait, duplicates, 1, Placement.AFTER_LAST);
     }
 
     /**
      * Adds the given modifier to the entity, with a custom placement.<br>
      */
-    public static void addModifier(LivingEntity entity, TempModifier modifier, Trait trait, Placement.Duplicates duplicates, int maxCount, Placement placement)
+    public static boolean addModifier(LivingEntity entity, TempModifier modifier, Trait trait, Placement.Duplicates duplicates, int maxCount, Placement placement)
     {
         TempModifierEvent.Add event = new TempModifierEvent.Add(entity, trait, modifier);
         NeoForge.EVENT_BUS.post(event);
         if (!event.isCanceled())
         {
-            EntityTempManager.getTemperatureCap(entity).ifPresent(cap ->
+            Optional<ITemperatureCap> optCap = EntityTempManager.getTemperatureCap(entity);
+            if (optCap.isPresent())
             {
+                ITemperatureCap cap = optCap.get();
                 if (addModifier(cap.getModifiers(trait), event.getModifier(), duplicates, maxCount, placement))
-                {   updateModifiers(entity, cap);
+                {
+                    updateModifiers(entity, cap);
+                    return true;
                 }
-            });
+                return false;
+            }
         }
+        return false;
     }
 
     public static boolean addModifier(List<TempModifier> modifiers, TempModifier modifier, Placement.Duplicates duplicatePolicy, int maxCount, Placement placement)
@@ -214,7 +220,7 @@ public class Temperature
         Predicate<TempModifier> predicate = placement.predicate();
         if (predicate == null) predicate = mod -> true;
 
-        boolean isReplacing = placement.mode()  == Placement.Mode.REPLACE || placement.mode() == Placement.Mode.REPLACE_OR_ADD;
+        boolean isReplacing = placement.mode().isReplacing();
         boolean isForward = placement.order() == Placement.Order.FIRST;
 
         if (!isReplacing
@@ -261,10 +267,11 @@ public class Temperature
     {
         EntityTempManager.getTemperatureCap(entity).ifPresent(cap ->
         {
+            boolean changed = false;
             for (TempModifier modifier : modifiers)
-            {   addModifier(entity, modifier, trait, duplicatePolicy);
+            {   changed |= addModifier(entity, modifier, trait, duplicatePolicy);
             }
-            updateModifiers(entity, cap);
+            if (changed) updateModifiers(entity, cap);
         });
     }
 
@@ -356,6 +363,9 @@ public class Temperature
         {   PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, new SyncTemperatureMessage(entity, cap.serializeTraits(), instant));
         }
     }
+    public static void updateTemperature(LivingEntity entity, boolean instant)
+    {   EntityTempManager.getTemperatureCap(entity).ifPresent(cap -> updateTemperature(entity, cap, instant));
+    }
 
     public static void updateModifiers(LivingEntity entity, ITemperatureCap cap)
     {
@@ -363,9 +373,21 @@ public class Temperature
         {   PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, new SyncTempModifiersMessage(entity, cap.serializeModifiers()));
         }
     }
+    public static void updateModifiers(LivingEntity entity)
+    {   EntityTempManager.getTemperatureCap(entity).ifPresent(cap -> updateModifiers(entity, cap));
+    }
 
     public static Map<Trait, Double> getTemperatures(LivingEntity entity)
     {   return EntityTempManager.getTemperatureCap(entity).map(ITemperatureCap::getTraits).orElse(new EnumMap<>(Trait.class));
+    }
+
+    public static EnumMap<Trait, List<TempModifier>> getModifiers(LivingEntity entity)
+    {
+        EnumMap<Trait, List<TempModifier>> map = new EnumMap<>(Trait.class);
+        for (Trait trait : EntityTempManager.VALID_MODIFIER_TRAITS)
+        {   map.put(trait, getModifiers(entity, trait));
+        }
+        return map;
     }
 
     /**
