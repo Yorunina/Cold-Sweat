@@ -12,6 +12,7 @@ import com.momosoftworks.coldsweat.common.command.BaseCommand;
 import com.momosoftworks.coldsweat.common.command.argument.TempAttributeTraitArgument;
 import com.momosoftworks.coldsweat.common.command.argument.TempModifierTraitArgument;
 import com.momosoftworks.coldsweat.common.capability.handler.EntityTempManager;
+import com.momosoftworks.coldsweat.common.command.argument.TemperatureTraitArgument;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
 import com.momosoftworks.coldsweat.util.math.CSMath;
 import net.minecraft.ChatFormatting;
@@ -33,7 +34,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 
@@ -51,8 +51,15 @@ public class TempCommand extends BaseCommand
                 .then(Commands.literal("set")
                         .then(Commands.argument("entities", EntityArgument.entities())
                                 .then(Commands.argument("amount", IntegerArgumentType.integer(-150, 150))
-                                        .executes(source -> executeSetEntityTemp(
-                                        source.getSource(), EntityArgument.getEntities(source, "entities"), IntegerArgumentType.getInteger(source, "amount")))
+                                        .executes(source -> executeSetEntityTemp(source.getSource(),
+                                                                                 EntityArgument.getEntities(source, "entities"),
+                                                                                 IntegerArgumentType.getInteger(source, "amount"),
+                                                                                 Temperature.Trait.BODY))
+                                        .then(Commands.argument("trait", TemperatureTraitArgument.temperatureSet())
+                                                .executes(source -> executeSetEntityTemp(source.getSource(),
+                                                                                         EntityArgument.getEntities(source, "entities"),
+                                                                                         IntegerArgumentType.getInteger(source, "amount"),
+                                                                                         TemperatureTraitArgument.getTemperature(source, "trait"))))
                                 )
                         )
                 )
@@ -60,8 +67,13 @@ public class TempCommand extends BaseCommand
                 .then(Commands.literal("get")
                         /* Get from entity */
                         .then(Commands.argument("entities", EntityArgument.entities())
-                                .executes(source -> executeGetEntityTemp(
-                                source.getSource(), EntityArgument.getEntities(source, "entities")))
+                                .executes(source -> executeGetEntityTemp(source.getSource(),
+                                                                         EntityArgument.getEntities(source, "entities"),
+                                                                         Temperature.Trait.BODY))
+                                .then(Commands.argument("trait", TemperatureTraitArgument.temperatureGet())
+                                        .executes(source -> executeGetEntityTemp(source.getSource(),
+                                                                                 EntityArgument.getEntities(source, "entities"),
+                                                                                 TemperatureTraitArgument.getTemperature(source, "trait"))))
                         )
                         /* Get from world */
                         .then(Commands.argument("pos", BlockPosArgument.blockPos())
@@ -193,7 +205,7 @@ public class TempCommand extends BaseCommand
                 );
     }
 
-    private int executeSetEntityTemp(CommandSourceStack source, Collection<? extends Entity> entities, int temp)
+    private int executeSetEntityTemp(CommandSourceStack source, Collection<? extends Entity> entities, double temp, Temperature.Trait trait)
     {
         if (entities.stream().anyMatch(entity -> !(entity instanceof Player || EntityTempManager.getEntitiesWithTemperature().contains(entity.getType()))))
         {   source.sendFailure(Component.translatable("commands.cold_sweat.temperature.invalid"));
@@ -204,23 +216,31 @@ public class TempCommand extends BaseCommand
         {
             if (!(entity instanceof LivingEntity)) continue;
             EntityTempManager.getTemperatureCap(entity).ifPresent(cap ->
-            {   cap.setTrait(Temperature.Trait.CORE, temp);
+            {   cap.setTrait(trait == Temperature.Trait.BODY ? Temperature.Trait.CORE : trait, temp);
                 Temperature.updateTemperature((LivingEntity) entity, cap, true);
             });
         }
 
+        Temperature.Units preferredUnits = CSMath.getIfNotNull(source.getPlayer(),
+                                                               player -> EntityTempManager.getTemperatureCap(player).map(ITemperatureCap::getPreferredUnits).orElse(Temperature.Units.F),
+                                                               Temperature.Units.F);
+        String unitsName = trait.isForWorld() ? " " + preferredUnits.getFormattedName() : "";
+        double convertedTemp = Temperature.convertIfNeeded(temp, trait, preferredUnits);
+
         //Compose & send message
         if (entities.size() == 1)
         {   Entity target = entities.iterator().next();
-            source.sendSuccess(() -> Component.translatable("commands.cold_sweat.temperature.set.single.result", target.getName().getString(), temp), true);
+            source.sendSuccess(() -> Component.translatable("commands.cold_sweat.temperature.set.single.result", trait.getSerializedName(), target.getName().getString(),
+                                                            CSMath.truncate(convertedTemp, 1) + unitsName), true);
         }
         else
-        {   source.sendSuccess(() -> Component.translatable("commands.cold_sweat.temperature.set.many.result", entities.size(), temp), true);
+        {   source.sendSuccess(() -> Component.translatable("commands.cold_sweat.temperature.set.many.result", trait.getSerializedName(), entities.size(),
+                                                            CSMath.truncate(convertedTemp, 1) + unitsName), true);
         }
         return entities.size();
     }
 
-    private int executeGetEntityTemp(CommandSourceStack source, Collection<? extends Entity> entities)
+    private int executeGetEntityTemp(CommandSourceStack source, Collection<? extends Entity> entities, Temperature.Trait trait)
     {
         if (entities.stream().anyMatch(entity -> !(entity instanceof Player || EntityTempManager.getEntitiesWithTemperature().contains(entity.getType()))))
         {   source.sendFailure(Component.translatable("commands.cold_sweat.temperature.invalid"));
@@ -228,8 +248,12 @@ public class TempCommand extends BaseCommand
         }
         for (Entity target : entities.stream().sorted(Comparator.comparing(player -> player.getName().getString())).toList())
         {   //Compose & send message
-            int bodyTemp = (int) Temperature.get((LivingEntity) target, Temperature.Trait.BODY);
-            source.sendSuccess(() -> Component.translatable("commands.cold_sweat.temperature.get.result", target.getName().getString(), bodyTemp), false);
+            Temperature.Units preferredUnits = EntityTempManager.getTemperatureCap(target).map(ITemperatureCap::getPreferredUnits).orElse(Temperature.Units.F);
+            double temp = CSMath.truncate(Temperature.convertIfNeeded(Temperature.get((LivingEntity) target, trait), trait, preferredUnits), 1);
+            String unitsName = trait.isForWorld() ? " " + preferredUnits.getFormattedName() : "";
+            source.sendSuccess(() -> Component.translatable("commands.cold_sweat.temperature.get.result", target.getName().getString(),
+                                                            trait.getSerializedName(), temp + unitsName),
+                               false);
         }
         return entities.size();
     }
