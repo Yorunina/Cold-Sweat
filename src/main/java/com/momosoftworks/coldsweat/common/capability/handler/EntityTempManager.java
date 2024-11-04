@@ -77,6 +77,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -216,15 +217,20 @@ public class EntityTempManager
             }
 
             // Remove expired modifiers
+            AtomicBoolean sync = new AtomicBoolean(false);
             for (Temperature.Trait trait : VALID_MODIFIER_TRAITS)
             {
                 cap.getModifiers(trait).removeIf(modifier ->
-                {   int expireTime = modifier.getExpireTime();
+                {
+                    int expireTime = modifier.getExpireTime();
+                    if (modifier.isDirty())
+                    {   sync.set(true);
+                        modifier.markClean();
+                    }
                     return (modifier.setTicksExisted(modifier.getTicksExisted() + 1) > expireTime && expireTime != -1);
                 });
             }
-
-            if (entity instanceof PlayerEntity && entity.tickCount % 60 == 0)
+            if (sync.get())
             {   Temperature.updateModifiers(entity, cap);
             }
         });
@@ -518,7 +524,7 @@ public class EntityTempManager
             {
                 if (!player.isSpectator() && (WorldHelper.isInWater(player) || player.tickCount % 40 == 0
                 && WorldHelper.isRainingAt(player.level, player.blockPosition())))
-                {   Temperature.addModifier(player, new WaterTempModifier(0.01f).tickRate(5), Temperature.Trait.WORLD, Placement.Duplicates.BY_CLASS);
+                {   Temperature.addModifier(player, new WaterTempModifier(0.01f).tickRate(10), Temperature.Trait.WORLD, Placement.Duplicates.BY_CLASS);
                 }
 
                 if (player.isOnFire())

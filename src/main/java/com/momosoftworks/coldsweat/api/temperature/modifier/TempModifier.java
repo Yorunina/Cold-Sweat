@@ -29,6 +29,7 @@ public abstract class TempModifier
     private double lastInput = 0;
     private double lastOutput = 0;
     private Function<Double, Double> function = temp -> temp;
+    private boolean changed = false;
 
     /**
      * Default constructor (REQUIRED for proper registration).<br>
@@ -146,6 +147,18 @@ public abstract class TempModifier
     @Override
     public String toString()
     {   return TempModifierRegistry.getKey(this).toString();
+    }
+
+    public void markDirty()
+    {   this.changed = true;
+    }
+
+    public boolean isDirty()
+    {   return this.changed;
+    }
+
+    public void markClean()
+    {   this.changed = false;
     }
 
     @Override
