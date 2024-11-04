@@ -38,15 +38,16 @@ public class ModCommands
             {   dispatcher.register(command.getBuilder());
             }
         });
-
-        ArgumentTypeInfos.registerByClass(TemperatureTraitArgument.class, new TemperatureTraitArgument.Info());
-        ArgumentTypeInfos.registerByClass(TempAttributeTraitArgument.class, new TempAttributeTraitArgument.Info());
-        ArgumentTypeInfos.registerByClass(TempModifierTraitArgument.class, new TempModifierTraitArgument.Info());
     }
 
     public static final DeferredRegister<ArgumentTypeInfo<?, ?>> ARGUMENTS = DeferredRegister.create(Registries.COMMAND_ARGUMENT_TYPE, ColdSweat.MOD_ID);
 
-    DeferredHolder<ArgumentTypeInfo<?,?>, ArgumentTypeInfo<?, ?>> TEMP_MODIFIER_TYPE = ARGUMENTS.register("temp_modifier_type", () -> new TempModifierTraitArgument.Info());
-    DeferredHolder<ArgumentTypeInfo<?,?>, ArgumentTypeInfo<?, ?>> TEMPERATURE_TYPE = ARGUMENTS.register("temperature_type", () -> new TemperatureTraitArgument.Info());
-    DeferredHolder<ArgumentTypeInfo<?,?>, ArgumentTypeInfo<?, ?>> ABILITY_OR_TEMP_TYPE = ARGUMENTS.register("ability_or_temp_type", () -> new TempAttributeTraitArgument.Info());
+    public static final DeferredHolder<ArgumentTypeInfo<?, ?>, ArgumentTypeInfo<?, ?>> TEMP_MODIFIER_TYPE =
+            ARGUMENTS.register("temp_modifier_type", () -> ArgumentTypeInfos.registerByClass(TempModifierTraitArgument.class, new TempModifierTraitArgument.Info()));
+
+    public static final DeferredHolder<ArgumentTypeInfo<?, ?>, ArgumentTypeInfo<?, ?>> TEMPERATURE_TYPE =
+            ARGUMENTS.register("temperature_type", () -> ArgumentTypeInfos.registerByClass(TemperatureTraitArgument.class, new TemperatureTraitArgument.Info()));
+
+    public static final DeferredHolder<ArgumentTypeInfo<?, ?>, ArgumentTypeInfo<?, ?>> ABILITY_OR_TEMP_TYPE =
+            ARGUMENTS.register("ability_or_temp_type", () -> ArgumentTypeInfos.registerByClass(TempAttributeTraitArgument.class, new TempAttributeTraitArgument.Info()));
 }
