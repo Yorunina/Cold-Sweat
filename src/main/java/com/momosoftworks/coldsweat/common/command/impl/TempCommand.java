@@ -56,15 +56,18 @@ public class TempCommand extends BaseCommand
                                                                                  EntityArgument.getEntities(source, "entities"),
                                                                                  IntegerArgumentType.getInteger(source, "amount"),
                                                                                  Temperature.Trait.BODY))
-                                        .then(Commands.argument("trait", TemperatureTraitArgument.temperatureSet())
-                                                .executes(source -> executeSetEntityTemp(source.getSource(),
-                                                                                         EntityArgument.getEntities(source, "entities"),
-                                                                                         IntegerArgumentType.getInteger(source, "amount"),
-                                                                                         TemperatureTraitArgument.getTemperature(source, "trait"))))
+                                )
+                                .then(Commands.argument("trait", TemperatureTraitArgument.temperatureSet())
+                                        .then(Commands.argument("amount", IntegerArgumentType.integer(-150, 150))
+                                                  .executes(source -> executeSetEntityTemp(source.getSource(),
+                                                                                           EntityArgument.getEntities(source, "entities"),
+                                                                                           IntegerArgumentType.getInteger(source, "amount"),
+                                                                                           TemperatureTraitArgument.getTemperature(source, "trait")))
+                                        )
                                 )
                         )
                 )
-                /* Set temperature */
+                /* Get temperature */
                 .then(Commands.literal("get")
                         /* Get from entity */
                         .then(Commands.argument("entities", EntityArgument.entities())
