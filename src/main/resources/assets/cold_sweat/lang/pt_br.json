@@ -153,9 +153,10 @@
   "cold_sweat.message.sleep.world.cold":   "Você não pode descansar agora; Está congelando lá fora.",
 
 
-  "commands.cold_sweat.temperature.set.single.result": "Define a temperatura de %d para %d",
-  "commands.cold_sweat.temperature.set.many.result":   "Define a temperatura de %d jogadores para %d",
-  "commands.cold_sweat.temperature.get.result":        "Temperatura corporal de %d é de %d",
+  "commands.cold_sweat.temperature.set.single.result": "Definida a temperatura %s de %s para %d",
+  "commands.cold_sweat.temperature.set.many.result":   "Definida a temperatura %s de %d entidades para %d",
+  "commands.cold_sweat.temperature.get.result":        "A temperatura %s de %s é %d",
+  "commands.cold_sweat.temperature.get.world.result":  "A temperatura em %d, %d, %d é %d %s",
   "commands.cold_sweat.temperature.invalid":           "O seletor inclui entidades que não possuem temperatura",
 
 
