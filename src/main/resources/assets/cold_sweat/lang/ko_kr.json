@@ -124,7 +124,9 @@
   "cold_sweat.message.sleep.world.cold":   "바깥 온도가 너무 낮아 잠을 잘 수 없습니다.",
 
 
-  "commands.cold_sweat.temperature.set.single.result": "%d의 체온을 다음으로 설정했습니다: %d",
-  "commands.cold_sweat.temperature.set.many.result":   "%d 플레이어의 체온을 다음으로 설정했습니다: %d",
-  "commands.cold_sweat.temperature.get.result":        "%d의 체온은 다음과 같습니다: %d"
+  "commands.cold_sweat.temperature.set.single.result": "%s 온도를 %s의 %d(으)로 설정했습니다",
+  "commands.cold_sweat.temperature.set.many.result":   "%s 온도를 %d개 개체의 %d(으)로 설정했습니다",
+  "commands.cold_sweat.temperature.get.result":        "%s의 %s 온도는 %d입니다",
+  "commands.cold_sweat.temperature.get.world.result":  "%d, %d, %d의 온도는 %d %s입니다",
+  "commands.cold_sweat.temperature.invalid":           "온도를 가지지 않은 개체가 선택되었습니다"
 }

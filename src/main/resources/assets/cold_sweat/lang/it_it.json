@@ -162,9 +162,9 @@
   "cold_sweat.message.sleep.world.cold":   "Non puoi riposare adesso, si muore di freddo fuori",
 
 
-  "commands.cold_sweat.temperature.set.single.result": "Set the temperature of %d to %d",
-  "commands.cold_sweat.temperature.set.many.result":   "Set the temperature of %d players to %d",
-  "commands.cold_sweat.temperature.get.result":        "%d's body temperature is %d",
+  "commands.cold_sweat.temperature.set.single.result": "Set the %s temperature of %s to %d",
+  "commands.cold_sweat.temperature.set.many.result":   "Set the %s temperature of %s players to %d",
+  "commands.cold_sweat.temperature.get.result":        "%s's %s temperature is %d",
   "commands.cold_sweat.temperature.invalid":           "The selector includes entities that do not have temperature",
 
 
