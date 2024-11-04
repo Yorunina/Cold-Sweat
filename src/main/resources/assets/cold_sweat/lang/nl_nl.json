@@ -183,10 +183,10 @@
   "cold_sweat.message.sleep.world.cold": "Je kunt nu niet rusten; Het vriest buiten.",
 
 
-  "commands.cold_sweat.temperature.set.single.result": "De temperatuur van %d ingesteld naar %d",
-  "commands.cold_sweat.temperature.set.many.result": "De temperatuur van %d spelers ingesteld naar %d",
-  "commands.cold_sweat.temperature.get.result": "%d's lichaamstemperatuur is %d",
-  "commands.cold_sweat.temperature.get.world.result": "De temperatuur op %d, %d, %d is %d %d",
+  "commands.cold_sweat.temperature.set.single.result": "De %s temperatuur van %s ingesteld naar %d",
+  "commands.cold_sweat.temperature.set.many.result": "De %s temperatuur van %d entiteiten ingesteld naar %d",
+  "commands.cold_sweat.temperature.get.result": "%s's %s temperatuur is %d",
+  "commands.cold_sweat.temperature.get.world.result": "De temperatuur op %d, %d, %d is %d %s",
   "commands.cold_sweat.temperature.invalid": "De selector bevat entiteiten die geen temperatuur hebben",
   "commands.cold_sweat.temperature.debug": "Modifiers & attributen die van invloed zijn op \"%d\" van %d:",
   "commands.cold_sweat.temperature.debug_hover_note": "Zweef voor meer informatie",
