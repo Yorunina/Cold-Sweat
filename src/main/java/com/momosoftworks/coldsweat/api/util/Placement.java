@@ -23,7 +23,11 @@ public record Placement(Mode mode, Order order, Predicate<TempModifier> predicat
         // Replace the desired instance of the modifier (fails if no modifiers pass the predicate)
         REPLACE,
         // Replace the desired instance of the modifier if it exists, otherwise add it to the end
-        REPLACE_OR_ADD
+        REPLACE_OR_ADD;
+
+        public boolean isReplacing()
+        {   return this == REPLACE || this == REPLACE_OR_ADD;
+        }
     }
 
     public enum Order
