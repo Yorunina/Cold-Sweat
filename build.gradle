@@ -143,10 +143,10 @@ dependencies {
     implementation fg.deobf("curse.maven:thirst-was-taken-679270:5071552")
     compileOnly fg.deobf("curse.maven:spoiled-364918:4614777")
 
-    implementation         ("org.valkyrienskies.core:api:1.1.0+8a93383ce5")
-    implementation         ("org.valkyrienskies.core:impl:1.1.0+8a93383ce5")
-    implementation         ("org.valkyrienskies.core:api-game:1.1.0+8a93383ce5")
-    implementation         ("org.valkyrienskies.core:util:1.1.0+8a93383ce5")
+    implementation         ("org.valkyrienskies.core:api:${valk_skies_api_version}")
+    implementation         ("org.valkyrienskies.core:impl:${valk_skies_api_version}")
+    implementation         ("org.valkyrienskies.core:api-game:${valk_skies_api_version}")
+    implementation         ("org.valkyrienskies.core:util:${valk_skies_api_version}")
     implementation fg.deobf("org.valkyrienskies:valkyrienskies-119-forge:2.1.2-beta.1+a04911c932")
     implementation fg.deobf("curse.maven:eureka-ships-654384:5321628")
 
