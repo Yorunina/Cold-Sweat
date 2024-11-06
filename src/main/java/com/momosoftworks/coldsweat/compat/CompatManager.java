@@ -1,4 +1,4 @@
-package com.momosoftworks.coldsweat.util.compat;
+package com.momosoftworks.coldsweat.compat;
 
 import com.anthonyhilyard.iceberg.util.Tooltips;
 import com.mojang.datafixers.util.Either;

@@ -1,4 +1,4 @@
-package com.momosoftworks.coldsweat.util.compat.create;
+package com.momosoftworks.coldsweat.compat.create;
 
 import com.google.common.collect.ImmutableList;
 import com.momosoftworks.coldsweat.api.util.Temperature;

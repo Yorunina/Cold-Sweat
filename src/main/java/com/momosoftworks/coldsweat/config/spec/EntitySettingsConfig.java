@@ -1,6 +1,6 @@
 package com.momosoftworks.coldsweat.config.spec;
 
-import com.momosoftworks.coldsweat.util.compat.CompatManager;
+import com.momosoftworks.coldsweat.compat.CompatManager;
 import com.momosoftworks.coldsweat.util.serialization.ListBuilder;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModLoadingContext;
