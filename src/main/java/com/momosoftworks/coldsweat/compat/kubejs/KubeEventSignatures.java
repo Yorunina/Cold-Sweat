@@ -1,4 +1,4 @@
-package com.momosoftworks.coldsweat.util.compat.kubejs;
+package com.momosoftworks.coldsweat.compat.kubejs;
 
 import com.momosoftworks.coldsweat.api.util.Temperature;
 import dev.architectury.event.Event;
