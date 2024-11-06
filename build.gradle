@@ -39,6 +39,8 @@ minecraft {
     runs {
         client {
             workingDirectory project.file('run')
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', 'coldsweat'
@@ -106,24 +108,35 @@ repositories {
         name = 'tterrag maven'
         url = 'https://maven.tterrag.com'
     }
-    mavenCentral()
 
     maven {
         name = 'MinecraftForge'
         url = 'https://maven.minecraftforge.net/'
     }
-
     // Add KFF Maven repository
     maven {
         name = 'Kotlin for Forge'
         url = 'https://thedarkcolour.github.io/KotlinForForge/'
     }
-
     maven {
         name = "Valkyrien Skies Internal"
         url = 'https://maven.valkyrienskies.org'
     }
-
+    maven {
+        // Shedaniel's maven (Architectury API)
+        url = "https://maven.architectury.dev"
+        content {
+            includeGroup "dev.architectury"
+        }
+    }
+    maven {
+        // saps.dev Maven (KubeJS and Rhino)
+        url = "https://maven.saps.dev/minecraft"
+        content {
+            includeGroup "dev.latvian.mods"
+        }
+    }
+    mavenCentral()
 }
 
 dependencies {
@@ -149,6 +162,10 @@ dependencies {
     implementation         ("org.valkyrienskies.core:util:${valk_skies_api_version}")
     implementation fg.deobf("org.valkyrienskies:valkyrienskies-119-forge:2.1.2-beta.1+a04911c932")
     implementation fg.deobf("curse.maven:eureka-ships-654384:5321628")
+
+    implementation fg.deobf("dev.latvian.mods:kubejs-forge:${kubejs_version}")
+    implementation fg.deobf("dev.latvian.mods:rhino-forge:${rhino_version}")
+    implementation fg.deobf("dev.architectury:architectury-forge:${architectury_version}")
 
     implementation 'thedarkcolour:kotlinforforge:3.12.0'
 
