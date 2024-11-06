@@ -3,6 +3,7 @@ package com.momosoftworks.coldsweat.api.util;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.momosoftworks.coldsweat.api.event.common.temperautre.TempModifierEvent;
+import com.momosoftworks.coldsweat.api.event.common.temperautre.TemperatureChangedEvent;
 import com.momosoftworks.coldsweat.api.temperature.modifier.TempModifier;
 import com.momosoftworks.coldsweat.common.capability.handler.EntityTempManager;
 import com.momosoftworks.coldsweat.common.capability.temperature.ITemperatureCap;
@@ -84,11 +85,22 @@ public class Temperature
     }
 
     public static void set(LivingEntity entity, Trait trait, double value)
-    {   EntityTempManager.getTemperatureCap(entity).ifPresent(cap -> cap.setTrait(trait, value));
+    {
+        if (NeoForge.EVENT_BUS.post(new TemperatureChangedEvent(entity, trait, get(entity, trait), value)).isCanceled())
+        {   return;
+        }
+        EntityTempManager.getTemperatureCap(entity).ifPresent(cap -> cap.setTrait(trait, value));
+        updateTemperature(entity);
     }
 
     public static void add(LivingEntity entity, Trait trait, double value)
-    {   EntityTempManager.getTemperatureCap(entity).ifPresent(cap -> cap.setTrait(trait, cap.getTrait(trait) + value));
+    {
+        double oldTemp = get(entity, trait);
+        if (NeoForge.EVENT_BUS.post(new TemperatureChangedEvent(entity, trait, oldTemp, oldTemp + value)).isCanceled())
+        {   return;
+        }
+        EntityTempManager.getTemperatureCap(entity).ifPresent(cap -> cap.setTrait(trait, cap.getTrait(trait) + value));
+        updateTemperature(entity);
     }
 
     /**
@@ -371,8 +383,11 @@ public class Temperature
         {   PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, new SyncTemperatureMessage(entity, cap.serializeTraits(), instant));
         }
     }
-    public static void updateTemperature(LivingEntity entity, boolean instant)
-    {   EntityTempManager.getTemperatureCap(entity).ifPresent(cap -> updateTemperature(entity, cap, instant));
+    public static void updateTemperature(LivingEntity entity)
+    {
+        EntityTempManager.getTemperatureCap(entity).ifPresent(cap ->
+        {   cap.syncValues(entity);
+        });
     }
 
     public static void updateModifiers(LivingEntity entity, ITemperatureCap cap)
