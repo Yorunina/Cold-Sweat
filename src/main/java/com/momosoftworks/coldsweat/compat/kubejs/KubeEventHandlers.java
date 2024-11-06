@@ -1,7 +1,7 @@
-package com.momosoftworks.coldsweat.util.compat.kubejs;
+package com.momosoftworks.coldsweat.compat.kubejs;
 
 import com.momosoftworks.coldsweat.api.util.Temperature;
-import com.momosoftworks.coldsweat.util.compat.kubejs.event.TempChangedEventJS;
+import com.momosoftworks.coldsweat.compat.kubejs.event.TempChangedEventJS;
 import dev.architectury.event.EventResult;
 import dev.latvian.mods.kubejs.bindings.event.EntityEvents;
 import dev.latvian.mods.kubejs.event.EventHandler;

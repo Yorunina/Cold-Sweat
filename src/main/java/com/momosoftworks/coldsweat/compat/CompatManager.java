@@ -1,4 +1,4 @@
-package com.momosoftworks.coldsweat.util.compat;
+package com.momosoftworks.coldsweat.compat;
 
 import com.anthonyhilyard.iceberg.util.Tooltips;
 import com.mojang.datafixers.util.Either;
@@ -6,7 +6,7 @@ import com.momosoftworks.coldsweat.ColdSweat;
 import com.momosoftworks.coldsweat.api.util.Temperature;
 import com.momosoftworks.coldsweat.common.capability.handler.EntityTempManager;
 import com.momosoftworks.coldsweat.core.init.BlockInit;
-import com.momosoftworks.coldsweat.util.compat.create.ColdSweatDisplayBehaviors;
+import com.momosoftworks.coldsweat.compat.create.ColdSweatDisplayBehaviors;
 import com.momosoftworks.coldsweat.util.math.CSMath;
 import com.momosoftworks.coldsweat.util.registries.ModBlocks;
 import com.momosoftworks.coldsweat.util.registries.ModDamageSources;
