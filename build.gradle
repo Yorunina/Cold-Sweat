@@ -9,27 +9,6 @@ plugins {
 version = mod_version
 group = mod_group_id
 
-repositories {
-    maven {
-        url 'https://www.cursemaven.com'
-        content {
-            includeGroup "curse.maven"
-        }
-    }
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "Modrinth"
-                url = "https://api.modrinth.com/maven"
-            }
-        }
-        filter {
-            includeGroup "maven.modrinth"
-        }
-    }
-    mavenLocal()
-}
-
 java {
     archivesBaseName = mod_name
     toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -53,7 +32,7 @@ runs {
         // "SCAN": For mods scan.
         // "REGISTRIES": For firing of registry events.
         // "REGISTRYDUMP": For getting the contents of all registries.
-        systemProperty 'forge.logging.markers', 'REGISTRIES'
+        systemProperty 'mixin.env.remapRefMap', 'true'
 
         // Recommended logging level for the console
         // You can set various levels here.
@@ -66,6 +45,8 @@ runs {
     client {
         // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
         systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+        systemProperty 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+        systemProperty 'forge.logging.markers', 'REGISTRIES'
     }
 
     server {
@@ -100,6 +81,49 @@ configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
+repositories {
+    maven {
+        url 'https://www.cursemaven.com'
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+    maven {
+        // Shedaniel's maven (Architectury API)
+        url = "https://maven.architectury.dev"
+        content {
+            includeGroup "dev.architectury"
+        }
+    }
+    maven {
+        // saps.dev Maven (KubeJS and Rhino)
+        url = "https://maven.saps.dev/minecraft"
+        content {
+            includeGroup "dev.latvian.mods"
+        }
+    }
+    maven {
+        url "https://maven.latvian.dev/releases"
+        content {
+            includeGroup "dev.latvian.apps"
+        }
+    }
+    maven { url 'https://jitpack.io' }
+    mavenCentral()
+    mavenLocal()
+}
+
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
 
@@ -111,6 +135,11 @@ dependencies {
     implementation "curse.maven:curios-continuation-1037991:5476603"
     implementation "curse.maven:iceberg-520110:5590963"
     implementation "curse.maven:in-game-account-switcher-232676:5474316"
+
+    implementation "dev.architectury:architectury-neoforge:${architectury_version}"
+    implementation "dev.latvian.mods:kubejs-neoforge:${kubejs_version}"
+    implementation "dev.latvian.apps:tiny-java-server:${tiny_server_version}"
+    implementation "com.github.rtyley:animated-gif-lib-for-java:animated-gif-lib-1.7"
 
     runtimeOnly "curse.maven:jei-238222:5519368"
     runtimeOnly "curse.maven:spark-361579:5434153"
