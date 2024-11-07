@@ -6,9 +6,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.momosoftworks.coldsweat.data.codec.requirement.sub_type.EntitySubRequirement;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -135,14 +132,6 @@ public record EntityRequirement(Optional<EntityType<?>> type, Optional<TagKey<En
             }
         }
         return true;
-    }
-
-    public CompoundTag serialize()
-    {   return (CompoundTag) getCodec().encodeStart(NbtOps.INSTANCE, this).result().orElseGet(CompoundTag::new);
-    }
-
-    public static EntityRequirement deserialize(CompoundTag tag)
-    {   return getCodec().decode(NbtOps.INSTANCE, tag).result().orElseThrow(() -> new IllegalArgumentException("Could not deserialize EntityRequirement")).getFirst();
     }
 
     @Override

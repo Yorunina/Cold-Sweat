@@ -1,7 +1,9 @@
 package com.momosoftworks.coldsweat.data.codec.requirement;
 
+import com.google.gson.JsonElement;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.momosoftworks.coldsweat.data.codec.util.CommonStreamCodecs;
 import com.momosoftworks.coldsweat.data.codec.util.IntegerBounds;
@@ -9,16 +11,9 @@ import com.momosoftworks.coldsweat.util.serialization.ConfigHelper;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.codec.StreamDecoder;
-import net.minecraft.network.codec.StreamEncoder;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -29,7 +24,6 @@ import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public record ItemRequirement(Optional<List<Either<TagKey<Item>, Item>>> items, Optional<TagKey<Item>> tag,
                               Optional<IntegerBounds> count, Optional<IntegerBounds> durability,
@@ -141,14 +135,6 @@ public record ItemRequirement(Optional<List<Either<TagKey<Item>, Item>>> items, 
         return true;
     }
 
-    public CompoundTag serialize()
-    {   return (CompoundTag) CODEC.encodeStart(NbtOps.INSTANCE, this).result().orElseGet(CompoundTag::new);
-    }
-
-    public static ItemRequirement deserialize(CompoundTag tag)
-    {   return CODEC.decode(NbtOps.INSTANCE, tag).result().orElseThrow(() -> new IllegalArgumentException("Could not deserialize ItemRequirement")).getFirst();
-    }
-
     @Override
     public boolean equals(Object obj)
     {
@@ -188,19 +174,6 @@ public record ItemRequirement(Optional<List<Either<TagKey<Item>, Item>>> items, 
     @Override
     public String toString()
     {
-        StringBuilder builder = new StringBuilder();
-        builder.append("ItemRequirement{");
-        items.ifPresent(itemList -> itemList.forEach(either -> builder.append(either.map(tag -> "#" + tag.location(),
-                                                                                         item -> BuiltInRegistries.ITEM.getKey(item)).toString())
-                                                                      .append(", ")));
-        count.ifPresent(bounds -> builder.append(bounds.toString()).append(", "));
-        durability.ifPresent(bounds -> builder.append(bounds.toString()).append(", "));
-        enchantments.ifPresent(enchantments -> builder.append("Enchantments: {").append(enchantments.stream().map(EnchantmentRequirement::toString).collect(Collectors.joining(", "))).append("}, "));
-        storedEnchantments.ifPresent(enchantments -> builder.append("Stored Enchantments: {").append(enchantments.stream().map(EnchantmentRequirement::toString).collect(Collectors.joining(", "))).append("}, "));
-        potion.ifPresent(potion -> builder.append("Potion: ").append(BuiltInRegistries.POTION.getKey(potion).toString()));
-        builder.append("NBT: ").append(components.toString()).append(", ");
-        builder.append("}");
-
-        return builder.toString();
+        return CODEC.encodeStart(JsonOps.INSTANCE, this).result().map(JsonElement::toString).orElse("");
     }
 }

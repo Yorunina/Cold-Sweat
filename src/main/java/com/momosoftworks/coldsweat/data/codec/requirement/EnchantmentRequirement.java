@@ -9,8 +9,6 @@ import com.momosoftworks.coldsweat.util.serialization.ConfigHelper;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.tags.TagKey;
@@ -53,14 +51,6 @@ public record EnchantmentRequirement(Either<TagKey<Enchantment>, Holder<Enchantm
             }
         }
         return false;
-    }
-
-    public CompoundTag serialize()
-    {   return (CompoundTag) CODEC.encodeStart(NbtOps.INSTANCE, this).result().orElseGet(CompoundTag::new);
-    }
-
-    public static EnchantmentRequirement deserialize(CompoundTag tag)
-    {   return CODEC.decode(NbtOps.INSTANCE, tag).result().orElseThrow(() -> new IllegalArgumentException("Could not deserialize EnchantmentRequirement")).getFirst();
     }
 
     @Override

@@ -10,8 +10,6 @@ import com.momosoftworks.coldsweat.util.serialization.RegistryHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
@@ -53,14 +51,6 @@ public record FluidRequirement(Optional<List<Either<TagKey<Fluid>, Fluid>>> flui
         }
     }
 
-    public CompoundTag serialize()
-    {   return (CompoundTag) CODEC.encodeStart(NbtOps.INSTANCE, this).result().orElseGet(CompoundTag::new);
-    }
-
-    public static FluidRequirement deserialize(CompoundTag tag)
-    {   return CODEC.decode(NbtOps.INSTANCE, tag).result().orElseThrow(() -> new IllegalArgumentException("Could not deserialize FluidRequirement")).getFirst();
-    }
-
     @Override
     public boolean equals(Object obj)
     {
@@ -88,6 +78,6 @@ public record FluidRequirement(Optional<List<Either<TagKey<Fluid>, Fluid>>> flui
     @Override
     public String toString()
     {
-        return CODEC.encodeStart(JsonOps.INSTANCE, this).mapOrElse(JsonElement::toString, err -> "Could not serialize object");
+        return CODEC.encodeStart(JsonOps.INSTANCE, this).result().map(Object::toString).orElse("serialize_failed");
     }
 }

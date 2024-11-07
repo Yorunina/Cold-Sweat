@@ -9,9 +9,6 @@ import com.momosoftworks.coldsweat.util.serialization.ConfigHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -22,7 +19,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public record EffectsRequirement(Map<Holder<MobEffect>, Instance> effects)
 {
@@ -103,14 +99,6 @@ public record EffectsRequirement(Map<Holder<MobEffect>, Instance> effects)
             && (instance.visible().isEmpty() || instance.visible().get() == effect.isVisible());
     }
 
-    public CompoundTag serialize()
-    {   return (CompoundTag) CODEC.encodeStart(NbtOps.INSTANCE, this).result().orElseGet(CompoundTag::new);
-    }
-
-    public static EffectsRequirement deserialize(CompoundTag tag)
-    {   return CODEC.decode(NbtOps.INSTANCE, tag).result().orElseThrow(() -> new IllegalArgumentException("Could not deserialize EffectsRequirement")).getFirst();
-    }
-
     @Override
     public boolean equals(Object obj)
     {
@@ -134,14 +122,6 @@ public record EffectsRequirement(Map<Holder<MobEffect>, Instance> effects)
                 Codec.BOOL.optionalFieldOf("ambient").forGetter(effect -> effect.ambient),
                 Codec.BOOL.optionalFieldOf("visible").forGetter(effect -> effect.visible)
         ).apply(instance, Instance::new));
-
-        public CompoundTag serialize()
-        {   return (CompoundTag) CODEC.encodeStart(NbtOps.INSTANCE, this).result().orElseGet(CompoundTag::new);
-        }
-
-        public static Instance deserialize(CompoundTag tag)
-        {   return CODEC.decode(NbtOps.INSTANCE, tag).result().orElseThrow(() -> new IllegalArgumentException("Could not deserialize BlockRequirement")).getFirst();
-        }
 
         @Override
         public boolean equals(Object obj)

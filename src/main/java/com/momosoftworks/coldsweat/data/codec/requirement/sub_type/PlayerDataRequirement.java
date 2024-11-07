@@ -11,9 +11,6 @@ import com.momosoftworks.coldsweat.util.entity.EntityHelper;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.advancements.CriterionProgress;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stat;
@@ -110,14 +107,6 @@ public record PlayerDataRequirement(IntegerBounds level, Optional<GameType> game
         return true;
     }
 
-    public CompoundTag serialize()
-    {   return (CompoundTag) CODEC.encodeStart(NbtOps.INSTANCE, this).result().orElseGet(CompoundTag::new);
-    }
-
-    public static EntitySubRequirement deserialize(CompoundTag tag)
-    {   return CODEC.decode(NbtOps.INSTANCE, tag).result().orElseThrow(() -> new IllegalArgumentException("Could not deserialize BlockRequirement")).getFirst();
-    }
-
     @Override
     public boolean equals(Object obj)
     {
@@ -171,14 +160,6 @@ public record PlayerDataRequirement(IntegerBounds level, Optional<GameType> game
         {   return statId.equals(BuiltInRegistries.STAT_TYPE.getKey(stat.getType())) && this.value.test(value);
         }
 
-        public CompoundTag serialize()
-        {   return (CompoundTag) CODEC.encodeStart(NbtOps.INSTANCE, this).result().orElseGet(CompoundTag::new);
-        }
-
-        public static StatRequirement deserialize(CompoundTag tag)
-        {   return CODEC.decode(NbtOps.INSTANCE, tag).result().orElseThrow(() -> new IllegalArgumentException("Could not deserialize BlockRequirement")).getFirst();
-        }
-
         @Override
         public boolean equals(Object obj)
         {
@@ -217,14 +198,6 @@ public record PlayerDataRequirement(IntegerBounds level, Optional<GameType> game
         {   return progress.isDone() == this.complete;
         }
 
-        public CompoundTag serialize()
-        {   return (CompoundTag) CODEC.encodeStart(NbtOps.INSTANCE, this).result().orElseGet(CompoundTag::new);
-        }
-
-        public static AdvancementCompletionRequirement deserialize(CompoundTag tag)
-        {   return CODEC.decode(NbtOps.INSTANCE, tag).result().orElseThrow(() -> new IllegalArgumentException("Could not deserialize BlockRequirement")).getFirst();
-        }
-
         @Override
         public boolean equals(Object obj)
         {
@@ -260,14 +233,6 @@ public record PlayerDataRequirement(IntegerBounds level, Optional<GameType> game
                 }
             }
             return true;
-        }
-
-        public CompoundTag serialize()
-        {   return (CompoundTag) CODEC.encodeStart(NbtOps.INSTANCE, this).result().orElseGet(CompoundTag::new);
-        }
-
-        public static AdvancementCriteriaRequirement deserialize(CompoundTag tag)
-        {   return CODEC.decode(NbtOps.INSTANCE, tag).result().orElseThrow(() -> new IllegalArgumentException("Could not deserialize BlockRequirement")).getFirst();
         }
 
         @Override

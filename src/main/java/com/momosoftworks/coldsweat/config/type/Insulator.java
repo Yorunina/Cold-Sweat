@@ -59,7 +59,7 @@ public record Insulator(Insulation insulation, Insulation.Slot slot, ItemRequire
 
     @Override
     public CompoundTag serialize()
-    {   return (CompoundTag) CODEC.encodeStart(NbtOps.INSTANCE, this).result().orElse(new CompoundTag());
+    {   return (CompoundTag) CODEC.encodeStart(NbtOps.INSTANCE, this).result().orElseGet(CompoundTag::new);
     }
 
     public static Insulator deserialize(CompoundTag tag)
@@ -71,8 +71,8 @@ public record Insulator(Insulation insulation, Insulation.Slot slot, ItemRequire
     {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        Insulator insulator = (Insulator) obj;
 
+        Insulator insulator = (Insulator) obj;
         return insulation.equals(insulator.insulation)
             && data.equals(insulator.data)
             && predicate.equals(insulator.predicate)

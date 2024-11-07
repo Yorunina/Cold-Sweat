@@ -34,7 +34,6 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.animal.Cod;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
@@ -676,7 +675,7 @@ public class ConfigHelper
             itemData.add(insulator.insulation() instanceof StaticInsulation
                          ? "static"
                          : "adaptive");
-            itemData.add(insulator.data().components().serialize().toString());
+            itemData.add(insulator.data().components().components().toString());
 
             return itemData;
         });
