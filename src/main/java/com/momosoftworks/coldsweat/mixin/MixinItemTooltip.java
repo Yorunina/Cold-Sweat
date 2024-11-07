@@ -1,5 +1,6 @@
 package com.momosoftworks.coldsweat.mixin;
 
+import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Pair;
 import com.momosoftworks.coldsweat.client.event.TooltipHandler;
 import com.momosoftworks.coldsweat.common.capability.handler.EntityTempManager;
@@ -7,6 +8,7 @@ import com.momosoftworks.coldsweat.common.capability.handler.ItemInsulationManag
 import com.momosoftworks.coldsweat.config.ConfigSettings;
 import com.momosoftworks.coldsweat.config.type.Insulator;
 import com.momosoftworks.coldsweat.data.codec.util.AttributeModifierMap;
+import com.momosoftworks.coldsweat.util.math.FastMultiMap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
@@ -52,32 +54,38 @@ public abstract class MixinItemTooltip
 
         // Add insulation attributes to tooltip
         AttributeModifierMap insulatorAttributes = new AttributeModifierMap();
+        AttributeModifierMap unmetInsulatorAttributes = new AttributeModifierMap();
         for (Insulator insulator : ConfigSettings.INSULATION_ITEMS.get().get(stack.getItem()))
         {
             if (insulator.test(player, stack))
             {   insulatorAttributes.putAll(insulator.attributes());
             }
+            else unmetInsulatorAttributes.putAll(insulator.attributes());
         }
-        if (!insulatorAttributes.isEmpty())
+        if (!insulatorAttributes.isEmpty() || !unmetInsulatorAttributes.isEmpty())
         {
             tooltip.add(CommonComponents.EMPTY);
             tooltip.add(Component.translatable("item.modifiers.insulation").withStyle(ChatFormatting.GRAY));
-            TooltipHandler.addModifierTooltipLines(tooltip, insulatorAttributes);
+            TooltipHandler.addModifierTooltipLines(tooltip, insulatorAttributes, false);
+            TooltipHandler.addModifierTooltipLines(tooltip, unmetInsulatorAttributes, true);
         }
 
         // Add curio attributes to tooltip
         AttributeModifierMap curioAttributes = new AttributeModifierMap();
+        AttributeModifierMap unmetCurioAttributes = new AttributeModifierMap();
         for (Insulator insulator : ConfigSettings.INSULATING_CURIOS.get().get(stack.getItem()))
         {
             if (insulator.test(player, stack))
             {   curioAttributes.putAll(insulator.attributes());
             }
+            else unmetCurioAttributes.putAll(insulator.attributes());
         }
-        if (!curioAttributes.isEmpty())
+        if (!curioAttributes.isEmpty() || !unmetCurioAttributes.isEmpty())
         {
             tooltip.add(CommonComponents.EMPTY);
             tooltip.add(Component.translatable("item.modifiers.curio").withStyle(ChatFormatting.GRAY));
-            TooltipHandler.addModifierTooltipLines(tooltip, curioAttributes);
+            TooltipHandler.addModifierTooltipLines(tooltip, curioAttributes, false);
+            TooltipHandler.addModifierTooltipLines(tooltip, unmetCurioAttributes, true);
         }
     }
 
@@ -95,11 +103,9 @@ public abstract class MixinItemTooltip
 
         for (Insulator insulator : ConfigSettings.INSULATING_ARMORS.get().get(stack.getItem()))
         {
-            if (insulator.test(player, stack))
-            {
-                for (Map.Entry<Attribute, AttributeModifier> entry : insulator.attributes().getMap().entries())
-                {   pTooltipAdder.accept(TooltipHandler.getFormattedAttributeModifier(Holder.direct(entry.getKey()), entry.getValue().amount(), entry.getValue().operation(), true));
-                }
+            boolean strikethrough = !insulator.test(player, stack);
+            for (Map.Entry<Attribute, AttributeModifier> entry : insulator.attributes().getMap().entries())
+            {   pTooltipAdder.accept(TooltipHandler.getFormattedAttributeModifier(Holder.direct(entry.getKey()), entry.getValue().amount(), entry.getValue().operation(), true, strikethrough));
             }
         }
         ItemInsulationManager.getInsulationCap(stack).ifPresent(cap ->
@@ -108,11 +114,9 @@ public abstract class MixinItemTooltip
             {
                 for (Insulator insulator : ConfigSettings.INSULATION_ITEMS.get().get(item.getItem()))
                 {
-                    if (insulator.test(player, item))
-                    {
-                        for (Map.Entry<Attribute, AttributeModifier> entry : insulator.attributes().getMap().entries())
-                        {   pTooltipAdder.accept(TooltipHandler.getFormattedAttributeModifier(Holder.direct(entry.getKey()), entry.getValue().amount(), entry.getValue().operation(), true));
-                        }
+                    boolean strikethrough = !insulator.test(player, stack);
+                    for (Map.Entry<Attribute, AttributeModifier> entry : insulator.attributes().getMap().entries())
+                    {   pTooltipAdder.accept(TooltipHandler.getFormattedAttributeModifier(Holder.direct(entry.getKey()), entry.getValue().amount(), entry.getValue().operation(), true, strikethrough));
                     }
                 }
             });
@@ -126,7 +130,8 @@ public abstract class MixinItemTooltip
     {
         if (EntityTempManager.isTemperatureAttribute(attribute.value()))
         {
-            MutableComponent newline = TooltipHandler.getFormattedAttributeModifier(attribute, modifier.amount(), modifier.operation(), false);
+            // TODO: Check this
+            MutableComponent newline = TooltipHandler.getFormattedAttributeModifier(attribute, modifier.amount(), modifier.operation(), false, false);
             tooltip.accept(newline);
             ci.cancel();
         }
