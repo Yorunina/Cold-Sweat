@@ -317,7 +317,7 @@ public class Temperature
                     TempModifier modifier = modifiers.get(i);
                     if (condition.test(modifier))
                     {
-                        TempModifierEvent.Remove event = new TempModifierEvent.Remove(entity, trait, maxCount, modifier);
+                        TempModifierEvent.Remove event = new TempModifierEvent.Remove(entity, trait, modifier);
                         NeoForge.EVENT_BUS.post(event);
                         if (!event.isCanceled())
                         {

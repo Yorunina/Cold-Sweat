@@ -39,8 +39,8 @@ public class TempModifierEvent extends Event
     /**
      * Fired when a {@link TempModifier} is about to be added to an entity. <br>
      * <br>
-     * {@link #entity} is the player the TempModifier is being applied to. <br>
-     * {@link #trait} determines the modifier's {@link Temperature.Trait}. It will never be {@link Temperature.Trait#BODY} <br>
+     * {@link #entity} - The player the TempModifier is being applied to. <br>
+     * {@link #trait} - The {@link Temperature.Trait} the modifier will be applied to. <br>
      * <br>
      * This is an {@link ICancellableEvent}. <br>
      * Canceling this event will prevent the TempModifier from being added.<br>
@@ -65,10 +65,9 @@ public class TempModifierEvent extends Event
     /**
      * Fired when a {@link TempModifier} is about to be removed from an entity. <br>
      * <br>
-     * {@link #entity} is the player the TempModifier is being removed from. <br>
-     * {@link #trait} is the modifier's {@link Temperature.Trait}. It will never be {@link Temperature.Trait#BODY}. <br>
-     * {@link #count} is the number of TempModifiers of the specified class being removed. <br>
-     * {@link #modifier} is the TempModifier being removed. <br>
+     * {@link #entity} - The player the TempModifier is being removed from. <br>
+     * {@link #trait} - The modifier's {@link Temperature.Trait}. It will never be {@link Temperature.Trait#BODY}. <br>
+     * {@link #modifier} - The TempModifier being removed. <br>
      * <br>
      * This is an {@link ICancellableEvent}. <br>
      * Canceling this event will prevent the TempModifier from being removed. <br>
@@ -77,20 +76,9 @@ public class TempModifierEvent extends Event
      */
     public static class Remove extends TempModifierEvent implements ICancellableEvent
     {
-        int count;
-
-        public Remove(LivingEntity entity, Temperature.Trait trait, int count, TempModifier modifier)
+        public Remove(LivingEntity entity, Temperature.Trait trait, TempModifier modifier)
         {
             super(entity, trait, modifier);
-            this.count = count;
-        }
-
-        public void setCount(int count)
-        {   this.count = count;
-        }
-
-        public int getCount()
-        {   return count;
         }
     }
 
