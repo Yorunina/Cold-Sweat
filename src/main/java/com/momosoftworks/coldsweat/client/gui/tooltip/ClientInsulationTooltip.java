@@ -35,12 +35,14 @@ public class ClientInsulationTooltip implements ClientTooltipComponent
     Insulation.Slot slot;
     int width = 0;
     ItemStack stack;
+    boolean strikethrough;
 
-    public ClientInsulationTooltip(List<Insulation> insulation, Insulation.Slot slot, ItemStack stack)
+    public ClientInsulationTooltip(List<Insulation> insulation, Insulation.Slot slot, ItemStack stack, boolean strikethrough)
     {
         this.insulation = insulation;
         this.slot = slot;
         this.stack = stack;
+        this.strikethrough = strikethrough;
     }
 
     @Override
@@ -113,6 +115,11 @@ public class ClientInsulationTooltip implements ClientTooltipComponent
             width += renderBar(graphics, x + width, y, negInsulation, slot, true, true, stack);
         }
         poseStack.popPose();
+        if (this.strikethrough)
+        {
+            graphics.fill(x - 1, y + 2, x + width + 1, y + 3, 0xaFF63232);
+            graphics.fill(x, y + 3, x + width + 2, y + 4, 0xaFF63232);
+        }
     }
 
     static void renderCell(GuiGraphics graphics, int x, int y, double insulation, int uvX, boolean isAdaptive)

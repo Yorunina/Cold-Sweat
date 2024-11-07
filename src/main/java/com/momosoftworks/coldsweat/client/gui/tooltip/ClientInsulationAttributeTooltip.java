@@ -24,10 +24,12 @@ public class ClientInsulationAttributeTooltip implements ClientTooltipComponent
 
     Component original;
     Font font;
+    boolean strikethrough;
 
-    public ClientInsulationAttributeTooltip(Component original, Font font)
+    public ClientInsulationAttributeTooltip(Component original, Font font, boolean strikethrough)
     {   this.original = original;
         this.font = font;
+        this.strikethrough = strikethrough;
     }
 
     @Override
@@ -48,5 +50,9 @@ public class ClientInsulationAttributeTooltip implements ClientTooltipComponent
         // Text
         int color = Optional.ofNullable(this.original.getStyle().getColor()).map(TextColor::getValue).orElse(16777215);
         graphics.drawString(font, this.original, x + 10, y + 1, color);
+        if (strikethrough)
+        {   graphics.fill(x - 1, y + 4, x + this.getWidth(font) + 1, y + 5, 401, 0xAFF63232);
+            graphics.fill(x, y + 5, x + this.getWidth(font) + 2, y + 6, 401, 0xAFF63232);
+        }
     }
 }
