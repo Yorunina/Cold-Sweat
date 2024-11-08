@@ -1,10 +1,13 @@
 package com.momosoftworks.coldsweat.compat.kubejs;
 
+import com.momosoftworks.coldsweat.api.event.common.insulation.InsulateItemEvent;
+import com.momosoftworks.coldsweat.api.event.common.temperautre.TempModifierEvent;
 import com.momosoftworks.coldsweat.api.event.common.temperautre.TemperatureChangedEvent;
 import dev.architectury.event.EventResult;
 import dev.latvian.mods.kubejs.KubeJSPlugin;
 import dev.latvian.mods.kubejs.script.BindingsEvent;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class KubePlugin extends KubeJSPlugin
@@ -12,7 +15,9 @@ public class KubePlugin extends KubeJSPlugin
     @Override
     public void registerEvents()
     {
+        KubeEventHandlers.COLD_SWEAT.register();
         KubeEventHandlers.init();
+        MinecraftForge.EVENT_BUS.register(KubePlugin.class);
     }
 
     @Override
@@ -22,11 +27,34 @@ public class KubePlugin extends KubeJSPlugin
     }
 
     @SubscribeEvent
+    public static void fireRegistries(ServerAboutToStartEvent event)
+    {
+        KubeEventSignatures.REGISTRIES.invoker().buildRegistries();
+    }
+
+    @SubscribeEvent
     public static void onTempChanged(TemperatureChangedEvent event)
     {
-        LivingEntity entity = event.getEntity();
-        EventResult result = KubeEventSignatures.TEMPERATURE_CHANGED.invoker().onTemperatureChanged(entity, event.getTrait(), event.getOldTemperature(), event.getTemperature());
-        if (result.isTrue())
+        EventResult result = KubeEventSignatures.TEMPERATURE_CHANGED.invoker().onTemperatureChanged(event);
+        if (result.isFalse())
+        {   event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onItemInsulated(InsulateItemEvent event)
+    {
+        EventResult result = KubeEventSignatures.INSULATE_ITEM.invoker().insulateItem(event);
+        if (result.isFalse())
+        {   event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onModifierAdded(TempModifierEvent.Add event)
+    {
+        EventResult result = KubeEventSignatures.ADD_MODIFIER.invoker().addModifier(event);
+        if (result.isFalse())
         {   event.setCanceled(true);
         }
     }
