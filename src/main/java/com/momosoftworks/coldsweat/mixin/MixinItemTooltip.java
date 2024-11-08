@@ -97,7 +97,7 @@ public abstract class MixinItemTooltip
     {
         // We don't care if the item is not equipped in the correct slot
         if (player == null || EquipmentSlotGroup.bySlot(Minecraft.getInstance().player.getEquipmentSlotForItem(stack)) != slot
-        || Arrays.stream(EquipmentSlot.values()).noneMatch(eq -> slot.test(eq) && stack.equals(player.getItemBySlot(eq))))
+        || Arrays.stream(EquipmentSlot.values()).noneMatch(eq -> slot.test(eq)))
         {   return;
         }
 
