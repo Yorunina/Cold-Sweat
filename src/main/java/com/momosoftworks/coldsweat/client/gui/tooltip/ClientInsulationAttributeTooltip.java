@@ -51,8 +51,8 @@ public class ClientInsulationAttributeTooltip implements ClientTooltipComponent
         int color = Optional.ofNullable(this.original.getStyle().getColor()).map(TextColor::getValue).orElse(16777215);
         graphics.drawString(font, this.original, x + 10, y + 1, color);
         if (strikethrough)
-        {   graphics.fill(x - 1, y + 4, x + this.getWidth(font) + 1, y + 5, 401, 0xAFF63232);
-            graphics.fill(x, y + 5, x + this.getWidth(font) + 2, y + 6, 401, 0xAFF63232);
+        {   graphics.fill(x + 10, y + 4, x + this.getWidth(font) + 1, y + 5, 401, 0xFFF63232);
+            graphics.fill(x + 11, y + 5, x + this.getWidth(font) + 2, y + 6, 401, 0xFFF63232);
         }
     }
 }
