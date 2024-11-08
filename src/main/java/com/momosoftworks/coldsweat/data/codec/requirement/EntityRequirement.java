@@ -4,6 +4,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.momosoftworks.coldsweat.data.codec.requirement.sub_type.EntitySubRequirement;
+import com.momosoftworks.coldsweat.data.codec.requirement.sub_type.PlayerDataRequirement;
+import com.momosoftworks.coldsweat.util.serialization.SerializablePredicate;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
@@ -16,19 +18,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public record EntityRequirement(Optional<EntityType<?>> type, Optional<TagKey<EntityType<?>>> tag,
                                 Optional<LocationRequirement> location, Optional<LocationRequirement> steppingOn,
                                 Optional<EffectsRequirement> effects, Optional<NbtRequirement> nbt, Optional<EntityFlagsRequirement> flags,
                                 Optional<EquipmentRequirement> equipment, Optional<EntitySubRequirement> typeSpecificData,
                                 Optional<String> team,
-                                Optional<EntityRequirement> vehicle, Optional<EntityRequirement> passenger, Optional<EntityRequirement> target)
+                                Optional<EntityRequirement> vehicle, Optional<EntityRequirement> passenger, Optional<EntityRequirement> target,
+                                Optional<SerializablePredicate<Entity>> predicate)
 {
     public static EntityRequirement NONE = new EntityRequirement(Optional.empty(), Optional.empty(), Optional.empty(),
                                                                  Optional.empty(), Optional.empty(), Optional.empty(),
                                                                  Optional.empty(), Optional.empty(), Optional.empty(),
                                                                  Optional.empty(), Optional.empty(), Optional.empty(),
-                                                                 Optional.empty());
+                                                                 Optional.empty(), Optional.empty());
 
     public static Codec<EntityRequirement> SIMPLE_CODEC = RecordCodecBuilder.create(instance -> instance.group(
             BuiltInRegistries.ENTITY_TYPE.byNameCodec().optionalFieldOf("type").forGetter(requirement -> requirement.type),
@@ -41,7 +45,8 @@ public record EntityRequirement(Optional<EntityType<?>> type, Optional<TagKey<En
             EquipmentRequirement.CODEC.optionalFieldOf("equipment").forGetter(requirement -> requirement.equipment),
             Codec.STRING.optionalFieldOf("team").forGetter(requirement -> requirement.team)
     ).apply(instance, (type, tag, location, standingOn, effects, nbt, flags, equipment, team) -> new EntityRequirement(type, tag, location, standingOn, effects, nbt, flags, equipment,
-                                                                                                            Optional.empty(), team, Optional.empty(), Optional.empty(), Optional.empty())));
+                                                                                                                 Optional.empty(), team, Optional.empty(), Optional.empty(), Optional.empty(),
+                                                                                                                 Optional.empty())));
 
     private static final List<Codec<EntityRequirement>> REQUIREMENT_CODEC_STACK = new ArrayList<>(List.of(SIMPLE_CODEC));
     // Allow for up to 16 layers of inner codecs
@@ -49,6 +54,23 @@ public record EntityRequirement(Optional<EntityType<?>> type, Optional<TagKey<En
     {   for (int i = 0; i < 4; i++)
         {   addCodecStack();
         }
+    }
+
+    public EntityRequirement(Predicate<Entity> predicate)
+    {
+        this(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+             Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+             Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+             Optional.empty(), Optional.of(new SerializablePredicate<>(predicate)));
+    }
+
+    public EntityRequirement(Optional<EntityType<?>> type, Optional<TagKey<EntityType<?>>> tag, Optional<LocationRequirement> location,
+                             Optional<LocationRequirement> steppingOn, Optional<EffectsRequirement> effects, Optional<NbtRequirement> nbt,
+                             Optional<EntityFlagsRequirement> flags, Optional<EquipmentRequirement> equipment, Optional<EntitySubRequirement> playerData,
+                             Optional<String> team, Optional<EntityRequirement> vehicle, Optional<EntityRequirement> passenger,
+                             Optional<EntityRequirement> target)
+    {
+        this(type, tag, location, steppingOn, effects, nbt, flags, equipment, playerData, team, vehicle, passenger, target, Optional.empty());
     }
 
     public static Codec<EntityRequirement> getCodec()
@@ -81,6 +103,9 @@ public record EntityRequirement(Optional<EntityType<?>> type, Optional<TagKey<En
     {
         if (entity == null)
         {   return true;
+        }
+        if (this.predicate.isPresent())
+        {   return this.predicate.get().test(entity);
         }
         if (Objects.equals(this, NONE))
         {   return true;

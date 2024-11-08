@@ -7,41 +7,30 @@ import net.minecraft.world.entity.LivingEntity;
 
 public class TempChangedEventJS implements KubeLivingEntityEvent
 {
-    private final LivingEntity entity;
-    private final Temperature.Trait trait;
-    private final double oldTemperature;
-    private double newTemperature;
-
-    public TempChangedEventJS(LivingEntity entity, Temperature.Trait trait, double oldTemperature, double newTemperature)
-    {
-        this.entity = entity;
-        this.trait = trait;
-        this.oldTemperature = oldTemperature;
-        this.newTemperature = newTemperature;
-    }
+    private final TemperatureChangedEvent event;
 
     public TempChangedEventJS(TemperatureChangedEvent event)
-    {   this(event.getEntity(), event.getTrait(), event.getOldTemperature(), event.getTemperature());
+    {   this.event = event;
     }
 
     @Override
     public LivingEntity getEntity()
-    {   return entity;
+    {   return event.getEntity();
     }
 
     public Temperature.Trait getTrait()
-    {   return trait;
+    {   return event.getTrait();
     }
 
     public double getOldTemperature()
-    {   return oldTemperature;
+    {   return event.getOldTemperature();
     }
 
     public double getTemperature()
-    {   return newTemperature;
+    {   return event.getTemperature();
     }
 
     public void setTemperature(double newTemperature)
-    {   this.newTemperature = newTemperature;
+    {   event.setTemperature(newTemperature);
     }
 }

@@ -8,6 +8,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.momosoftworks.coldsweat.data.codec.util.CommonStreamCodecs;
 import com.momosoftworks.coldsweat.data.codec.util.IntegerBounds;
 import com.momosoftworks.coldsweat.util.serialization.ConfigHelper;
+import com.momosoftworks.coldsweat.util.serialization.SerializablePredicate;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -24,11 +25,12 @@ import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public record ItemRequirement(Optional<List<Either<TagKey<Item>, Item>>> items, Optional<TagKey<Item>> tag,
                               Optional<IntegerBounds> count, Optional<IntegerBounds> durability,
                               Optional<List<EnchantmentRequirement>> enchantments, Optional<List<EnchantmentRequirement>> storedEnchantments,
-                              Optional<Potion> potion, ItemComponentsRequirement components)
+                              Optional<Potion> potion, ItemComponentsRequirement components, Optional<SerializablePredicate<ItemStack>> predicate)
 {
     public static final Codec<ItemRequirement> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ConfigHelper.tagOrBuiltinCodec(Registries.ITEM, BuiltInRegistries.ITEM).listOf().optionalFieldOf("items").forGetter(predicate -> predicate.items),
@@ -38,7 +40,9 @@ public record ItemRequirement(Optional<List<Either<TagKey<Item>, Item>>> items, 
             EnchantmentRequirement.CODEC.listOf().optionalFieldOf("enchantments").forGetter(predicate -> predicate.enchantments),
             EnchantmentRequirement.CODEC.listOf().optionalFieldOf("stored_enchantments").forGetter(predicate -> predicate.storedEnchantments),
             BuiltInRegistries.POTION.byNameCodec().optionalFieldOf("potion").forGetter(predicate -> predicate.potion),
-            ItemComponentsRequirement.CODEC.optionalFieldOf("components", new ItemComponentsRequirement()).forGetter(predicate -> predicate.components)
+            ItemComponentsRequirement.CODEC.optionalFieldOf("components", new ItemComponentsRequirement()).forGetter(predicate -> predicate.components),
+            Codec.STRING.xmap(SerializablePredicate::<ItemStack>deserialize, SerializablePredicate::serialize)
+                        .optionalFieldOf("predicate").forGetter(predicate -> predicate.predicate)
     ).apply(instance, ItemRequirement::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ItemRequirement> STREAM_CODEC = StreamCodec.of(
@@ -70,14 +74,33 @@ public record ItemRequirement(Optional<List<Either<TagKey<Item>, Item>>> items, 
                                                                    Optional.empty(), Optional.empty(), Optional.empty(),
                                                                    Optional.empty(), new ItemComponentsRequirement());
 
+    public ItemRequirement(Optional<List<Either<TagKey<Item>, Item>>> items, Optional<TagKey<Item>> tag,
+                           Optional<IntegerBounds> count, Optional<IntegerBounds> durability,
+                           Optional<List<EnchantmentRequirement>> enchantments,
+                           Optional<List<EnchantmentRequirement>> storedEnchantments,
+                           Optional<Potion> potion, ItemComponentsRequirement components)
+    {
+        this(items, tag, count, durability, enchantments, storedEnchantments, potion, components, Optional.empty());
+    }
+
+    public ItemRequirement(Predicate<ItemStack> predicate)
+    {
+        this(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+             Optional.empty(), Optional.empty(), Optional.empty(), new ItemComponentsRequirement(),
+             Optional.of(new SerializablePredicate<>(predicate)));
+    }
+
     public boolean test(ItemStack stack, boolean ignoreCount)
     {
+        if (this.predicate.isPresent())
+        {   return this.predicate.get().test(stack);
+        }
         if (stack.isEmpty() && items.isPresent() && !items.get().isEmpty())
         {   return false;
         }
 
-        if (this.components.components().isEmpty())
-        {   return true;
+        if (!this.components.components().isEmpty())
+        {   return false;
         }
         if (items.isPresent())
         {
