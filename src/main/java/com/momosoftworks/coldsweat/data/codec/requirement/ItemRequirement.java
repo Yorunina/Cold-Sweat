@@ -159,44 +159,20 @@ public record ItemRequirement(Optional<List<Either<TagKey<Item>, Item>>> items, 
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-        {   return true;
-        }
-        if (obj == null || getClass() != obj.getClass())
-        {   return false;
-        }
-
-        ItemRequirement that = (ItemRequirement) obj;
-
-        if (!items.equals(that.items))
-        {   return false;
-        }
-        if (!items.equals(that.items))
-        {   return false;
-        }
-        if (!count.equals(that.count))
-        {   return false;
-        }
-        if (!durability.equals(that.durability))
-        {   return false;
-        }
-        if (!enchantments.equals(that.enchantments))
-        {   return false;
-        }
-        if (!storedEnchantments.equals(that.storedEnchantments))
-        {   return false;
-        }
-        if (!potion.equals(that.potion))
-        {   return false;
-        }
-        return components.equals(that.components);
+    public String toString()
+    {   return CODEC.encodeStart(JsonOps.INSTANCE, this).result().map(Object::toString).orElse("serialize_failed");
     }
 
     @Override
-    public String toString()
+    public boolean equals(Object obj)
     {
-        return CODEC.encodeStart(JsonOps.INSTANCE, this).result().map(JsonElement::toString).orElse("");
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        ItemRequirement that = (ItemRequirement) obj;
+        return items.equals(that.items) && tag.equals(that.tag) && count.equals(that.count)
+            && durability.equals(that.durability) && enchantments.equals(that.enchantments)
+            && storedEnchantments.equals(that.storedEnchantments) && potion.equals(that.potion)
+            && components.equals(that.components) && predicate.equals(that.predicate);
     }
 }

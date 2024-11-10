@@ -100,17 +100,17 @@ public record EffectsRequirement(Map<Holder<MobEffect>, Instance> effects)
     }
 
     @Override
+    public String toString()
+    {   return CODEC.encodeStart(JsonOps.INSTANCE, this).result().map(Object::toString).orElse("serialize_failed");
+    }
+
+    @Override
     public boolean equals(Object obj)
     {
-        if (this == obj)
-        {   return true;
-        }
-        if (obj == null || getClass() != obj.getClass())
-        {   return false;
-        }
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
 
         EffectsRequirement that = (EffectsRequirement) obj;
-
         return effects.equals(that.effects);
     }
 
@@ -124,37 +124,21 @@ public record EffectsRequirement(Map<Holder<MobEffect>, Instance> effects)
         ).apply(instance, Instance::new));
 
         @Override
-        public boolean equals(Object obj)
-        {
-            if (this == obj)
-            {   return true;
-            }
-            if (obj == null || getClass() != obj.getClass())
-            {   return false;
-            }
-
-            Instance instance = (Instance) obj;
-
-            if (!amplifier.equals(instance.amplifier))
-            {   return false;
-            }
-            if (!duration.equals(instance.duration))
-            {   return false;
-            }
-            if (!ambient.equals(instance.ambient))
-            {   return false;
-            }
-            return visible.equals(instance.visible);
-        }
-
-        /*@Override
         public String toString()
         {   return CODEC.encodeStart(JsonOps.INSTANCE, this).result().map(Object::toString).orElse("serialize_failed");
-        }*/
-    }
+        }
 
-    /*@Override
-    public String toString()
-    {   return CODEC.encodeStart(JsonOps.INSTANCE, this).result().map(Object::toString).orElse("serialize_failed");
-    }*/
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+
+            Instance that = (Instance) obj;
+            return amplifier.equals(that.amplifier)
+                    && duration.equals(that.duration)
+                    && ambient.equals(that.ambient)
+                    && visible.equals(that.visible);
+        }
+    }
 }

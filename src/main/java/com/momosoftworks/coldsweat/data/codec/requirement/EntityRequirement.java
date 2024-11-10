@@ -160,18 +160,19 @@ public record EntityRequirement(Optional<EntityType<?>> type, Optional<TagKey<En
     }
 
     @Override
+    public String toString()
+    {   return getCodec().encodeStart(JsonOps.INSTANCE, this).result().map(Object::toString).orElse("serialize_failed");
+    }
+
+    @Override
     public boolean equals(Object obj)
     {
-        if (this == obj)
-        {   return true;
-        }
-        if (obj == null || getClass() != obj.getClass())
-        {   return false;
-        }
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
 
         EntityRequirement that = (EntityRequirement) obj;
-
         return type.equals(that.type)
+            && tag.equals(that.tag)
             && location.equals(that.location)
             && steppingOn.equals(that.steppingOn)
             && effects.equals(that.effects)
@@ -181,11 +182,7 @@ public record EntityRequirement(Optional<EntityType<?>> type, Optional<TagKey<En
             && typeSpecificData.equals(that.typeSpecificData)
             && vehicle.equals(that.vehicle)
             && passenger.equals(that.passenger)
-            && target.equals(that.target);
-    }
-
-    @Override
-    public String toString()
-    {   return getCodec().encodeStart(JsonOps.INSTANCE, this).result().map(Object::toString).orElse("serialize_failed");
+            && target.equals(that.target)
+            && predicate.equals(that.predicate);
     }
 }
