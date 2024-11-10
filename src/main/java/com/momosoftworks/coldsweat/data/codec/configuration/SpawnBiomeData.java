@@ -28,7 +28,6 @@ public record SpawnBiomeData(List<Either<TagKey<Biome>, Biome>> biomes, MobCateg
 
     @Override
     public String toString()
-    {
-        return CODEC.encodeStart(JsonOps.INSTANCE, this).result().map(Object::toString).orElse("");
+    {   return CODEC.encodeStart(JsonOps.INSTANCE, this).result().map(Object::toString).orElse("serialize_failed");
     }
 }
