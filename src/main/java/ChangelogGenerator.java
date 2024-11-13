@@ -67,7 +67,6 @@ public class ChangelogGenerator
             }
 
             writer.write("</pre></div>");
-            writer.write("</body></html>");
 
         }
         catch (IOException e)
