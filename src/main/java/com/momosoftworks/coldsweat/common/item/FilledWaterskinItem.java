@@ -302,24 +302,23 @@ public class FilledWaterskinItem extends Item
         double temp = CSMath.round(stack.get(ModItemComponents.WATER_TEMPERATURE), 2);
         if (TooltipHandler.isShiftDown())
         {
+            String crouchKey = Minecraft.getInstance().options.keyShift.getKey().getDisplayName().getString();
+            tooltip.add(Component.translatable("tooltip.cold_sweat.waterskin.drink", Component.literal(crouchKey).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY));
+
             // Info tooltip for hotbar functionality
             String perSecond = Component.translatable("tooltip.cold_sweat.per_second").getString();
 
             tooltip.add(Component.empty());
             tooltip.add(Component.translatable("tooltip.cold_sweat.hotbar").withStyle(ChatFormatting.GRAY));
-            Component tempEffectText = (temp > 0
-                        ? Component.translatable("tooltip.cold_sweat.temperature_effect", "+" + CSMath.round(EFFECT_RATE * ConfigSettings.TEMP_RATE.get(), 2)).withStyle(TooltipHandler.HOT) :
-                        temp == 0
-                        ? Component.translatable("tooltip.cold_sweat.temperature_effect", "+0") :
-                        Component.translatable("tooltip.cold_sweat.temperature_effect", CSMath.round(EFFECT_RATE * ConfigSettings.TEMP_RATE.get(), 2)).withStyle(TooltipHandler.COLD))
+            Component tempEffectText = (temp > 0  ? Component.translatable("tooltip.cold_sweat.temperature_effect", "+" + CSMath.round(EFFECT_RATE * ConfigSettings.TEMP_RATE.get(), 2)).withStyle(TooltipHandler.HOT) :
+                                        temp == 0 ? Component.translatable("tooltip.cold_sweat.temperature_effect", "+0").withStyle(ChatFormatting.WHITE)
+                                                  : Component.translatable("tooltip.cold_sweat.temperature_effect", "-" + CSMath.round(EFFECT_RATE * ConfigSettings.TEMP_RATE.get(), 2)).withStyle(TooltipHandler.COLD))
                         .append(perSecond);
             tooltip.add(tempEffectText);
 
-            Component tempText = temp > 0
-                                 ? Component.translatable("tooltip.cold_sweat.temperature_effect", "+" + CSMath.formatDoubleOrInt(temp)).withStyle(TooltipHandler.HOT) :
-                                 temp == 0
-                                 ? Component.translatable("tooltip.cold_sweat.temperature_effect", "+" + CSMath.formatDoubleOrInt(temp)) :
-                                 Component.translatable("tooltip.cold_sweat.temperature_effect", CSMath.formatDoubleOrInt(temp)).withStyle(TooltipHandler.COLD);
+            Component tempText = temp > 0  ? Component.translatable("tooltip.cold_sweat.temperature_effect", "+" + CSMath.formatDoubleOrInt(temp)).withStyle(TooltipHandler.HOT) :
+                                 temp == 0 ? Component.translatable("tooltip.cold_sweat.temperature_effect", "+" + CSMath.formatDoubleOrInt(temp)).withStyle(ChatFormatting.WHITE)
+                                           : Component.translatable("tooltip.cold_sweat.temperature_effect", CSMath.formatDoubleOrInt(temp)).withStyle(TooltipHandler.COLD);
 
             // Info tooltip for drinking/pouring functionality
             tooltip.add(Component.empty());
