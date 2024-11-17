@@ -415,9 +415,7 @@ public class ConfigSettings
                 }
             }
             ConfigLoadingHandler.removeEntries(dataMap.values(), ModRegistries.FUEL_DATA);
-            for (Map.Entry<Item, FuelData> entry : dataMap.entries())
-            {   holder.get().put(entry.getKey(), entry.getValue());
-            }
+            holder.get().putAll(dataMap);
         };
         BOILER_FUEL = addSetting("boiler_fuel_items", FastMultiMap::new, holder -> fuelAdder.accept(FuelData.FuelType.BOILER, ItemSettingsConfig.BOILER_FUELS, holder));
         ICEBOX_FUEL = addSetting("icebox_fuel_items", FastMultiMap::new, holder -> fuelAdder.accept(FuelData.FuelType.ICEBOX, ItemSettingsConfig.ICEBOX_FUELS, holder));
@@ -674,8 +672,8 @@ public class ConfigSettings
             };
 
             // Parse goat and chameleon biomes
-            configReader.accept(EntitySettingsConfig.getInstance().getChameleonSpawnBiomes(), ModEntities.CHAMELEON);
-            configReader.accept(EntitySettingsConfig.getInstance().getGoatSpawnBiomes(), EntityType.GOAT);
+            configReader.accept(EntitySettingsConfig.CHAMELEON_SPAWN_BIOMES.get(), ModEntities.CHAMELEON);
+            configReader.accept(EntitySettingsConfig.GOAT_SPAWN_BIOMES.get(), EntityType.GOAT);
         });
 
         INSULATED_MOUNTS = addSetting("insulated_entities", FastMultiMap::new, holder ->
@@ -686,7 +684,7 @@ public class ConfigSettings
             {
                 MountData data = MountData.fromToml(list);
                 for (EntityType<?> entityType : RegistryHelper.mapForgeRegistryTagList(ForgeRegistries.ENTITY_TYPES, data.entities()))
-                {   dataMap.put(entityType, MountData.fromToml(list));
+                {   dataMap.put(entityType, data);
                 }
             }
             // Handle registry removals
