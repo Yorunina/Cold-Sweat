@@ -2,8 +2,8 @@ package com.momosoftworks.coldsweat.core.init;
 
 import com.momosoftworks.coldsweat.ColdSweat;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
-import com.momosoftworks.coldsweat.config.type.Insulator;
 import com.momosoftworks.coldsweat.compat.CompatManager;
+import com.momosoftworks.coldsweat.data.codec.configuration.InsulatorData;
 import com.momosoftworks.coldsweat.util.serialization.ObjectBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -87,8 +87,8 @@ public class ModCreativeTabs
             .title(Component.translatable("itemGroup.cs_insulation_items"))
             .build());
 
-    private static List<ItemStack> sort(Collection<Map.Entry<Item, Insulator>> items)
-    {   List<Map.Entry<Item, Insulator>> list = new ArrayList<>(items);
+    private static List<ItemStack> sort(Collection<Map.Entry<Item, InsulatorData>> items)
+    {   List<Map.Entry<Item, InsulatorData>> list = new ArrayList<>(items);
         // Sort by name first
         list.sort(Comparator.comparing(item -> item.getKey().getDefaultInstance().getDisplayName().getString()));
         // Sort by tags the items are in

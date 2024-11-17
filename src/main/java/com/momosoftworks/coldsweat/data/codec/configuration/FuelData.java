@@ -3,18 +3,30 @@ package com.momosoftworks.coldsweat.data.codec.configuration;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.momosoftworks.coldsweat.data.codec.requirement.ItemComponentsRequirement;
 import com.momosoftworks.coldsweat.data.codec.requirement.ItemRequirement;
+import com.momosoftworks.coldsweat.data.codec.requirement.NbtRequirement;
+import com.momosoftworks.coldsweat.util.serialization.ConfigHelper;
+import com.momosoftworks.coldsweat.util.serialization.NBTHelper;
 import com.momosoftworks.coldsweat.util.serialization.NbtSerializable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public record FuelData(FuelType type, Double fuel,
-                       ItemRequirement data, Optional<List<String>> requiredMods)
+                       ItemRequirement data, Optional<List<String>> requiredMods) implements NbtSerializable, RequirementHolder
 {
+    public FuelData(FuelType type, Double fuel, ItemRequirement data)
+    {   this(type, fuel, data, Optional.empty());
+    }
+
     public static final Codec<FuelData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             FuelType.CODEC.fieldOf("type").forGetter(FuelData::type),
             Codec.DOUBLE.fieldOf("fuel").forGetter(FuelData::fuel),
@@ -22,12 +34,42 @@ public record FuelData(FuelType type, Double fuel,
             Codec.STRING.listOf().optionalFieldOf("required_mods").forGetter(FuelData::requiredMods)
     ).apply(instance, FuelData::new));
 
+    @Override
+    public boolean test(ItemStack stack)
+    {   return data.test(stack, true);
+    }
+
+    @Nullable
+    public static FuelData fromToml(List<?> entry, FuelType fuelType)
+    {
+        if (entry.size() < 2)
+        {   return null;
+        }
+        String[] itemIDs = ((String) entry.get(0)).split(",");
+        List<Item> items = ConfigHelper.getItems(itemIDs);
+        double fuel = ((Number) entry.get(1)).doubleValue();
+        ItemComponentsRequirement componentsRequirement = entry.size() > 2
+                                                          ? ItemComponentsRequirement.parse((String) entry.get(2))
+                                                          : new ItemComponentsRequirement();
+        ItemRequirement itemRequirement = new ItemRequirement(items, componentsRequirement);
+        return new FuelData(fuelType, fuel, itemRequirement, Optional.empty());
+    }
+
+    @Override
+    public CompoundTag serialize()
+    {   return (CompoundTag) CODEC.encodeStart(NbtOps.INSTANCE, this).result().orElseGet(CompoundTag::new);
+    }
+
+    public static FuelData deserialize(CompoundTag tag)
+    {   return CODEC.decode(NbtOps.INSTANCE, tag).result().orElseThrow(() -> new IllegalStateException("Failed to deserialize FuelData")).getFirst();
+    }
+
     public enum FuelType implements StringRepresentable
     {
         BOILER("boiler"),
         ICEBOX("icebox"),
         HEARTH("hearth"),
-        SOUL_LAMP("soul_lamp");
+        SOUL_LAMP("soulspring_lamp");
 
         public static Codec<FuelType> CODEC = StringRepresentable.fromEnum(FuelType::values);
 

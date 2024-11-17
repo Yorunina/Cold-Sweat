@@ -11,6 +11,7 @@ import com.momosoftworks.coldsweat.core.network.message.BlockDataUpdateMessage;
 import com.momosoftworks.coldsweat.core.network.message.ParticleBatchMessage;
 import com.momosoftworks.coldsweat.core.network.message.PlayEntityAttachedSoundMessage;
 import com.momosoftworks.coldsweat.core.network.message.SyncForgeDataMessage;
+import com.momosoftworks.coldsweat.data.codec.configuration.BiomeTempData;
 import com.momosoftworks.coldsweat.util.ClientOnlyHelper;
 import com.momosoftworks.coldsweat.compat.CompatManager;
 import com.momosoftworks.coldsweat.util.entity.DummyPlayer;
@@ -539,12 +540,12 @@ public abstract class WorldHelper
         double variance = 1 / Math.max(1, 2 + biome.getModifiedClimateSettings().downfall() * 2);
         double baseTemp = biome.getBaseTemperature();
 
-        Triplet<Double, Double, Temperature.Units> biomeTemp = CSMath.orElse(ConfigSettings.BIOME_TEMPS.get(registryAccess).getOrDefault(biome, null),
-                                                                             new Triplet<>(baseTemp - variance, baseTemp + variance, Temperature.Units.MC));
-        Triplet<Double, Double, Temperature.Units> configOffset = ConfigSettings.BIOME_OFFSETS.get(registryAccess)
-                                                                  .getOrDefault(biome, new Triplet<>(0d, 0d, Temperature.Units.MC));
-        return CSMath.addPairs(Pair.of(biomeTemp.getA(), biomeTemp.getB()),
-                               Pair.of(configOffset.getA(), configOffset.getB()));
+        BiomeTempData biomeTemp = ConfigSettings.BIOME_TEMPS.get(registryAccess)
+                                  .getOrDefault(biome, new BiomeTempData(biome, baseTemp - variance, baseTemp + variance, Temperature.Units.MC));
+        BiomeTempData configOffset = ConfigSettings.BIOME_OFFSETS.get(registryAccess)
+                                     .getOrDefault(biome, new BiomeTempData(biome, 0d, 0d, Temperature.Units.MC));
+        return CSMath.addPairs(Pair.of(biomeTemp.min(), biomeTemp.max()),
+                               Pair.of(configOffset.min(), configOffset.max()));
     }
 
     /**

@@ -18,6 +18,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.neoforgespi.Environment;
@@ -84,6 +85,23 @@ public class RegistryHelper
         return list;
     }
 
+    public static <T> List<T> mapBuiltinRegistryTagList(Registry<T> registry, List<Either<TagKey<T>, T>> eitherList)
+    {
+        List<T> list = new ArrayList<>();
+        if (registry == null) return list;
+
+        for (Either<TagKey<T>, T> either : eitherList)
+        {
+            either.ifLeft(tagKey ->
+                          {
+                              Optional<HolderSet.Named<T>> tag = registry.getTag(tagKey);
+                              tag.ifPresent(tag1 -> list.addAll(tag1.stream().map(Holder::value).toList()));
+                          });
+            either.ifRight(list::add);
+        }
+        return list;
+    }
+
     public static <T> Optional<T> getVanillaRegistryValue(ResourceKey<Registry<T>> registry, ResourceLocation id)
     {
         try
@@ -115,12 +133,12 @@ public class RegistryHelper
     }
 
     @Nullable
-    public static StructureType<?> getStructure(ResourceLocation structureId, RegistryAccess registryAccess)
-    {   return registryAccess.registryOrThrow(Registries.STRUCTURE_TYPE).get(structureId);
+    public static Structure getStructure(ResourceLocation structureId, RegistryAccess registryAccess)
+    {   return registryAccess.registryOrThrow(Registries.STRUCTURE).get(structureId);
     }
 
     @Nullable
-    public static ResourceLocation getStructureId(StructureType<?> structure, RegistryAccess registryAccess)
-    {   return registryAccess.registryOrThrow(Registries.STRUCTURE_TYPE).getKey(structure);
+    public static ResourceLocation getStructureId(Structure structure, RegistryAccess registryAccess)
+    {   return registryAccess.registryOrThrow(Registries.STRUCTURE).getKey(structure);
     }
 }

@@ -6,7 +6,7 @@ import com.momosoftworks.coldsweat.client.event.TooltipHandler;
 import com.momosoftworks.coldsweat.common.capability.handler.EntityTempManager;
 import com.momosoftworks.coldsweat.common.capability.handler.ItemInsulationManager;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
-import com.momosoftworks.coldsweat.config.type.Insulator;
+import com.momosoftworks.coldsweat.data.codec.configuration.InsulatorData;
 import com.momosoftworks.coldsweat.data.codec.util.AttributeModifierMap;
 import com.momosoftworks.coldsweat.util.math.FastMultiMap;
 import net.minecraft.ChatFormatting;
@@ -55,9 +55,9 @@ public abstract class MixinItemTooltip
         // Add insulation attributes to tooltip
         AttributeModifierMap insulatorAttributes = new AttributeModifierMap();
         AttributeModifierMap unmetInsulatorAttributes = new AttributeModifierMap();
-        for (Insulator insulator : ConfigSettings.INSULATION_ITEMS.get().get(stack.getItem()))
+        for (InsulatorData insulator : ConfigSettings.INSULATION_ITEMS.get().get(stack.getItem()))
         {
-            if (insulator.test(player, stack))
+            if (TooltipHandler.passesRequirement(ConfigSettings.INSULATION_ITEMS, insulator))
             {   insulatorAttributes.putAll(insulator.attributes());
             }
             else unmetInsulatorAttributes.putAll(insulator.attributes());
@@ -73,9 +73,9 @@ public abstract class MixinItemTooltip
         // Add curio attributes to tooltip
         AttributeModifierMap curioAttributes = new AttributeModifierMap();
         AttributeModifierMap unmetCurioAttributes = new AttributeModifierMap();
-        for (Insulator insulator : ConfigSettings.INSULATING_CURIOS.get().get(stack.getItem()))
+        for (InsulatorData insulator : ConfigSettings.INSULATING_CURIOS.get().get(stack.getItem()))
         {
-            if (insulator.test(player, stack))
+            if (TooltipHandler.passesRequirement(ConfigSettings.INSULATING_CURIOS, insulator))
             {   curioAttributes.putAll(insulator.attributes());
             }
             else unmetCurioAttributes.putAll(insulator.attributes());
@@ -101,9 +101,9 @@ public abstract class MixinItemTooltip
         {   return;
         }
 
-        for (Insulator insulator : ConfigSettings.INSULATING_ARMORS.get().get(stack.getItem()))
+        for (InsulatorData insulator : ConfigSettings.INSULATING_ARMORS.get().get(stack.getItem()))
         {
-            boolean strikethrough = !insulator.test(player, stack);
+            boolean strikethrough = !TooltipHandler.passesRequirement(ConfigSettings.INSULATING_ARMORS, insulator);
             for (Map.Entry<Attribute, AttributeModifier> entry : insulator.attributes().getMap().entries())
             {   pTooltipAdder.accept(TooltipHandler.getFormattedAttributeModifier(Holder.direct(entry.getKey()), entry.getValue().amount(), entry.getValue().operation(), true, strikethrough));
             }
@@ -112,9 +112,9 @@ public abstract class MixinItemTooltip
         {
             cap.getInsulation().stream().map(Pair::getFirst).forEach(item ->
             {
-                for (Insulator insulator : ConfigSettings.INSULATION_ITEMS.get().get(item.getItem()))
+                for (InsulatorData insulator : ConfigSettings.INSULATION_ITEMS.get().get(item.getItem()))
                 {
-                    boolean strikethrough = !insulator.test(player, stack);
+                    boolean strikethrough = !TooltipHandler.passesRequirement(ConfigSettings.INSULATION_ITEMS, insulator);
                     for (Map.Entry<Attribute, AttributeModifier> entry : insulator.attributes().getMap().entries())
                     {   pTooltipAdder.accept(TooltipHandler.getFormattedAttributeModifier(Holder.direct(entry.getKey()), entry.getValue().amount(), entry.getValue().operation(), true, strikethrough));
                     }

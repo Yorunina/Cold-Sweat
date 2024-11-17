@@ -6,6 +6,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.momosoftworks.coldsweat.data.codec.requirement.EntityRequirement;
+import com.momosoftworks.coldsweat.data.codec.configuration.RequirementHolder;
 import com.momosoftworks.coldsweat.data.codec.util.IntegerBounds;
 import com.momosoftworks.coldsweat.util.entity.EntityHelper;
 import net.minecraft.advancements.AdvancementProgress;
@@ -31,7 +32,7 @@ import java.util.Optional;
 public record PlayerDataRequirement(IntegerBounds level, Optional<GameType> gameType, Optional<Map<StatRequirement, IntegerBounds>> stats,
                                     Optional<Map<ResourceLocation, Boolean>> recipes,
                                     Optional<Map<ResourceLocation, Either<AdvancementCompletionRequirement, AdvancementCriteriaRequirement>>> advancements,
-                                    Optional<EntityRequirement> lookingAt) implements EntitySubRequirement
+                                    Optional<EntityRequirement> lookingAt) implements EntitySubRequirement, RequirementHolder
 {
     public static MapCodec<PlayerDataRequirement> getCodec()
     {   return getCodec(EntityRequirement.getCodec());
@@ -49,6 +50,7 @@ public record PlayerDataRequirement(IntegerBounds level, Optional<GameType> game
         ).apply(instance, PlayerDataRequirement::new));
     }
 
+    @Override
     public boolean test(Entity entity, Level level, Vec3 position)
     {
         if (!(entity instanceof Player player)) return false;

@@ -9,7 +9,7 @@ import com.momosoftworks.coldsweat.api.insulation.AdaptiveInsulation;
 import com.momosoftworks.coldsweat.api.insulation.Insulation;
 import com.momosoftworks.coldsweat.common.capability.handler.ItemInsulationManager;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
-import com.momosoftworks.coldsweat.config.type.Insulator;
+import com.momosoftworks.coldsweat.data.codec.configuration.InsulatorData;
 import com.momosoftworks.coldsweat.data.codec.util.CommonStreamCodecs;
 import com.momosoftworks.coldsweat.util.math.CSMath;
 import com.momosoftworks.coldsweat.util.math.FastMap;
@@ -22,33 +22,33 @@ import net.minecraft.world.item.ItemStack;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public record ItemInsulationCap(List<Pair<ItemStack, Multimap<Insulator, Insulation>>> insulation)
+public record ItemInsulationCap(List<Pair<ItemStack, Multimap<InsulatorData, Insulation>>> insulation)
 {
-    public static final Codec<Pair<Insulator, List<Insulation>>> INSULATION_PAIR_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Insulator.CODEC.fieldOf("insulator").forGetter(Pair::getFirst),
+    public static final Codec<Pair<InsulatorData, List<Insulation>>> INSULATION_PAIR_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            InsulatorData.CODEC.fieldOf("insulator").forGetter(Pair::getFirst),
             Codec.list(Insulation.getCodec()).fieldOf("insulation").forGetter(Pair::getSecond)
     ).apply(instance, Pair::new));
 
-    public static final Codec<Multimap<Insulator, Insulation>> INSULATOR_INSULATION_MULTIMAP_CODEC = Codec.unboundedMap(Codec.STRING, INSULATION_PAIR_CODEC).
+    public static final Codec<Multimap<InsulatorData, Insulation>> INSULATOR_INSULATION_MULTIMAP_CODEC = Codec.unboundedMap(Codec.STRING, INSULATION_PAIR_CODEC).
     xmap(
         map ->
         {
-            Multimap<Insulator, Insulation> multimap = new FastMultiMap<>();
+            Multimap<InsulatorData, Insulation> multimap = new FastMultiMap<>();
             map.forEach((key, pair) -> multimap.putAll(pair.getFirst(), pair.getSecond()));
             return multimap;
         },
         multimap ->
         {
-            Map<String, Pair<Insulator, List<Insulation>>> map = new HashMap<>();
+            Map<String, Pair<InsulatorData, List<Insulation>>> map = new HashMap<>();
             int i = 0;
-            for (Map.Entry<Insulator, Collection<Insulation>> entry : multimap.asMap().entrySet())
+            for (Map.Entry<InsulatorData, Collection<Insulation>> entry : multimap.asMap().entrySet())
             {   map.put(String.valueOf(i++), Pair.of(entry.getKey(), new ArrayList<>(entry.getValue())));
             }
             return map;
         }
     );
 
-    public static final Codec<Pair<ItemStack, Multimap<Insulator, Insulation>>> ITEM_INSULATION_PAIR_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final Codec<Pair<ItemStack, Multimap<InsulatorData, Insulation>>> ITEM_INSULATION_PAIR_CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ItemStack.CODEC.fieldOf("item").forGetter(Pair::getFirst),
             INSULATOR_INSULATION_MULTIMAP_CODEC.fieldOf("insulation").forGetter(Pair::getSecond)
     ).apply(instance, Pair::new));
@@ -64,14 +64,14 @@ public record ItemInsulationCap(List<Pair<ItemStack, Multimap<Insulator, Insulat
     {   this(new ArrayList<>());
     }
 
-    public List<Pair<ItemStack, Multimap<Insulator, Insulation>>> getInsulation()
+    public List<Pair<ItemStack, Multimap<InsulatorData, Insulation>>> getInsulation()
     {   return ImmutableList.copyOf(this.insulation());
     }
 
     public ItemInsulationCap calcAdaptiveInsulation(double worldTemp, double minTemp, double maxTemp)
     {
         var insulation = new ArrayList<>(this.insulation());
-        for (Pair<ItemStack, Multimap<Insulator, Insulation>> entry : insulation)
+        for (Pair<ItemStack, Multimap<InsulatorData, Insulation>> entry : insulation)
         {
             Collection<Insulation> entryInsul = entry.getSecond().values();
             for (Insulation pair : entryInsul)
@@ -99,7 +99,7 @@ public record ItemInsulationCap(List<Pair<ItemStack, Multimap<Insulator, Insulat
     {
         var insulation = new ArrayList<>(this.insulation());
 
-        Multimap<Insulator, Insulation> newInsulation = ConfigSettings.INSULATION_ITEMS.get().get(stack.getItem()).stream()
+        Multimap<InsulatorData, Insulation> newInsulation = ConfigSettings.INSULATION_ITEMS.get().get(stack.getItem()).stream()
                                                         .map(insulator -> Map.entry(insulator, insulator.insulation().split()))
                                                         .collect(FastMultiMap::new, (map, o) -> map.putAll(o.getKey(), o.getValue()), FastMultiMap::putAll);
         if (!newInsulation.isEmpty())
@@ -111,7 +111,7 @@ public record ItemInsulationCap(List<Pair<ItemStack, Multimap<Insulator, Insulat
     public ItemInsulationCap removeInsulationItem(ItemStack stack)
     {
         var insulation = new ArrayList<>(this.insulation());
-        Optional<Pair<ItemStack, Multimap<Insulator, Insulation>>> toRemove = insulation.stream().filter(entry -> entry.getFirst().equals(stack)).findFirst();
+        Optional<Pair<ItemStack, Multimap<InsulatorData, Insulation>>> toRemove = insulation.stream().filter(entry -> entry.getFirst().equals(stack)).findFirst();
         toRemove.ifPresent(insulation::remove);
 
         return new ItemInsulationCap(insulation);
@@ -125,7 +125,7 @@ public record ItemInsulationCap(List<Pair<ItemStack, Multimap<Insulator, Insulat
     {
         AtomicInteger positiveInsul = new AtomicInteger();
 
-        Multimap<Insulator, Insulation> insulation = ConfigSettings.INSULATION_ITEMS.get().get(insulationItem.getItem())
+        Multimap<InsulatorData, Insulation> insulation = ConfigSettings.INSULATION_ITEMS.get().get(insulationItem.getItem())
                                                      .stream().filter(insulator -> insulator.test(null, insulationItem))
                                                      .map(insulator -> Map.entry(insulator, insulator.insulation().split()))
                                                      .collect(FastMultiMap::new, (map, o) -> map.putAll(o.getKey(), o.getValue()), FastMultiMap::putAll);
@@ -133,7 +133,7 @@ public record ItemInsulationCap(List<Pair<ItemStack, Multimap<Insulator, Insulat
         {   return false;
         }
 
-        List<Pair<ItemStack, Multimap<Insulator, Insulation>>> insulList = new ArrayList<>(this.insulation);
+        List<Pair<ItemStack, Multimap<InsulatorData, Insulation>>> insulList = new ArrayList<>(this.insulation);
         insulList.add(Pair.of(insulationItem, insulation));
 
         // Get the total positive/negative insulation of the armor
@@ -152,23 +152,23 @@ public record ItemInsulationCap(List<Pair<ItemStack, Multimap<Insulator, Insulat
         // Iterate over insulation items
         for (int i = 0; i < this.insulation().size(); i++)
         {
-            Pair<ItemStack, Multimap<Insulator, Insulation>> entry = this.insulation().get(i);
-            Multimap<Insulator, Insulation> insulList = entry.getSecond();
+            Pair<ItemStack, Multimap<InsulatorData, Insulation>> entry = this.insulation().get(i);
+            Multimap<InsulatorData, Insulation> insulList = entry.getSecond();
             // Store ItemStack data
             ItemStack.STREAM_CODEC.encode(buffer, entry.getFirst());
             // Store insulation data
-            CommonStreamCodecs.writeMap(buffer, insulList.asMap(), Insulator.STREAM_CODEC, CommonStreamCodecs.listCodec(Insulation.getNetworkCodec()));
+            CommonStreamCodecs.writeMap(buffer, insulList.asMap(), InsulatorData.STREAM_CODEC, CommonStreamCodecs.listCodec(Insulation.getNetworkCodec()));
         }
     }
 
     public static ItemInsulationCap deserialize(RegistryFriendlyByteBuf buffer)
     {
-        List<Pair<ItemStack, Multimap<Insulator, Insulation>>> insulation = new ArrayList<>();
+        List<Pair<ItemStack, Multimap<InsulatorData, Insulation>>> insulation = new ArrayList<>();
         int size = buffer.readInt();
         for (int i = 0; i < size; i++)
         {
             ItemStack stack = ItemStack.STREAM_CODEC.decode(buffer);
-            Multimap<Insulator, Insulation> insulList = new FastMultiMap<>(CommonStreamCodecs.readMap(buffer, Insulator.STREAM_CODEC, CommonStreamCodecs.listCodec(Insulation.getNetworkCodec())));
+            Multimap<InsulatorData, Insulation> insulList = new FastMultiMap<>(CommonStreamCodecs.readMap(buffer, InsulatorData.STREAM_CODEC, CommonStreamCodecs.listCodec(Insulation.getNetworkCodec())));
             insulation.add(Pair.of(stack, insulList));
         }
         return new ItemInsulationCap(insulation);

@@ -4,11 +4,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.momosoftworks.coldsweat.ColdSweat;
 import com.momosoftworks.coldsweat.client.event.TooltipHandler;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
-import com.momosoftworks.coldsweat.config.type.PredicateItem;
+import com.momosoftworks.coldsweat.data.codec.configuration.FuelData;
 import com.momosoftworks.coldsweat.util.math.CSMath;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
@@ -54,9 +53,9 @@ public class ClientSoulspringTooltip implements ClientTooltipComponent
             int i = 0;
             for (Item item : ConfigSettings.SOULSPRING_LAMP_FUEL.get().keySet())
             {
-                for (PredicateItem it : ConfigSettings.SOULSPRING_LAMP_FUEL.get().get(item))
+                for (FuelData fuelData : ConfigSettings.SOULSPRING_LAMP_FUEL.get().get(item))
                 {
-                    graphics.renderItem(new ItemStack(Holder.direct(item), 1, it.data().components().getAsPatch()),
+                    graphics.renderItem(new ItemStack(Holder.direct(item), 1, fuelData.data().components().getAsPatch()),
                                         x + ((i * 16) % 96), y + 12 + CSMath.floor(i / 6d) * 16);
                     i++;
                 }
