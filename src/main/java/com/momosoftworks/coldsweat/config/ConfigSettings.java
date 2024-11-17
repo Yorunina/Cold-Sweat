@@ -427,9 +427,7 @@ public class ConfigSettings
                 }
             }
             ConfigLoadingHandler.removeEntries(dataMap.values(), ModRegistries.FUEL_DATA);
-            for (Map.Entry<Item, FuelData> entry : dataMap.entries())
-            {   holder.get().put(entry.getKey(), entry.getValue());
-            }
+            holder.get().putAll(dataMap);
         };
         BOILER_FUEL = addSetting("boiler_fuel_items", FastMultiMap::new, holder -> fuelAdder.accept(FuelData.FuelType.BOILER, ItemSettingsConfig.BOILER_FUELS, holder));
         ICEBOX_FUEL = addSetting("icebox_fuel_items", FastMultiMap::new, holder -> fuelAdder.accept(FuelData.FuelType.ICEBOX, ItemSettingsConfig.ICEBOX_FUELS, holder));
