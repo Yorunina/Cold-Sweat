@@ -17,6 +17,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -126,12 +127,12 @@ public class RegistryHelper
     }
 
     @Nullable
-    public static StructureType<?> getStructure(ResourceLocation structureId, RegistryAccess registryAccess)
-    {   return registryAccess.registryOrThrow(Registry.STRUCTURE_TYPE_REGISTRY).get(structureId);
+    public static Structure getStructure(ResourceLocation structureId, RegistryAccess registryAccess)
+    {   return registryAccess.registryOrThrow(Registry.STRUCTURE_REGISTRY).get(structureId);
     }
 
     @Nullable
-    public static ResourceLocation getStructureId(StructureType<?> structure, RegistryAccess registryAccess)
-    {   return registryAccess.registryOrThrow(Registry.STRUCTURE_TYPE_REGISTRY).getKey(structure);
+    public static ResourceLocation getStructureId(Structure structure, RegistryAccess registryAccess)
+    {   return registryAccess.registryOrThrow(Registry.STRUCTURE_REGISTRY).getKey(structure);
     }
 }
