@@ -203,7 +203,7 @@ public class EntitySettingsConfig
         }
         catch (Exception ignored) {}
 
-        modContainer.registerConfig(ModConfig.Type.COMMON, SPEC, "coldsweat/entity_settings.toml");
+        modContainer.registerConfig(ModConfig.Type.COMMON, SPEC, "coldsweat/entity.toml");
     }
 
     public static EntitySettingsConfig getInstance()

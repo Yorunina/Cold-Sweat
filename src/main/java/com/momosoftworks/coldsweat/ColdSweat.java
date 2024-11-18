@@ -64,6 +64,8 @@ public class ColdSweat
         ModAdvancementTriggers.TRIGGERS.register(bus);
         ModItemComponents.DATA_COMPONENTS.register(bus);
 
+        ConfigUpdater.updateFileNames();
+
         // Setup configs
         WorldSettingsConfig.setup(modContainer);
         ItemSettingsConfig.setup(modContainer);

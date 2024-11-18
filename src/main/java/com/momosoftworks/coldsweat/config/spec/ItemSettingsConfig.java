@@ -322,7 +322,7 @@ public class ItemSettingsConfig
         }
         catch (Exception ignored) {}
 
-        modContainer.registerConfig(ModConfig.Type.COMMON, SPEC, "coldsweat/item_settings.toml");
+        modContainer.registerConfig(ModConfig.Type.COMMON, SPEC, "coldsweat/item.toml");
     }
 
     public void save()

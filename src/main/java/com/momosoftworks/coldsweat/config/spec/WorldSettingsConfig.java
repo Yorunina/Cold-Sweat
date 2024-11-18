@@ -737,7 +737,7 @@ public class WorldSettingsConfig
         }
         catch (Exception ignored) {}
 
-        modContainer.registerConfig(ModConfig.Type.COMMON, SPEC, "coldsweat/world_settings.toml");
+        modContainer.registerConfig(ModConfig.Type.COMMON, SPEC, "coldsweat/world.toml");
     }
 
     public static WorldSettingsConfig getInstance()
