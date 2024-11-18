@@ -111,7 +111,7 @@ public class ConfigLoadingHandler
         /*
          Read mod-related tags for config settings
          */
-        ConfigSettings.HEARTH_SPREAD_WHITELIST.get()
+        ConfigSettings.THERMAL_SOURCE_SPREAD_WHITELIST.get()
                 .addAll(registryAccess.registryOrThrow(Registries.BLOCK)
                         .getTag(ModBlockTags.HEARTH_SPREAD_WHITELIST).orElseThrow()
                         .stream().map(holder ->
@@ -119,7 +119,7 @@ public class ConfigLoadingHandler
                             return holder.value();
                         }).toList());
 
-        ConfigSettings.HEARTH_SPREAD_BLACKLIST.get().
+        ConfigSettings.THERMAL_SOURCE_SPREAD_BLACKLIST.get().
                 addAll(registryAccess.registryOrThrow(Registries.BLOCK)
                        .getTag(ModBlockTags.HEARTH_SPREAD_BLACKLIST).orElseThrow()
                        .stream().map(holder ->
@@ -688,7 +688,7 @@ public class ConfigLoadingHandler
         return output;
     }
 
-    private static List<File> findFilesRecursive(File directory)
+    public static List<File> findFilesRecursive(File directory)
     {
         List<File> files = new ArrayList<>();
         File[] filesInDirectory = directory.listFiles();
