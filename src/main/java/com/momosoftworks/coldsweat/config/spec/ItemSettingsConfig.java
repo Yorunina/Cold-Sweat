@@ -27,7 +27,7 @@ public class ItemSettingsConfig
     public static final ModConfigSpec.ConfigValue<List<? extends List<?>>> SOULSPRING_LAMP_FUELS;
     public static final ModConfigSpec.ConfigValue<List<? extends String>> SOULSPRING_LAMP_DIMENSIONS;
     public static final ModConfigSpec.ConfigValue<List<? extends List<?>>> FOOD_TEMPERATURES;
-    public static final ModConfigSpec.ConfigValue<List<? extends List<?>>> CARRIED_ITEM_TEMPERATURE;
+    public static final ModConfigSpec.ConfigValue<List<? extends List<?>>> CARRIED_ITEM_TEMPERATURES;
 
     public static final ModConfigSpec.ConfigValue<List<? extends List<?>>> INSULATION_ITEMS;
     public static final ModConfigSpec.ConfigValue<List<? extends String>> INSULATION_BLACKLIST;
@@ -288,7 +288,7 @@ public class ItemSettingsConfig
          */
         BUILDER.push("Misc");
 
-        CARRIED_ITEM_TEMPERATURE = BUILDER
+        CARRIED_ITEM_TEMPERATURES = BUILDER
                 .comment("Defines items that affect the player's temperature when in the inventory",
                          "Format: [[\"item_id\", temperature, strict_type, trait, *nbt, *max_effect], [\"item_id\", temperature, strict_type, trait, *nbt, *max_effect], ...etc]",
                          "temperature: The temperature change the item will apply to the entity. For core temperature, this is applied every tick",
@@ -325,177 +325,11 @@ public class ItemSettingsConfig
         modContainer.registerConfig(ModConfig.Type.COMMON, SPEC, "coldsweat/item.toml");
     }
 
-    public void save()
+    public static void save()
     {   SPEC.save();
     }
 
     public static ItemSettingsConfig getInstance()
     {   return INSTANCE;
-    }
-
-    /* Getters */
-
-    public List<? extends List<?>> getBoilerFuelItems()
-    {   return BOILER_FUELS.get();
-    }
-
-    public List<? extends List<?>> getIceboxFuelItems()
-    {   return ICEBOX_FUELS.get();
-    }
-
-    public List<? extends List<?>> getHearthFuelItems()
-    {   return HEARTH_FUELS.get();
-    }
-
-    public List<? extends List<?>> getInsulationItems()
-    {   return INSULATION_ITEMS.get();
-    }
-
-    public List<? extends List<?>> getInsulatingArmorItems()
-    {   return INSULATING_ARMOR.get();
-    }
-
-    public List<?> getArmorInsulationSlots()
-    {   return INSULATION_SLOTS.get();
-    }
-
-    public double getInsulationStrength()
-    {   return INSULATION_STRENGTH.get();
-    }
-
-    public List<? extends String> getInsulationBlacklist()
-    {   return INSULATION_BLACKLIST.get();
-    }
-
-    public List<? extends List<?>> getSoulLampFuelItems()
-    {   return SOULSPRING_LAMP_FUELS.get();
-    }
-
-    public List<? extends List<?>> getFoodTemperatures()
-    {   return FOOD_TEMPERATURES.get();
-    }
-
-    public List<? extends String> getValidSoulLampDimensions()
-    {   return SOULSPRING_LAMP_DIMENSIONS.get();
-    }
-
-    public int getWaterskinStrength()
-    {   return WATERSKIN_STRENGTH.get();
-    }
-
-    public boolean arePotionsEnabled()
-    {   return ALLOW_POTIONS_IN_HEARTH.get();
-    }
-
-    public List<String> getPotionBlacklist()
-    {   return (List<String>) HEARTH_POTION_BLACKLIST.get();
-    }
-
-    public List<? extends List<?>> getInsulatingCurios()
-    {   return CompatManager.isCuriosLoaded() ? INSULATING_CURIOS.get() : List.of();
-    }
-
-    public List<? extends List<?>> getCarriedTemps()
-    {   return CARRIED_ITEM_TEMPERATURE.get();
-    }
-
-    /* Setters */
-
-    public synchronized void setBoilerFuelItems(List<? extends List<?>> itemMap)
-    {   synchronized (BOILER_FUELS)
-        {   BOILER_FUELS.set(itemMap);
-        }
-    }
-
-    public synchronized void setIceboxFuelItems(List<? extends List<?>> itemMap)
-    {   synchronized (ICEBOX_FUELS)
-        {   ICEBOX_FUELS.set(itemMap);
-        }
-    }
-
-    public synchronized void setHearthFuelItems(List<? extends List<?>> itemMap)
-    {   synchronized (HEARTH_FUELS)
-        {   HEARTH_FUELS.set(itemMap);
-        }
-    }
-
-    public synchronized void setInsulationItems(List<? extends List<?>> items)
-    {   synchronized (INSULATION_ITEMS)
-        {   INSULATION_ITEMS.set(items);
-        }
-    }
-
-    public synchronized void setInsulatingArmorItems(List<? extends List<?>> itemMap)
-    {   synchronized (INSULATING_ARMOR)
-        {   INSULATING_ARMOR.set(itemMap);
-        }
-    }
-
-    public synchronized void setArmorInsulationSlots(List<?> slots)
-    {   synchronized (INSULATION_SLOTS)
-        {   INSULATION_SLOTS.set(slots);
-        }
-    }
-
-    public synchronized void setInsulationStrength(double effectiveness)
-    {   synchronized (INSULATION_STRENGTH)
-        {   INSULATION_STRENGTH.set(effectiveness);
-        }
-    }
-
-    public synchronized void setSoulLampFuelItems(List<? extends List<?>> items)
-    {   synchronized (SOULSPRING_LAMP_FUELS)
-        {   SOULSPRING_LAMP_FUELS.set(items);
-        }
-    }
-
-    public synchronized void setFoodTemperatures(List<? extends List<?>> itemMap)
-    {   synchronized (FOOD_TEMPERATURES)
-        {   FOOD_TEMPERATURES.set(itemMap);
-        }
-    }
-
-    public synchronized void setValidSoulLampDimensions(List<? extends String> items)
-    {   synchronized (SOULSPRING_LAMP_DIMENSIONS)
-        {   SOULSPRING_LAMP_DIMENSIONS.set(items);
-        }
-    }
-
-    public synchronized void setWaterskinStrength(int strength)
-    {   synchronized (WATERSKIN_STRENGTH)
-        {   WATERSKIN_STRENGTH.set(strength);
-        }
-    }
-
-    public synchronized void setPotionsEnabled(Boolean saver)
-    {   synchronized (ALLOW_POTIONS_IN_HEARTH)
-        {   ALLOW_POTIONS_IN_HEARTH.set(saver);
-        }
-    }
-
-    public synchronized void setPotionBlacklist(List<String> saver)
-    {   synchronized (HEARTH_POTION_BLACKLIST)
-        {   HEARTH_POTION_BLACKLIST.set(saver);
-        }
-    }
-
-    public synchronized void setInsulationBlacklist(List<String> blacklist)
-    {   synchronized (INSULATION_BLACKLIST)
-        {   INSULATION_BLACKLIST.set(blacklist);
-        }
-    }
-
-    public synchronized void setInsulatingCurios(List<? extends List<?>> items)
-    {   if (CompatManager.isCuriosLoaded())
-        {   synchronized (INSULATING_CURIOS)
-            {   INSULATING_CURIOS.set(items);
-            }
-        }
-    }
-
-    public synchronized void setCarriedTemps(List<? extends List<?>> items)
-    {   synchronized (CARRIED_ITEM_TEMPERATURE)
-        {   CARRIED_ITEM_TEMPERATURE.set(items);
-        }
     }
 }
