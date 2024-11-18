@@ -62,6 +62,8 @@ public class ColdSweat
         AttributeInit.ATTRIBUTES.register(bus);
         CommandInit.ARGUMENTS.register(bus);
 
+        ConfigUpdater.updateFileNames();
+
         // Setup configs
         WorldSettingsConfig.setup();
         ItemSettingsConfig.setup();
