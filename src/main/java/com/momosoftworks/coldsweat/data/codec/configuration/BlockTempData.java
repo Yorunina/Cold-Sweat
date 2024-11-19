@@ -2,10 +2,10 @@ package com.momosoftworks.coldsweat.data.codec.configuration;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.momosoftworks.coldsweat.api.temperature.block_temp.BlockTemp;
 import com.momosoftworks.coldsweat.api.util.Temperature;
+import com.momosoftworks.coldsweat.data.codec.impl.ConfigData;
 import com.momosoftworks.coldsweat.data.codec.requirement.BlockRequirement;
 import com.momosoftworks.coldsweat.data.codec.requirement.NbtRequirement;
 import com.momosoftworks.coldsweat.util.serialization.ConfigHelper;
@@ -13,16 +13,14 @@ import com.momosoftworks.coldsweat.util.serialization.NBTHelper;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.Predicate;
 
 public record BlockTempData(List<Either<TagKey<Block>, Block>> blocks, double temperature, double range,
                             double maxEffect, boolean fade, double maxTemp, double minTemp, Temperature.Units units,
-                            List<BlockRequirement> conditions, Optional<List<String>> requiredMods)
+                            List<BlockRequirement> conditions, Optional<List<String>> requiredMods) implements ConfigData<BlockTempData>
 {
     public BlockTempData(Collection<Block> blocks, double temperature, double range, double maxEffect, boolean fade, double maxTemp,
                          double minTemp, Temperature.Units units, List<BlockRequirement> conditions)
@@ -114,8 +112,13 @@ public record BlockTempData(List<Either<TagKey<Block>, Block>> blocks, double te
     }
 
     @Override
+    public Codec<BlockTempData> getCodec()
+    {   return CODEC;
+    }
+
+    @Override
     public String toString()
-    {   return CODEC.encodeStart(JsonOps.INSTANCE, this).result().map(Object::toString).orElse("serialize_failed");
+    {   return this.asString();
     }
 
     @Override
