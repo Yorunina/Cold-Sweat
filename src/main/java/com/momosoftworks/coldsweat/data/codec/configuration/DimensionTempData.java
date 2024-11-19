@@ -2,10 +2,10 @@ package com.momosoftworks.coldsweat.data.codec.configuration;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.momosoftworks.coldsweat.ColdSweat;
 import com.momosoftworks.coldsweat.api.util.Temperature;
+import com.momosoftworks.coldsweat.data.codec.impl.ConfigData;
 import com.momosoftworks.coldsweat.util.serialization.ConfigHelper;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.Registry;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 public record DimensionTempData(List<Either<TagKey<DimensionType>, DimensionType>> dimensions, double temperature,
-                                Temperature.Units units, boolean isOffset, Optional<List<String>> requiredMods)
+                                Temperature.Units units, boolean isOffset, Optional<List<String>> requiredMods) implements ConfigData<DimensionTempData>
 {
     public DimensionTempData(DimensionType dimension, double temperature, Temperature.Units units)
     {   this(List.of(Either.right(dimension)), temperature, units, false, Optional.empty());
@@ -59,8 +59,13 @@ public record DimensionTempData(List<Either<TagKey<DimensionType>, DimensionType
     }
 
     @Override
+    public Codec<DimensionTempData> getCodec()
+    {   return CODEC;
+    }
+
+    @Override
     public String toString()
-    {   return CODEC.encodeStart(JsonOps.INSTANCE, this).result().map(Object::toString).orElse("serialize_failed");
+    {   return this.asString();
     }
 
     @Override
