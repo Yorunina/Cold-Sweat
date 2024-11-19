@@ -2,9 +2,10 @@ package com.momosoftworks.coldsweat.data.codec.configuration;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.momosoftworks.coldsweat.api.util.Temperature;
+import com.momosoftworks.coldsweat.data.codec.impl.ConfigData;
+import com.momosoftworks.coldsweat.data.codec.impl.RequirementHolder;
 import com.momosoftworks.coldsweat.data.codec.requirement.EntityRequirement;
 import com.momosoftworks.coldsweat.data.codec.requirement.ItemComponentsRequirement;
 import com.momosoftworks.coldsweat.data.codec.requirement.ItemRequirement;
@@ -30,7 +31,7 @@ public record ItemCarryTempData(ItemRequirement data, List<Either<IntegerBounds,
                                 Temperature.Trait trait,
                                 Double maxEffect,
                                 EntityRequirement entityRequirement,
-                                Optional<List<String>> requiredMods) implements NbtSerializable, RequirementHolder
+                                Optional<List<String>> requiredMods) implements NbtSerializable, RequirementHolder, ConfigData<ItemCarryTempData>
 {
     public ItemCarryTempData(ItemRequirement data, List<Either<IntegerBounds, EquipmentSlot>> slots, double temperature,
                              Temperature.Trait trait, Double maxEffect, EntityRequirement entityRequirement)
@@ -149,8 +150,13 @@ public record ItemCarryTempData(ItemRequirement data, List<Either<IntegerBounds,
     }
 
     @Override
+    public Codec<ItemCarryTempData> getCodec()
+    {   return CODEC;
+    }
+
+    @Override
     public String toString()
-    {   return CODEC.encodeStart(JsonOps.INSTANCE, this).result().map(Object::toString).orElse("serialize_failed");
+    {   return this.asString();
     }
 
     @Override

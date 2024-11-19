@@ -10,19 +10,16 @@ import com.mojang.serialization.JsonOps;
 import com.momosoftworks.coldsweat.ColdSweat;
 import com.momosoftworks.coldsweat.api.insulation.AdaptiveInsulation;
 import com.momosoftworks.coldsweat.api.insulation.StaticInsulation;
-import com.momosoftworks.coldsweat.data.ModRegistries;
-import com.momosoftworks.coldsweat.data.codec.configuration.*;
-import com.momosoftworks.coldsweat.data.codec.requirement.EntityRequirement;
-import com.momosoftworks.coldsweat.data.codec.requirement.ItemComponentsRequirement;
-import com.momosoftworks.coldsweat.data.codec.requirement.ItemRequirement;
-import com.momosoftworks.coldsweat.data.codec.util.AttributeModifierMap;
 import com.momosoftworks.coldsweat.compat.CompatManager;
-import com.momosoftworks.coldsweat.util.exceptions.ArgumentCountException;
+import com.momosoftworks.coldsweat.data.ModRegistries;
+import com.momosoftworks.coldsweat.data.codec.configuration.FuelData;
+import com.momosoftworks.coldsweat.data.codec.configuration.InsulatorData;
+import com.momosoftworks.coldsweat.data.codec.impl.ConfigData;
+import com.momosoftworks.coldsweat.data.codec.requirement.EntityRequirement;
 import com.momosoftworks.coldsweat.util.math.CSMath;
 import com.momosoftworks.coldsweat.util.math.FastMultiMap;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
@@ -36,12 +33,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraft.world.level.levelgen.structure.Structure;
-import net.minecraft.world.level.levelgen.structure.StructureType;
-import oshi.util.tuples.Triplet;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -51,7 +43,6 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class ConfigHelper
 {
@@ -244,7 +235,7 @@ public class ConfigHelper
         return tag;
     }
 
-    public static <K, V> CompoundTag serializeRegistry(Map<K, V> map, String key, ResourceKey<Registry<K>> keyRegistry, ResourceKey<Registry<V>> modRegistry, RegistryAccess registryAccess)
+    public static <K, V extends ConfigData<?>> CompoundTag serializeRegistry(Map<K, V> map, String key, ResourceKey<Registry<K>> keyRegistry, ResourceKey<Registry<V>> modRegistry, RegistryAccess registryAccess)
     {
         Codec<V> codec = ModRegistries.getCodec(modRegistry);
         CompoundTag tag = new CompoundTag();
@@ -254,18 +245,20 @@ public class ConfigHelper
         {
             ResourceLocation elementId = registryAccess.registryOrThrow(keyRegistry).getKey(entry.getKey());
             if (elementId == null)
-            {   ColdSweat.LOGGER.error("Error serializing {}: dimension \"{}\" does not exist", keyRegistry.location(), entry.getKey());
+            {   ColdSweat.LOGGER.error("Error serializing {}: \"{}\" does not exist", keyRegistry.location(), entry.getKey());
                 continue;
             }
-            codec.encodeStart(NbtOps.INSTANCE, entry.getValue()).result().ifPresentOrElse(
-                    result -> mapTag.put(elementId.toString(), result),
-                    () -> ColdSweat.LOGGER.error("Error serializing {}: failed to serialize \"{}\"", keyRegistry.location(), elementId));
+            codec.encodeStart(NbtOps.INSTANCE, entry.getValue()).result().ifPresentOrElse(encoded ->
+            {
+                ((CompoundTag) encoded).putUUID("UUID", entry.getValue().getId());
+                mapTag.put(elementId.toString(), encoded);
+            }, () -> ColdSweat.LOGGER.error("Error serializing {} \"{}\"", keyRegistry.location(), elementId));
         }
         tag.put(key, mapTag);
         return tag;
     }
 
-    public static <K, V> Map<K, V> deserializeRegistry(CompoundTag tag, String key, ResourceKey<Registry<K>> keyRegistry, ResourceKey<Registry<V>> modRegistry, RegistryAccess registryAccess)
+    public static <K, V extends ConfigData<?>> Map<K, V> deserializeRegistry(CompoundTag tag, String key, ResourceKey<Registry<K>> keyRegistry, ResourceKey<Registry<V>> modRegistry, RegistryAccess registryAccess)
     {
         Codec<V> codec = ModRegistries.getCodec(modRegistry);
 
@@ -275,14 +268,13 @@ public class ConfigHelper
         for (String entryKey : mapTag.getAllKeys())
         {
             CompoundTag entryData = mapTag.getCompound(entryKey);
-            K dimension = registryAccess.registryOrThrow(keyRegistry).get(ResourceLocation.parse(entryKey));
-            if (dimension == null)
+            K object = registryAccess.registryOrThrow(keyRegistry).get(ResourceLocation.parse(entryKey));
+            if (object == null)
             {   ColdSweat.LOGGER.error("Error deserializing {}: \"{}\" does not exist", keyRegistry.location(), entryKey);
                 continue;
             }
-            codec.decode(NbtOps.INSTANCE, entryData).result().ifPresentOrElse(
-                    result -> map.put(dimension, result.getFirst()),
-                    () -> ColdSweat.LOGGER.error("Error deserializing {}: failed to deserialize \"{}\"", keyRegistry.location(), entryKey));
+            codec.decode(NbtOps.INSTANCE, entryData).result().map(Pair::getFirst)
+                 .ifPresent(value -> map.put(object, value));
         }
         return map;
     }

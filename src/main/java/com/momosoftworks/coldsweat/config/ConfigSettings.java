@@ -13,6 +13,7 @@ import com.momosoftworks.coldsweat.config.spec.*;
 import com.momosoftworks.coldsweat.core.init.ModEntities;
 import com.momosoftworks.coldsweat.data.ModRegistries;
 import com.momosoftworks.coldsweat.data.codec.configuration.*;
+import com.momosoftworks.coldsweat.data.codec.impl.ConfigData;
 import com.momosoftworks.coldsweat.util.math.FastMultiMap;
 import com.momosoftworks.coldsweat.util.math.FastMap;
 import com.momosoftworks.coldsweat.util.serialization.*;
@@ -1136,5 +1137,6 @@ public class ConfigSettings
         for (Map.Entry<String, DynamicHolder<?>> entry : CONFIG_SETTINGS.entrySet())
         {   entry.getValue().reset();
         }
+        ConfigData.IDENTIFIABLES.clear();
     }
 }

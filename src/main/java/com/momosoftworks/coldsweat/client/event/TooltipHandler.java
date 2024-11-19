@@ -14,6 +14,8 @@ import com.momosoftworks.coldsweat.client.gui.tooltip.SoulspringTooltip;
 import com.momosoftworks.coldsweat.common.capability.handler.ItemInsulationManager;
 import com.momosoftworks.coldsweat.common.item.SoulspringLampItem;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
+import com.momosoftworks.coldsweat.data.codec.impl.ConfigData;
+import com.momosoftworks.coldsweat.data.codec.util.AttributeModifierMap;
 import com.momosoftworks.coldsweat.core.network.message.SyncItemPredicatesMessage;
 import com.momosoftworks.coldsweat.data.codec.configuration.FoodData;
 import com.momosoftworks.coldsweat.data.codec.configuration.FuelData;
@@ -72,13 +74,10 @@ public class TooltipHandler
 
     private static int HOVERED_ITEM_UPDATE_COOLDOWN = 0;
     private static ItemStack HOVERED_STACK = ItemStack.EMPTY;
-    public static Map<String, Object> HOVERED_STACK_PREDICATES = new FastMap<>();
+    public static FastMap<UUID, Boolean> HOVERED_STACK_PREDICATES = new FastMap<>();
 
-    private static <T> Map<T, Boolean> getPropertyMap(DynamicHolder<Multimap<Item, T>> config)
-    {   return (Map<T, Boolean>) HOVERED_STACK_PREDICATES.getOrDefault(ConfigSettings.getKey(config), new FastMap<>());
-    }
-    public static <T> boolean passesRequirement(DynamicHolder<Multimap<Item, T>> config, T element)
-    {   return getPropertyMap(config).getOrDefault(element, true);
+    public static <T extends ConfigData<?>> boolean passesRequirement(T element)
+    {   return HOVERED_STACK_PREDICATES.getOrDefault(element.getId(), false);
     }
 
     public static boolean isShiftDown()
@@ -261,7 +260,7 @@ public class TooltipHandler
             Map<Integer, Double> foodTemps = new FastMap<>();
             for (FoodData foodData : ConfigSettings.FOOD_TEMPERATURES.get().get(item))
             {
-                if (passesRequirement(ConfigSettings.FOOD_TEMPERATURES, foodData))
+                if (passesRequirement(foodData))
                 {   foodTemps.merge(foodData.duration(), foodData.temperature(), Double::sum);
                 }
             }
@@ -297,8 +296,6 @@ public class TooltipHandler
          */
         if (!hideTooltips && !stack.isEmpty())
         {
-            List<InsulatorData> validInsulations = new ArrayList<>();
-
             // Insulation ingredient
             {
                 List<Insulation> insulation = new ArrayList<>();
@@ -307,11 +304,10 @@ public class TooltipHandler
                 {
                     if (!insulator.insulation().isEmpty())
                     {
-                        if (passesRequirement(ConfigSettings.INSULATION_ITEMS, insulator))
+                        if (passesRequirement(insulator))
                         {   insulation.addAll(insulator.insulation().split());
                         }
                         else unmetInsulation.addAll(insulator.insulation().split());
-                        validInsulations.add(insulator);
                     }
                 }
                 if (!insulation.isEmpty())
@@ -331,11 +327,10 @@ public class TooltipHandler
                 {
                     if (!insulator.insulation().isEmpty())
                     {
-                        if (passesRequirement(ConfigSettings.INSULATING_CURIOS, insulator))
+                        if (passesRequirement(insulator))
                         {   insulation.addAll(insulator.insulation().split());
                         }
                         else unmetInsulation.addAll(insulator.insulation().split());
-                        validInsulations.add(insulator);
                     }
                 }
                 if (!insulation.isEmpty())
@@ -354,11 +349,10 @@ public class TooltipHandler
             {
                 if (!insulator.insulation().isEmpty())
                 {
-                    if (passesRequirement(ConfigSettings.INSULATING_ARMORS, insulator))
+                    if (passesRequirement(insulator))
                     {   insulation.addAll(insulator.insulation().split());
                     }
                     else unmetInsulation.addAll(insulator.insulation().split());
-                    validInsulations.add(insulator);
                 }
             }
 
@@ -366,27 +360,21 @@ public class TooltipHandler
             {
                 // Iterate over both the insulation items and the checks for each item
                 List<Pair<ItemStack, Multimap<InsulatorData, Insulation>>> insulators = cap.getInsulation();
-                List<Pair<ItemStack, Map<InsulatorData, Boolean>>> insulatorChecks = ((List) HOVERED_STACK_PREDICATES.get("armor_insulation"));
 
                 for (int i = 0; i < insulators.size(); i++)
                 {
-                    // Get the next insulator item
                     Pair<ItemStack, Multimap<InsulatorData, Insulation>> pair = insulators.get(i);
-                    // Get the next insulator check, or create an empty one
-                    Pair<ItemStack, Map<InsulatorData, Boolean>> checkPair = insulatorChecks.size() > i
-                                                                             ? insulatorChecks.get(i)
-                                                                             : Pair.of(pair.getFirst(), new FastMap<>());
+                    Multimap<InsulatorData, Insulation> insulatorMap = pair.getSecond();
 
-                    // Iterate over the insulators for this insulation item
-                    for (Map.Entry<InsulatorData, Insulation> entry : pair.getSecond().entries())
+                    for (InsulatorData insulator : insulatorMap.keySet())
                     {
-                        // If the insulator has passed, or the check isn't present, the insulation is valid
-                        boolean passes = checkPair.getSecond().getOrDefault(entry.getKey(), true);
-                        if (passes)
-                        {   insulation.add(entry.getValue());
+                        if (!insulator.insulation().isEmpty())
+                        {
+                            if (passesRequirement(insulator))
+                            {   insulation.addAll(insulator.insulation().split());
+                            }
+                            else unmetInsulation.addAll(insulator.insulation().split());
                         }
-                        // If the insulator check says the insulation isn't valid, it is "unmet"
-                        else unmetInsulation.add(entry.getValue());
                     }
                 }
 

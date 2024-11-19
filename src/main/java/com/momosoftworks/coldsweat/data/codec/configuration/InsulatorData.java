@@ -2,12 +2,13 @@ package com.momosoftworks.coldsweat.data.codec.configuration;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.momosoftworks.coldsweat.ColdSweat;
 import com.momosoftworks.coldsweat.api.insulation.AdaptiveInsulation;
 import com.momosoftworks.coldsweat.api.insulation.Insulation;
 import com.momosoftworks.coldsweat.api.insulation.StaticInsulation;
+import com.momosoftworks.coldsweat.data.codec.impl.ConfigData;
+import com.momosoftworks.coldsweat.data.codec.impl.RequirementHolder;
 import com.momosoftworks.coldsweat.data.codec.requirement.EntityRequirement;
 import com.momosoftworks.coldsweat.data.codec.requirement.ItemComponentsRequirement;
 import com.momosoftworks.coldsweat.data.codec.requirement.ItemRequirement;
@@ -36,7 +37,7 @@ public record InsulatorData(Insulation.Slot slot,
                             Insulation insulation, ItemRequirement data,
                             EntityRequirement predicate, AttributeModifierMap attributes,
                             Map<ResourceLocation, Double> immuneTempModifiers,
-                            Optional<List<String>> requiredMods) implements NbtSerializable, RequirementHolder
+                            Optional<List<String>> requiredMods) implements NbtSerializable, RequirementHolder, ConfigData<InsulatorData>
 {
 
     public InsulatorData(Insulation.Slot slot, Insulation insulation, ItemRequirement data,
@@ -124,8 +125,13 @@ public record InsulatorData(Insulation.Slot slot,
     }
 
     @Override
+    public Codec<InsulatorData> getCodec()
+    {   return CODEC;
+    }
+
+    @Override
     public String toString()
-    {   return CODEC.encodeStart(JsonOps.INSTANCE, this).result().map(Object::toString).orElse("serialize_failed");
+    {   return this.asString();
     }
 
     @Override

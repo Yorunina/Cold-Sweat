@@ -1,6 +1,5 @@
 package com.momosoftworks.coldsweat.mixin;
 
-import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Pair;
 import com.momosoftworks.coldsweat.client.event.TooltipHandler;
 import com.momosoftworks.coldsweat.common.capability.handler.EntityTempManager;
@@ -8,7 +7,6 @@ import com.momosoftworks.coldsweat.common.capability.handler.ItemInsulationManag
 import com.momosoftworks.coldsweat.config.ConfigSettings;
 import com.momosoftworks.coldsweat.data.codec.configuration.InsulatorData;
 import com.momosoftworks.coldsweat.data.codec.util.AttributeModifierMap;
-import com.momosoftworks.coldsweat.util.math.FastMultiMap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
@@ -28,12 +26,15 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 @Mixin(ItemStack.class)
@@ -57,7 +58,7 @@ public abstract class MixinItemTooltip
         AttributeModifierMap unmetInsulatorAttributes = new AttributeModifierMap();
         for (InsulatorData insulator : ConfigSettings.INSULATION_ITEMS.get().get(stack.getItem()))
         {
-            if (TooltipHandler.passesRequirement(ConfigSettings.INSULATION_ITEMS, insulator))
+            if (TooltipHandler.passesRequirement(insulator))
             {   insulatorAttributes.putAll(insulator.attributes());
             }
             else unmetInsulatorAttributes.putAll(insulator.attributes());
@@ -75,7 +76,7 @@ public abstract class MixinItemTooltip
         AttributeModifierMap unmetCurioAttributes = new AttributeModifierMap();
         for (InsulatorData insulator : ConfigSettings.INSULATING_CURIOS.get().get(stack.getItem()))
         {
-            if (TooltipHandler.passesRequirement(ConfigSettings.INSULATING_CURIOS, insulator))
+            if (TooltipHandler.passesRequirement(insulator))
             {   curioAttributes.putAll(insulator.attributes());
             }
             else unmetCurioAttributes.putAll(insulator.attributes());
@@ -103,7 +104,7 @@ public abstract class MixinItemTooltip
 
         for (InsulatorData insulator : ConfigSettings.INSULATING_ARMORS.get().get(stack.getItem()))
         {
-            boolean strikethrough = !TooltipHandler.passesRequirement(ConfigSettings.INSULATING_ARMORS, insulator);
+            boolean strikethrough = !TooltipHandler.passesRequirement(insulator);
             for (Map.Entry<Attribute, AttributeModifier> entry : insulator.attributes().getMap().entries())
             {   pTooltipAdder.accept(TooltipHandler.getFormattedAttributeModifier(Holder.direct(entry.getKey()), entry.getValue().amount(), entry.getValue().operation(), true, strikethrough));
             }
@@ -114,7 +115,7 @@ public abstract class MixinItemTooltip
             {
                 for (InsulatorData insulator : ConfigSettings.INSULATION_ITEMS.get().get(item.getItem()))
                 {
-                    boolean strikethrough = !TooltipHandler.passesRequirement(ConfigSettings.INSULATION_ITEMS, insulator);
+                    boolean strikethrough = !TooltipHandler.passesRequirement(insulator);
                     for (Map.Entry<Attribute, AttributeModifier> entry : insulator.attributes().getMap().entries())
                     {   pTooltipAdder.accept(TooltipHandler.getFormattedAttributeModifier(Holder.direct(entry.getKey()), entry.getValue().amount(), entry.getValue().operation(), true, strikethrough));
                     }

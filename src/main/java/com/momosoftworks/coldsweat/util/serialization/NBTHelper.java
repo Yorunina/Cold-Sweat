@@ -37,7 +37,13 @@ public class NBTHelper
     {
         // Write the modifier's data to a CompoundTag
         CompoundTag modifierTag = new CompoundTag();
-        modifierTag.putString("Id", TempModifierRegistry.getKey(modifier).toString());
+        ResourceLocation modifierId = TempModifierRegistry.getKey(modifier);
+        if (modifierId == null)
+        {
+            ColdSweat.LOGGER.error("Failed to get key for TempModifier: {}", modifier);
+            return modifierTag;
+        }
+        modifierTag.putString("Id", modifierId.toString());
 
         // Add the modifier's arguments
         modifierTag.put("ModifierData", modifier.getNBT());

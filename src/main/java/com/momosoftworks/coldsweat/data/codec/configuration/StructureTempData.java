@@ -1,12 +1,11 @@
 package com.momosoftworks.coldsweat.data.codec.configuration;
 
 import com.mojang.datafixers.util.Either;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.momosoftworks.coldsweat.ColdSweat;
 import com.momosoftworks.coldsweat.api.util.Temperature;
+import com.momosoftworks.coldsweat.data.codec.impl.ConfigData;
 import com.momosoftworks.coldsweat.util.serialization.ConfigHelper;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
@@ -18,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 public record StructureTempData(List<Either<TagKey<Structure>, Structure>> structures, double temperature,
-                                Temperature.Units units, boolean isOffset, Optional<List<String>> requiredMods)
+                                Temperature.Units units, boolean isOffset, Optional<List<String>> requiredMods) implements ConfigData<StructureTempData>
 {
     public StructureTempData(Structure structure, double temperature, boolean isOffset, Temperature.Units units)
     {   this(List.of(Either.right(structure)), temperature, units, !isOffset, Optional.empty());
@@ -56,8 +55,13 @@ public record StructureTempData(List<Either<TagKey<Structure>, Structure>> struc
     }
 
     @Override
+    public Codec<StructureTempData> getCodec()
+    {   return CODEC;
+    }
+
+    @Override
     public String toString()
-    {   return CODEC.encodeStart(JsonOps.INSTANCE, this).result().map(Object::toString).orElse("serialize_failed");
+    {   return this.asString();
     }
 
     @Override
