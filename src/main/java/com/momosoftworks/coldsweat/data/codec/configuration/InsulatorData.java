@@ -12,26 +12,24 @@ import com.momosoftworks.coldsweat.data.codec.impl.RequirementHolder;
 import com.momosoftworks.coldsweat.data.codec.requirement.EntityRequirement;
 import com.momosoftworks.coldsweat.data.codec.requirement.ItemComponentsRequirement;
 import com.momosoftworks.coldsweat.data.codec.requirement.ItemRequirement;
-import com.momosoftworks.coldsweat.data.codec.requirement.NbtRequirement;
 import com.momosoftworks.coldsweat.data.codec.util.AttributeModifierMap;
 import com.momosoftworks.coldsweat.data.codec.util.CommonStreamCodecs;
 import com.momosoftworks.coldsweat.util.serialization.ConfigHelper;
-import com.momosoftworks.coldsweat.util.serialization.NBTHelper;
 import com.momosoftworks.coldsweat.util.serialization.NbtSerializable;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public record InsulatorData(Insulation.Slot slot,
                             Insulation insulation, ItemRequirement data,
@@ -102,7 +100,7 @@ public record InsulatorData(Insulation.Slot slot,
             return null;
         }
 
-        boolean adaptive = entry.size() < 4 || entry.get(3).equals("adaptive");
+        boolean adaptive = entry.size() > 3 && entry.get(3).equals("adaptive");
         ItemComponentsRequirement components = entry.size() > 4 ? ItemComponentsRequirement.parse((String) entry.get(4)) : new ItemComponentsRequirement();
         double insulVal1 = ((Number) entry.get(1)).doubleValue();
         double insulVal2 = ((Number) entry.get(2)).doubleValue();
