@@ -61,7 +61,7 @@ public class IceboxScreen extends AbstractHearthScreen<IceboxContainer>
 
             graphics.blit(ICEBOX_GUI, leftPos + 117, topPos + 78, 176, powered ? 14 : 22, 14, 8, 256, 256);
 
-            if (CSMath.betweenInclusive(mouseX, leftPos + 117, leftPos + 131) && CSMath.betweenInclusive(mouseY, topPos + 78, topPos + 86))
+            if (CSMath.betweenInclusive(mouseX, leftPos + 114, leftPos + 132) && CSMath.betweenInclusive(mouseY, topPos + 78, topPos + 86))
             {   this.setTooltipForNextRenderPass(Component.translatable(powered ? "gui.cold_sweat.hearth.powered" : "gui.cold_sweat.hearth.unpowered"));
             }
         }
