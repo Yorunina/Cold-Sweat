@@ -6,6 +6,7 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import com.momosoftworks.coldsweat.ColdSweat;
 import com.momosoftworks.coldsweat.api.insulation.AdaptiveInsulation;
@@ -17,6 +18,7 @@ import com.momosoftworks.coldsweat.data.codec.configuration.InsulatorData;
 import com.momosoftworks.coldsweat.data.codec.impl.ConfigData;
 import com.momosoftworks.coldsweat.data.codec.requirement.EntityRequirement;
 import com.momosoftworks.coldsweat.util.math.CSMath;
+import com.momosoftworks.coldsweat.util.math.FastMap;
 import com.momosoftworks.coldsweat.util.math.FastMultiMap;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -25,6 +27,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -36,6 +39,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.Property;
+import org.apache.logging.log4j.util.TriConsumer;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -45,14 +49,15 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ConfigHelper
 {
     private ConfigHelper() {}
 
-    public static <T> List<T> parseRegistryItems(ResourceKey<Registry<T>> registry, RegistryAccess registryAccess, String objects)
+    public static <T> List<Holder<T>> parseRegistryItems(ResourceKey<Registry<T>> registry, RegistryAccess registryAccess, String objects)
     {
-        List<T> registryList = new ArrayList<>();
+        List<Holder<T>> registryList = new ArrayList<>();
         Registry<T> reg = registryAccess.registryOrThrow(registry);
 
         for (String objString : objects.split(","))
@@ -61,12 +66,12 @@ public class ConfigHelper
             {
                 final String tagID = objString.replace("#", "");
                 Optional<HolderSet.Named<T>> tag = reg.getTag(TagKey.create(registry, ResourceLocation.parse(tagID)));
-                tag.ifPresent(tg -> registryList.addAll(tg.stream().map(Holder::value).toList()));
+                tag.ifPresent(tg -> registryList.addAll(tg.stream().toList()));
             }
             else
             {
                 ResourceLocation id = ResourceLocation.parse(objString);
-                Optional<T> obj = Optional.ofNullable(reg.get(id));
+                Optional<Holder.Reference<T>> obj = reg.getHolder(ResourceKey.create(registry, id));
                 if (obj.isEmpty())
                 {
                     ColdSweat.LOGGER.error("Error parsing config: \"{}\" does not exist", objString);
@@ -132,17 +137,30 @@ public class ConfigHelper
         return items;
     }
 
-    public static <K, V> Map<K, V> getRegistryMap(List<? extends List<?>> source, RegistryAccess registryAccess, ResourceKey<Registry<K>> keyRegistry,
-                                                  Function<List<?>, V> valueCreator, Function<V, List<Either<TagKey<K>, K>>> taggedListGetter)
+    public static <K, V> Map<Holder<K>, V> getRegistryMap(List<? extends List<?>> source, RegistryAccess registryAccess, ResourceKey<Registry<K>> keyRegistry,
+                                                          Function<List<?>, V> valueCreator, Function<V, List<Either<TagKey<K>, Holder<K>>>> taggedListGetter)
     {
-        Map<K, V> map = new HashMap<>();
+        return getRegistryMapLike(source, registryAccess, keyRegistry, valueCreator, taggedListGetter, FastMap::new, FastMap::put);
+    }
+
+    public static <K, V> Multimap<Holder<K>, V> getRegistryMultimap(List<? extends List<?>> source, RegistryAccess registryAccess, ResourceKey<Registry<K>> keyRegistry,
+                                                                    Function<List<?>, V> valueCreator, Function<V, List<Either<TagKey<K>, Holder<K>>>> taggedListGetter)
+    {
+        return getRegistryMapLike(source, registryAccess, keyRegistry, valueCreator, taggedListGetter, FastMultiMap::new, FastMultiMap::put);
+    }
+
+    private static <K, V, M> M getRegistryMapLike(List<? extends List<?>> source, RegistryAccess registryAccess, ResourceKey<Registry<K>> keyRegistry,
+                                                  Function<List<?>, V> valueCreator, Function<V, List<Either<TagKey<K>, Holder<K>>>> taggedListGetter,
+                                                  Supplier<M> mapSupplier, TriConsumer<M, Holder<K>, V> mapAdder)
+    {
+        M map = mapSupplier.get();
         for (List<?> entry : source)
         {
             V data = valueCreator.apply(entry);
             if (data != null)
             {
-                for (K key : RegistryHelper.mapRegistryTagList(keyRegistry, taggedListGetter.apply(data), registryAccess))
-                {   map.put(key, data);
+                for (Holder<K> key : RegistryHelper.mapRegistryTagList(keyRegistry, taggedListGetter.apply(data), registryAccess))
+                {   mapAdder.accept(map, key, data);
                 }
             }
             else ColdSweat.LOGGER.error("Error parsing {} config \"{}\"", keyRegistry.location(), entry.toString());
@@ -235,22 +253,40 @@ public class ConfigHelper
     }
 
     public static <K, V extends ConfigData<?>> CompoundTag serializeRegistry(Map<K, V> map, String key,
-                                                                             ResourceKey<Registry<K>> keyRegistry, ResourceKey<Registry<V>> modRegistry,
-                                                                             Function<K, ResourceLocation> registryGetter)
+                                                                             ResourceKey<Registry<K>> gameRegistry, ResourceKey<Registry<V>> modRegistry,
+                                                                             Function<K, ResourceLocation> keyGetter)
+    {
+        return serializeEitherRegistry(map, key, gameRegistry, modRegistry, null, keyGetter);
+    }
+
+    public static <K, V extends ConfigData<?>> CompoundTag serializeHolderRegistry(Map<Holder<K>, V> map, String key,
+                                                                                   ResourceKey<Registry<K>> gameRegistry, ResourceKey<Registry<V>> modRegistry,
+                                                                                   RegistryAccess registryAccess)
+    {
+        return serializeEitherRegistry(map, key, gameRegistry, modRegistry, registryAccess, RegistryHelper::getKey);
+    }
+
+    private static <K, V extends ConfigData<?>> CompoundTag serializeEitherRegistry(Map<K, V> map, String key,
+                                                                                    ResourceKey<?> gameRegistry, ResourceKey<Registry<V>> modRegistry,
+                                                                                    RegistryAccess registryAccess, Function<K, ResourceLocation> keyGetter)
     {
         Codec<V> codec = ModRegistries.getCodec(modRegistry);
+        DynamicOps<Tag> encoderOps = registryAccess != null
+                                     ? RegistryOps.create(NbtOps.INSTANCE, registryAccess)
+                                     : NbtOps.INSTANCE;
+
         CompoundTag tag = new CompoundTag();
         CompoundTag mapTag = new CompoundTag();
 
         for (Map.Entry<K, V> entry : map.entrySet())
         {
-            ResourceLocation elementId = registryGetter.apply(entry.getKey());
+            ResourceLocation elementId = keyGetter.apply(entry.getKey());
             if (elementId == null)
-            {   ColdSweat.LOGGER.error("Error serializing {}: \"{}\" does not exist", keyRegistry.location(), entry.getKey());
+            {   ColdSweat.LOGGER.error("Error serializing {}: \"{}\" does not exist", gameRegistry.location(), entry.getKey());
                 continue;
             }
-            codec.encodeStart(NbtOps.INSTANCE, entry.getValue())
-            .resultOrPartial(e -> ColdSweat.LOGGER.error("Error serializing {} \"{}\": {}", keyRegistry.location(), elementId, e))
+            codec.encode(entry.getValue(), encoderOps, encoderOps.empty())
+            .resultOrPartial(e -> ColdSweat.LOGGER.error("Error serializing {} \"{}\": {}", gameRegistry.location(), elementId, e))
             .ifPresent(encoded ->
             {
                 ((CompoundTag) encoded).putUUID("UUID", entry.getValue().getId());
@@ -262,35 +298,67 @@ public class ConfigHelper
     }
 
     public static <K, V extends ConfigData<?>> Map<K, V> deserializeRegistry(CompoundTag tag, String key,
-                                                                             ResourceKey<Registry<K>> keyRegistry, ResourceKey<Registry<V>> modRegistry,
-                                                                             Function<ResourceLocation, K> registryGetter)
+                                                                            ResourceKey<Registry<V>> modRegistry,
+                                                                            Function<ResourceLocation, K> keyGetter)
+    {
+        return deserializeEitherRegistry(tag, key, modRegistry, keyGetter, null);
+    }
+
+    public static <K, V extends ConfigData<?>> Map<Holder<K>, V> deserializeHolderRegistry(CompoundTag tag, String key,
+                                                                                          ResourceKey<Registry<K>> gameRegistry, ResourceKey<Registry<V>> modRegistry,
+                                                                                          RegistryAccess registryAccess)
+    {
+        Registry<K> registry = registryAccess.registryOrThrow(gameRegistry);
+        return deserializeEitherRegistry(tag, key, modRegistry, k -> registry.getHolder(ResourceKey.create(gameRegistry, k)).orElse(null), registryAccess);
+    }
+
+    private static <K, V extends ConfigData<?>> Map<K, V> deserializeEitherRegistry(CompoundTag tag, String key,
+                                                                                    ResourceKey<Registry<V>> modRegistry,
+                                                                                    Function<ResourceLocation, K> keyGetter,
+                                                                                    RegistryAccess registryAccess)
     {
         Codec<V> codec = ModRegistries.getCodec(modRegistry);
 
-        Map<K, V> map = new HashMap<>();
+        Map<K, V> map = new FastMap<>();
         CompoundTag mapTag = tag.getCompound(key);
+        DynamicOps<Tag> decoderOps = registryAccess != null
+                                     ? RegistryOps.create(NbtOps.INSTANCE, registryAccess)
+                                     : NbtOps.INSTANCE;
 
         for (String entryKey : mapTag.getAllKeys())
         {
             CompoundTag entryData = mapTag.getCompound(entryKey);
-            K object = registryGetter.apply(ResourceLocation.parse(entryKey));
-            if (object == null)
-            {   ColdSweat.LOGGER.error("Error deserializing {}: \"{}\" does not exist", keyRegistry.location(), entryKey);
-                continue;
-            }
-            codec.decode(NbtOps.INSTANCE, entryData).result().map(Pair::getFirst)
+            codec.decode(decoderOps, entryData)
+            .resultOrPartial(e -> ColdSweat.LOGGER.error("Error deserializing {}: {}", modRegistry.location(), e))
+            .map(Pair::getFirst)
             .ifPresent(value ->
             {
-                ConfigData.IDENTIFIABLES.put(entryData.getUUID("UUID"), value);
-                map.put(object, value);
+                K entry = keyGetter.apply(ResourceLocation.parse(entryKey));
+                if (entry != null)
+                {   ConfigData.IDENTIFIABLES.put(entryData.getUUID("UUID"), value);
+                    map.put(entry, value);
+                }
             });
         }
         return map;
     }
 
     public static <K, V extends ConfigData<?>> CompoundTag serializeMultimapRegistry(Multimap<K, V> map, String key,
-                                                                                     ResourceKey<Registry<V>> modRegistry,
-                                                                                     Function<K, ResourceLocation> keyGetter)
+                                                                                    ResourceKey<Registry<V>> modRegistry,
+                                                                                    Function<K, ResourceLocation> keyGetter)
+    {
+        return serializeEitherMultimapRegistry(map, key, modRegistry, keyGetter);
+    }
+
+    public static <K, V extends ConfigData<?>> CompoundTag serializeHolderMultimapRegistry(Multimap<Holder<K>, V> map, String key,
+                                                                                          ResourceKey<Registry<V>> modRegistry)
+    {
+        return serializeEitherMultimapRegistry(map, key, modRegistry, RegistryHelper::getKey);
+    }
+
+    private static <K, V extends ConfigData<?>> CompoundTag serializeEitherMultimapRegistry(Multimap<K, V> map, String key,
+                                                                                           ResourceKey<Registry<V>> modRegistry,
+                                                                                           Function<K, ResourceLocation> keyGetter)
     {
         Codec<V> codec = ModRegistries.getCodec(modRegistry);
         CompoundTag tag = new CompoundTag();
@@ -323,6 +391,21 @@ public class ConfigHelper
     public static <K, V extends ConfigData<?>> Multimap<K, V> deserializeMultimapRegistry(CompoundTag tag, String key,
                                                                                           ResourceKey<Registry<V>> modRegistry,
                                                                                           Function<ResourceLocation, K> keyGetter)
+    {
+        return deserializeEitherMultimapRegistry(tag, key, modRegistry, keyGetter);
+    }
+
+    public static <K, V extends ConfigData<?>> Multimap<Holder<K>, V> deserializeHolderMultimapRegistry(CompoundTag tag, String key,
+                                                                                                        ResourceKey<Registry<K>> gameRegistry, ResourceKey<Registry<V>> modRegistry,
+                                                                                                        RegistryAccess registryAccess)
+    {
+        Registry<K> registry = registryAccess.registryOrThrow(gameRegistry);
+        return deserializeEitherMultimapRegistry(tag, key, modRegistry, k -> registry.getHolder(ResourceKey.create(gameRegistry, k)).orElse(null));
+    }
+
+    private static <K, V extends ConfigData<?>> Multimap<K, V> deserializeEitherMultimapRegistry(CompoundTag tag, String key,
+                                                                                                ResourceKey<Registry<V>> modRegistry,
+                                                                                                Function<ResourceLocation, K> keyGetter)
     {
         Codec<V> codec = ModRegistries.getCodec(modRegistry);
 
@@ -528,7 +611,7 @@ public class ConfigHelper
                                                       }));
     }
 
-    public static <T> Codec<Either<TagKey<T>, T>> tagOrVanillaRegistryCodec(ResourceKey<Registry<T>> vanillaRegistry, Codec<Holder<T>> codec)
+    public static <T> Codec<Either<TagKey<T>, Holder<T>>> tagOrHolderCodec(ResourceKey<Registry<T>> vanillaRegistry, Codec<Holder<T>> codec)
     {
         return Codec.either(Codec.STRING.comapFlatMap(str ->
                                                       {
@@ -539,7 +622,7 @@ public class ConfigHelper
                                                           return DataResult.success(TagKey.create(vanillaRegistry, itemLocation));
                                                       },
                                                       key -> "#" + key.location()),
-                            codec.xmap(Holder::value, Holder::direct));
+                            codec);
     }
 
     public static <T> Codec<Either<TagKey<T>, ResourceKey<T>>> tagOrResourceKeyCodec(ResourceKey<Registry<T>> vanillaRegistry)

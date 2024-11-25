@@ -335,7 +335,7 @@ public class ConfigLoadingHandler
             // Add listed items as insulators
             List<Item> items = new ArrayList<>();
             insulator.data().items().ifPresent(itemList ->
-            {   items.addAll(RegistryHelper.mapRegistryTagList(Registries.ITEM, itemList, registryAccess));
+            {   items.addAll(RegistryHelper.mapBuiltinRegistryTagList(BuiltInRegistries.ITEM, itemList));
             });
             insulator.data().tag().ifPresent(tag ->
             {   items.addAll(BuiltInRegistries.ITEM.getTag(tag).get().stream().map(Holder::value).toList());
@@ -374,7 +374,7 @@ public class ConfigLoadingHandler
 
             List<Item> items = new ArrayList<>();
             fuelData.data().items().ifPresent(itemList ->
-            {   items.addAll(RegistryHelper.mapRegistryTagList(Registries.ITEM, itemList, registryAccess));
+            {   items.addAll(RegistryHelper.mapBuiltinRegistryTagList(BuiltInRegistries.ITEM, itemList));
             });
             fuelData.data().tag().ifPresent(tag ->
             {   items.addAll(BuiltInRegistries.ITEM.getTag(tag).get().stream().map(Holder::value).toList());
@@ -409,7 +409,7 @@ public class ConfigLoadingHandler
 
             List<Item> items = new ArrayList<>();
             foodData.data().items().ifPresent(itemList ->
-            {   items.addAll(RegistryHelper.mapRegistryTagList(Registries.ITEM, itemList, registryAccess));
+            {   items.addAll(RegistryHelper.mapBuiltinRegistryTagList(BuiltInRegistries.ITEM, itemList));
             });
             foodData.data().tag().ifPresent(tag ->
             {   items.addAll(BuiltInRegistries.ITEM.getTag(tag).get().stream().map(Holder::value).toList());
@@ -465,7 +465,7 @@ public class ConfigLoadingHandler
                 {   return;
                 }
             }
-            Block[] blocks = RegistryHelper.mapRegistryTagList(Registries.BLOCK, blockTempData.blocks(), registryAccess).toArray(Block[]::new);
+            Block[] blocks = RegistryHelper.mapBuiltinRegistryTagList(BuiltInRegistries.BLOCK, blockTempData.blocks()).toArray(Block[]::new);
             BlockTemp blockTemp = new BlockTemp(blockTempData.temperature() < 0 ? -blockTempData.maxEffect() : -Double.MAX_VALUE,
                                                 blockTempData.temperature() > 0 ? blockTempData.maxEffect() : Double.MAX_VALUE,
                                                 blockTempData.minTemp(),
@@ -510,7 +510,7 @@ public class ConfigLoadingHandler
                 {   return;
                 }
             }
-            for (Biome biome : RegistryHelper.mapRegistryTagList(Registries.BIOME, biomeTempData.biomes(), registryAccess))
+            for (Holder<Biome> biome : RegistryHelper.mapRegistryTagList(Registries.BIOME, biomeTempData.biomes(), registryAccess))
             {
                 if (biomeTempData.isOffset())
                 {   ConfigSettings.BIOME_OFFSETS.get(registryAccess).put(biome, biomeTempData);
@@ -536,7 +536,7 @@ public class ConfigLoadingHandler
                 }
             }
 
-            for (DimensionType dimension : RegistryHelper.mapRegistryTagList(Registries.DIMENSION_TYPE, dimensionTempData.dimensions(), registryAccess))
+            for (Holder<DimensionType> dimension : RegistryHelper.mapRegistryTagList(Registries.DIMENSION_TYPE, dimensionTempData.dimensions(), registryAccess))
             {
                 if (dimensionTempData.isOffset())
                 {   ConfigSettings.DIMENSION_OFFSETS.get(registryAccess).put(dimension, dimensionTempData);
@@ -561,7 +561,7 @@ public class ConfigLoadingHandler
                 {   return;
                 }
             }
-            for (Structure structure : RegistryHelper.mapRegistryTagList(Registries.STRUCTURE, structureTempData.structures(), registryAccess))
+            for (Holder<Structure> structure : RegistryHelper.mapRegistryTagList(Registries.STRUCTURE, structureTempData.structures(), registryAccess))
             {
                 if (structureTempData.isOffset())
                 {   ConfigSettings.STRUCTURE_OFFSETS.get(registryAccess).put(structure, structureTempData);
@@ -611,7 +611,7 @@ public class ConfigLoadingHandler
                 {   return;
                 }
             }
-            List<EntityType<?>> entities = RegistryHelper.mapRegistryTagList(Registries.ENTITY_TYPE, mountData.entities(), registryAccess);
+            List<EntityType<?>> entities = RegistryHelper.mapBuiltinRegistryTagList(BuiltInRegistries.ENTITY_TYPE, mountData.entities());
             for (EntityType<?> entity : entities)
             {   ConfigSettings.INSULATED_MOUNTS.get().put(entity, new MountData(entities, mountData.coldInsulation(), mountData.heatInsulation(), mountData.requirement()));
             }
@@ -631,7 +631,7 @@ public class ConfigLoadingHandler
                 {   return;
                 }
             }
-            for (Biome biome : RegistryHelper.mapRegistryTagList(Registries.BIOME, spawnBiomeData.biomes(), registryAccess))
+            for (Holder<Biome> biome : RegistryHelper.mapRegistryTagList(Registries.BIOME, spawnBiomeData.biomes(), registryAccess))
             {   ConfigSettings.ENTITY_SPAWN_BIOMES.get(registryAccess).put(biome, spawnBiomeData);
             }
         });
@@ -654,7 +654,7 @@ public class ConfigLoadingHandler
             List<Either<TagKey<EntityType<?>>, EntityType<?>>> types = new ArrayList<>();
             entityTempData.entity().entities().ifPresent(type -> types.addAll(type));
 
-            for (EntityType<?> entity : RegistryHelper.mapRegistryTagList(Registries.ENTITY_TYPE, types, registryAccess))
+            for (EntityType<?> entity : RegistryHelper.mapBuiltinRegistryTagList(BuiltInRegistries.ENTITY_TYPE, types))
             {   ConfigSettings.ENTITY_TEMPERATURES.get().put(entity, entityTempData);
             }
         });

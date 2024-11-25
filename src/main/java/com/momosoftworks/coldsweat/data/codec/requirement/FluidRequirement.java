@@ -42,7 +42,7 @@ public record FluidRequirement(Optional<List<Either<TagKey<Fluid>, Fluid>>> flui
             if (this.tag.isPresent() && !flState.is(this.tag.get()))
             {   return false;
             }
-            else if (this.fluids.isPresent() && !RegistryHelper.mapRegistryTagList(Registries.FLUID, fluids.get(), level.registryAccess()).contains(flState.getType()))
+            else if (this.fluids.isPresent() && !RegistryHelper.mapBuiltinRegistryTagList(BuiltInRegistries.FLUID, fluids.get()).contains(flState.getType()))
             {   return false;
             }
             else

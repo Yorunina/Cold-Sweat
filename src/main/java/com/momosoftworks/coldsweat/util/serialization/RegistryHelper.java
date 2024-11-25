@@ -67,24 +67,6 @@ public class RegistryHelper
         return access;
     }
 
-    public static <T> List<T> mapRegistryTagList(ResourceKey<Registry<T>> registry, List<Either<TagKey<T>, T>> eitherList, @Nullable RegistryAccess registryAccess)
-    {
-        Registry<T> reg = registryAccess != null ? registryAccess.registryOrThrow(registry) : getRegistry(registry);
-        List<T> list = new ArrayList<>();
-        if (reg == null) return list;
-
-        for (Either<TagKey<T>, T> either : eitherList)
-        {
-            either.ifLeft(tagKey ->
-            {
-                Optional<HolderSet.Named<T>> tag = reg.getTag(tagKey);
-                tag.ifPresent(tag1 -> list.addAll(tag1.stream().map(Holder::value).toList()));
-            });
-            either.ifRight(list::add);
-        }
-        return list;
-    }
-
     public static <T> List<T> mapBuiltinRegistryTagList(Registry<T> registry, List<Either<TagKey<T>, T>> eitherList)
     {
         List<T> list = new ArrayList<>();
@@ -102,6 +84,24 @@ public class RegistryHelper
         return list;
     }
 
+    public static <T> List<Holder<T>> mapRegistryTagList(ResourceKey<Registry<T>> registry, List<Either<TagKey<T>, Holder<T>>> eitherList, @Nullable RegistryAccess registryAccess)
+    {
+        Registry<T> reg = registryAccess != null ? registryAccess.registryOrThrow(registry) : getRegistry(registry);
+        List<Holder<T>> list = new ArrayList<>();
+        if (reg == null) return list;
+
+        for (Either<TagKey<T>, Holder<T>> either : eitherList)
+        {
+            either.ifLeft(tagKey ->
+            {
+                Optional<HolderSet.Named<T>> tag = reg.getTag(tagKey);
+                tag.ifPresent(tag1 -> list.addAll(tag1.stream().toList()));
+            });
+            either.ifRight(list::add);
+        }
+        return list;
+    }
+
     public static <T> Optional<T> getVanillaRegistryValue(ResourceKey<Registry<T>> registry, ResourceLocation id)
     {
         try
@@ -113,8 +113,13 @@ public class RegistryHelper
     }
 
     @Nullable
-    public static Biome getBiome(ResourceLocation biomeId, RegistryAccess registryAccess)
-    {   return registryAccess.registryOrThrow(Registries.BIOME).get(biomeId);
+    public static ResourceLocation getKey(Holder<?> holder)
+    {   return holder.unwrapKey().map(ResourceKey::location).orElse(null);
+    }
+
+    @Nullable
+    public static Holder<Biome> getBiome(ResourceLocation biomeId, RegistryAccess registryAccess)
+    {   return registryAccess.registryOrThrow(Registries.BIOME).getHolder(ResourceKey.create(Registries.BIOME, biomeId)).orElse(null);
     }
 
     @Nullable
@@ -123,8 +128,8 @@ public class RegistryHelper
     }
 
     @Nullable
-    public static DimensionType getDimension(ResourceLocation dimensionId, RegistryAccess registryAccess)
-    {   return registryAccess.registryOrThrow(Registries.DIMENSION_TYPE).get(dimensionId);
+    public static Holder<DimensionType> getDimension(ResourceLocation dimensionId, RegistryAccess registryAccess)
+    {   return registryAccess.registryOrThrow(Registries.DIMENSION_TYPE).getHolder(ResourceKey.create(Registries.DIMENSION_TYPE, dimensionId)).orElse(null);
     }
 
     @Nullable
@@ -133,8 +138,8 @@ public class RegistryHelper
     }
 
     @Nullable
-    public static Structure getStructure(ResourceLocation structureId, RegistryAccess registryAccess)
-    {   return registryAccess.registryOrThrow(Registries.STRUCTURE).get(structureId);
+    public static Holder<Structure> getStructure(ResourceLocation structureId, RegistryAccess registryAccess)
+    {   return registryAccess.registryOrThrow(Registries.STRUCTURE).getHolder(ResourceKey.create(Registries.STRUCTURE, structureId)).orElse(null);
     }
 
     @Nullable

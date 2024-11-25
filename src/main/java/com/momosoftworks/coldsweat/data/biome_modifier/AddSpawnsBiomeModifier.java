@@ -6,6 +6,7 @@ import com.momosoftworks.coldsweat.core.init.ModBiomeModifiers;
 import com.momosoftworks.coldsweat.data.codec.configuration.SpawnBiomeData;
 import com.momosoftworks.coldsweat.util.serialization.RegistryHelper;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
@@ -23,10 +24,10 @@ public record AddSpawnsBiomeModifier(boolean useConfigs) implements BiomeModifie
     {
         if (phase == Phase.ADD && useConfigs)
         {
-            Collection<SpawnBiomeData> spawns = ConfigSettings.ENTITY_SPAWN_BIOMES.get(RegistryHelper.getRegistryAccess()).get(biome.value());
+            Collection<SpawnBiomeData> spawns = ConfigSettings.ENTITY_SPAWN_BIOMES.get(RegistryHelper.getRegistryAccess()).get(biome);
             for (SpawnBiomeData spawn : spawns)
             {
-                RegistryHelper.mapRegistryTagList(Registries.ENTITY_TYPE, spawn.entities(), RegistryHelper.getRegistryAccess())
+                RegistryHelper.mapBuiltinRegistryTagList(BuiltInRegistries.ENTITY_TYPE, spawn.entities())
                 .forEach(entityType ->
                 {
                     builder.getMobSpawnSettings().getSpawner(MobCategory.CREATURE).removeIf(spawnerData -> spawnerData.type == entityType);

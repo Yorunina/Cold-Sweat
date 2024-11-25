@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.momosoftworks.coldsweat.data.codec.impl.ConfigData;
 import com.momosoftworks.coldsweat.util.serialization.ConfigHelper;
+import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -17,19 +18,19 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public record SpawnBiomeData(List<Either<TagKey<Biome>, Biome>> biomes, MobCategory category,
+public record SpawnBiomeData(List<Either<TagKey<Biome>, Holder<Biome>>> biomes, MobCategory category,
                              int weight, List<Either<TagKey<EntityType<?>>, EntityType<?>>> entities, Optional<List<String>> requiredMods) implements ConfigData<SpawnBiomeData>
 {
-    public SpawnBiomeData(List<Biome> biomes, MobCategory category, int weight, List<EntityType<?>> entities)
+    public SpawnBiomeData(List<Holder<Biome>> biomes, MobCategory category, int weight, List<EntityType<?>> entities)
     {
-        this(biomes.stream().map(Either::<TagKey<Biome>, Biome>right).toList(),
+        this(biomes.stream().map(Either::<TagKey<Biome>, Holder<Biome>>right).toList(),
              category, weight,
              entities.stream().map(Either::<TagKey<EntityType<?>>, EntityType<?>>right).toList(),
              Optional.empty());
     }
 
     public static final Codec<SpawnBiomeData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            ConfigHelper.tagOrVanillaRegistryCodec(Registries.BIOME, Biome.CODEC).listOf().fieldOf("biomes").forGetter(SpawnBiomeData::biomes),
+            ConfigHelper.tagOrHolderCodec(Registries.BIOME, Biome.CODEC).listOf().fieldOf("biomes").forGetter(SpawnBiomeData::biomes),
             MobCategory.CODEC.fieldOf("category").forGetter(SpawnBiomeData::category),
             Codec.INT.fieldOf("weight").forGetter(SpawnBiomeData::weight),
             ConfigHelper.tagOrBuiltinCodec(Registries.ENTITY_TYPE, BuiltInRegistries.ENTITY_TYPE).listOf().fieldOf("entities").forGetter(SpawnBiomeData::entities),
@@ -43,7 +44,7 @@ public record SpawnBiomeData(List<Either<TagKey<Biome>, Biome>> biomes, MobCateg
         {   return null;
         }
         String biomeId = ((String) entry.get(0));
-        List<Biome> biomes = ConfigHelper.parseRegistryItems(Registries.BIOME, registryAccess, biomeId);
+        List<Holder<Biome>> biomes = ConfigHelper.parseRegistryItems(Registries.BIOME, registryAccess, biomeId);
         if (biomes.isEmpty())
         {   return null;
         }

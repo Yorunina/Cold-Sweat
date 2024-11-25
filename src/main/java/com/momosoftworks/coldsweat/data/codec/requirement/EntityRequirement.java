@@ -13,7 +13,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.scores.Team;
 
 import java.util.ArrayList;
