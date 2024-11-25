@@ -1,7 +1,6 @@
 package com.momosoftworks.coldsweat.common.container;
 
 import com.momosoftworks.coldsweat.config.ConfigSettings;
-import com.momosoftworks.coldsweat.core.event.TaskScheduler;
 import com.momosoftworks.coldsweat.core.init.ModMenus;
 import com.momosoftworks.coldsweat.util.math.CSMath;
 import net.minecraft.core.component.DataComponents;
@@ -38,12 +37,6 @@ public class HearthContainer extends AbstractContainerMenu
                 // Check if the potion is blacklisted
                 PotionContents potioncontents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
                 return StreamSupport.stream(potioncontents.getAllEffects().spliterator(), false).noneMatch(eff -> ConfigSettings.HEARTH_POTION_BLACKLIST.get().contains(eff.getEffect()));
-            }
-
-            @Override
-            public void setChanged()
-            {   TaskScheduler.scheduleServer(() -> ((HearthBlockEntity) this.container).checkForFuel(), 0);
-                super.setChanged();
             }
         });
 

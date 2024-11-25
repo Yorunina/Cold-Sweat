@@ -47,6 +47,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Inventory;
@@ -80,7 +81,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.StreamSupport;
 import java.util.stream.Collectors;
 
-public class HearthBlockEntity extends RandomizableContainerBlockEntity
+public class HearthBlockEntity extends RandomizableContainerBlockEntity implements WorldlyContainer
 {
     // List of SpreadPaths, which determine where the Hearth is affecting and how it spreads through/around blocks
     List<SpreadPath> paths = new ArrayList<>(this.getMaxPaths());
@@ -361,11 +362,6 @@ public class HearthBlockEntity extends RandomizableContainerBlockEntity
             }
         }
 
-        // Input fuel
-        if (this.ticksExisted % 20 == 0)
-        {   this.checkForFuel();
-        }
-
         // Update fuel
         if (!this.level.isClientSide && this.isFuelChanged()
         || (wasUsingColdFuel != this.shouldUseColdFuel || wasUsingHotFuel != this.shouldUseHotFuel))
@@ -542,6 +538,13 @@ public class HearthBlockEntity extends RandomizableContainerBlockEntity
         {
             serverLevel.getChunkSource().blockChanged(this.getBlockPos());
         }
+    }
+
+    @Override
+    public void setChanged()
+    {
+        super.setChanged();
+        this.checkForFuel();
     }
 
     public void checkForFuel()
@@ -1144,6 +1147,21 @@ public class HearthBlockEntity extends RandomizableContainerBlockEntity
 
     public void setBackPowered(boolean isPowered)
     {   this.isBackPowered = isPowered;
+    }
+
+    @Override
+    public int[] getSlotsForFace(Direction side)
+    {   return new int[0];
+    }
+
+    @Override
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, Direction pDirection)
+    {   return getItemFuel(stack) != 0;
+    }
+
+    @Override
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction direction)
+    {   return true;
     }
 
     public abstract static class FluidHandler implements IFluidHandler
