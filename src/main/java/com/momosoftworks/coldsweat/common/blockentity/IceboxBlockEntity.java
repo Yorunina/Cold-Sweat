@@ -55,7 +55,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class IceboxBlockEntity extends HearthBlockEntity implements MenuProvider, WorldlyContainer, LidBlockEntity
+public class IceboxBlockEntity extends HearthBlockEntity implements LidBlockEntity
 {
     public static int[] WATERSKIN_SLOTS = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     public static int[] FUEL_SLOT = {0};
@@ -136,11 +136,6 @@ public class IceboxBlockEntity extends HearthBlockEntity implements MenuProvider
     @Override
     protected Component getDefaultName()
     {   return Component.translatable("container." + ColdSweat.MOD_ID + ".icebox");
-    }
-
-    @Override
-    public Component getDisplayName()
-    {   return this.getCustomName() != null ? this.getCustomName() : this.getDefaultName();
     }
 
     public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T te)
@@ -371,8 +366,8 @@ public class IceboxBlockEntity extends HearthBlockEntity implements MenuProvider
     }
 
     @Override
-    public int[] getSlotsForFace(Direction dir)
-    {   return dir.getAxis() == Direction.Axis.Y ? WATERSKIN_SLOTS : FUEL_SLOT;
+    public int[] getSlotsForFace(Direction side)
+    {   return side.getAxis() == Direction.Axis.Y ? WATERSKIN_SLOTS : FUEL_SLOT;
     }
 
     @Override
@@ -381,11 +376,6 @@ public class IceboxBlockEntity extends HearthBlockEntity implements MenuProvider
         if (slot == 0)
             return this.getItemFuel(stack) != 0;
         else return stack.is(ModItemTags.ICEBOX_VALID) || stack.isEdible();
-    }
-
-    @Override
-    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction direction)
-    {   return true;
     }
 
     @Override
