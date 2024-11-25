@@ -48,10 +48,10 @@ public class HearthScreen extends AbstractHearthScreen<HearthContainer>
             graphics.blit(HEARTH_GUI, leftPos + 60, topPos + 21, 176, backPowered ? 60 : 68, 14, 8, 256, 256);
             graphics.blit(HEARTH_GUI, leftPos + 102, topPos + 21, 190, sidePowered ? 60 : 68, 14, 8, 256, 256);
 
-            if (CSMath.betweenInclusive(mouseX, leftPos + 60, leftPos + 74) && CSMath.betweenInclusive(mouseY, topPos + 21, topPos + 29))
+            if (CSMath.betweenInclusive(mouseX, leftPos + 56, leftPos + 75) && CSMath.betweenInclusive(mouseY, topPos + 17, topPos + 29))
             {   this.setTooltipForNextRenderPass(Component.translatable(backPowered ? "gui.cold_sweat.hearth.powered" : "gui.cold_sweat.hearth.unpowered"));
             }
-            if (CSMath.betweenInclusive(mouseX, leftPos + 102, leftPos + 116) && CSMath.betweenInclusive(mouseY, topPos + 21, topPos + 29))
+            if (CSMath.betweenInclusive(mouseX, leftPos + 99, leftPos + 117) && CSMath.betweenInclusive(mouseY, topPos + 17, topPos + 29))
             {   this.setTooltipForNextRenderPass(Component.translatable(sidePowered ? "gui.cold_sweat.hearth.powered" : "gui.cold_sweat.hearth.unpowered"));
             }
         }
