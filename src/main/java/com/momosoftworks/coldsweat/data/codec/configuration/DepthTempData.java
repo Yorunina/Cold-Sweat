@@ -22,12 +22,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public record DepthTempData(List<TempRegion> temperatures, List<Either<TagKey<DimensionType>, DimensionType>> dimensions,
+public record DepthTempData(List<TempRegion> temperatures, List<Either<TagKey<DimensionType>, Holder<DimensionType>>> dimensions,
                             Optional<List<String>> requiredMods) implements ConfigData<DepthTempData>
 {
     public static final Codec<DepthTempData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             TempRegion.CODEC.listOf().fieldOf("regions").forGetter(DepthTempData::temperatures),
-            ConfigHelper.tagOrVanillaRegistryCodec(Registries.DIMENSION_TYPE, DimensionType.CODEC).listOf().fieldOf("dimensions").forGetter(DepthTempData::dimensions),
+            ConfigHelper.tagOrHolderCodec(Registries.DIMENSION_TYPE, DimensionType.CODEC).listOf().fieldOf("dimensions").forGetter(DepthTempData::dimensions),
             Codec.STRING.listOf().optionalFieldOf("required_mods").forGetter(DepthTempData::requiredMods)
     ).apply(instance, DepthTempData::new));
 

@@ -14,8 +14,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -23,7 +21,7 @@ public class SyncConfigSettingsMessage
 {
     public static final UUID EMPTY_UUID = new UUID(0, 0);
 
-    Map<String, CompoundTag> configValues;
+    CompoundTag configValues;
     UUID menuOpener;
 
     public SyncConfigSettingsMessage(RegistryAccess registryAccess)
@@ -34,32 +32,20 @@ public class SyncConfigSettingsMessage
     {   this(ConfigSettings.encode(registryAccess), menuOpener);
     }
 
-    private SyncConfigSettingsMessage(Map<String, CompoundTag> values, UUID menuOpener)
+    private SyncConfigSettingsMessage(CompoundTag values, UUID menuOpener)
     {   this.configValues = values;
         this.menuOpener = menuOpener;
     }
 
     public static void encode(SyncConfigSettingsMessage message, FriendlyByteBuf buffer)
     {
+        buffer.writeNbt(message.configValues);
         buffer.writeUUID(message.menuOpener);
-        buffer.writeInt(message.configValues.size());
-
-        for (Map.Entry<String, CompoundTag> entry : message.configValues.entrySet())
-        {   buffer.writeUtf(entry.getKey());
-            buffer.writeNbt(entry.getValue());
-        }
     }
 
     public static SyncConfigSettingsMessage decode(FriendlyByteBuf buffer)
-    {   UUID menuOpener = buffer.readUUID();
-        int size = buffer.readInt();
-        Map<String, CompoundTag> values = new HashMap<>();
-
-        for (int i = 0; i < size; i++)
-        {   values.put(buffer.readUtf(), buffer.readNbt());
-        }
-
-        return new SyncConfigSettingsMessage(values, menuOpener);
+    {
+        return new SyncConfigSettingsMessage(buffer.readNbt(), buffer.readUUID());
     }
 
     public static void handle(SyncConfigSettingsMessage message, Supplier<NetworkEvent.Context> contextSupplier)
@@ -73,7 +59,7 @@ public class SyncConfigSettingsMessage
             {
                 if (context.getSender() != null && context.getSender().hasPermissions(2))
                 {
-                    message.configValues.forEach((name, values) -> ConfigSettings.decode(name, values, registryAccess));
+                    ConfigSettings.decode(message.configValues, registryAccess);
                     ConfigSettings.saveValues(registryAccess);
                     MainSettingsConfig.save();
                     WorldSettingsConfig.save();
@@ -85,7 +71,7 @@ public class SyncConfigSettingsMessage
             }
             else if (context.getDirection().getReceptionSide().isClient())
             {
-                message.configValues.forEach((name, values) -> ConfigSettings.decode(name, values, registryAccess));
+                ConfigSettings.decode(message.configValues, registryAccess);
                 if (message.menuOpener.equals(ClientOnlyHelper.getClientPlayer().getUUID()))
                 {   ClientOnlyHelper.openConfigScreen();
                 }

@@ -22,7 +22,7 @@ import java.util.Optional;
 public record EffectsRequirement(Map<MobEffect, Instance> effects)
 {
     public static final Codec<EffectsRequirement> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.unboundedMap(ConfigHelper.tagOrForgeRegistryCodec(Registries.MOB_EFFECT, ForgeRegistries.MOB_EFFECTS), Instance.CODEC)
+            Codec.unboundedMap(ConfigHelper.tagOrBuiltinCodec(Registries.MOB_EFFECT, ForgeRegistries.MOB_EFFECTS), Instance.CODEC)
             .xmap(map ->
                   {
                         Map<MobEffect, Instance> effects = new HashMap<>();

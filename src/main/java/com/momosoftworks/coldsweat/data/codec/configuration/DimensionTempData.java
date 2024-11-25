@@ -7,6 +7,7 @@ import com.momosoftworks.coldsweat.ColdSweat;
 import com.momosoftworks.coldsweat.api.util.Temperature;
 import com.momosoftworks.coldsweat.data.codec.impl.ConfigData;
 import com.momosoftworks.coldsweat.util.serialization.ConfigHelper;
+import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
@@ -16,19 +17,19 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public record DimensionTempData(List<Either<TagKey<DimensionType>, DimensionType>> dimensions, double temperature,
+public record DimensionTempData(List<Either<TagKey<DimensionType>, Holder<DimensionType>>> dimensions, double temperature,
                                 Temperature.Units units, boolean isOffset, Optional<List<String>> requiredMods) implements ConfigData<DimensionTempData>
 {
-    public DimensionTempData(DimensionType dimension, double temperature, Temperature.Units units)
+    public DimensionTempData(Holder<DimensionType> dimension, double temperature, Temperature.Units units)
     {   this(List.of(Either.right(dimension)), temperature, units, false, Optional.empty());
     }
 
-    public DimensionTempData(List<DimensionType> dimensions, double temperature, Temperature.Units units)
-    {   this(dimensions.stream().map(Either::<TagKey<DimensionType>, DimensionType>right).toList(), temperature, units, false, Optional.empty());
+    public DimensionTempData(List<Holder<DimensionType>> dimensions, double temperature, Temperature.Units units)
+    {   this(dimensions.stream().map(Either::<TagKey<DimensionType>, Holder<DimensionType>>right).toList(), temperature, units, false, Optional.empty());
     }
 
     public static final Codec<DimensionTempData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            ConfigHelper.tagOrVanillaRegistryCodec(Registries.DIMENSION_TYPE, DimensionType.CODEC).listOf().fieldOf("dimensions").forGetter(DimensionTempData::dimensions),
+            ConfigHelper.tagOrHolderCodec(Registries.DIMENSION_TYPE, DimensionType.CODEC).listOf().fieldOf("dimensions").forGetter(DimensionTempData::dimensions),
             Codec.DOUBLE.fieldOf("temperature").forGetter(DimensionTempData::temperature),
             Temperature.Units.CODEC.optionalFieldOf("units", Temperature.Units.MC).forGetter(DimensionTempData::units),
             Codec.BOOL.optionalFieldOf("is_offset", false).forGetter(DimensionTempData::isOffset),
@@ -43,7 +44,7 @@ public record DimensionTempData(List<Either<TagKey<DimensionType>, DimensionType
     public static DimensionTempData fromToml(List<?> entry, boolean absolute, RegistryAccess registryAccess)
     {
         String dimensionIdString = (String) entry.get(0);
-        List<DimensionType> dimensions = ConfigHelper.parseRegistryItems(Registries.DIMENSION_TYPE, registryAccess, dimensionIdString);
+        List<Holder<DimensionType>> dimensions = ConfigHelper.parseRegistryItems(Registries.DIMENSION_TYPE, registryAccess, dimensionIdString);
         if (dimensions.isEmpty())
         {   ColdSweat.LOGGER.error("Error parsing dimension config: string \"{}\" does not contain valid dimensions", dimensionIdString);
             return null;

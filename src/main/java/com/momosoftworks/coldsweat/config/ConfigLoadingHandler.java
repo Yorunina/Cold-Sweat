@@ -512,7 +512,7 @@ public class ConfigLoadingHandler
                 {   return;
                 }
             }
-            for (Biome biome : RegistryHelper.mapVanillaRegistryTagList(Registries.BIOME, biomeTempData.biomes(), registryAccess))
+            for (Holder<Biome> biome : RegistryHelper.mapVanillaRegistryTagList(Registries.BIOME, biomeTempData.biomes(), registryAccess))
             {
                 if (biomeTempData.isOffset())
                 {   ConfigSettings.BIOME_OFFSETS.get(registryAccess).put(biome, biomeTempData);
@@ -538,7 +538,7 @@ public class ConfigLoadingHandler
                 }
             }
 
-            for (DimensionType dimension : RegistryHelper.mapVanillaRegistryTagList(Registries.DIMENSION_TYPE, dimensionTempData.dimensions(), registryAccess))
+            for (Holder<DimensionType> dimension : RegistryHelper.mapVanillaRegistryTagList(Registries.DIMENSION_TYPE, dimensionTempData.dimensions(), registryAccess))
             {
                 if (dimensionTempData.isOffset())
                 {   ConfigSettings.DIMENSION_OFFSETS.get(registryAccess).put(dimension, dimensionTempData);
@@ -563,7 +563,7 @@ public class ConfigLoadingHandler
                 {   return;
                 }
             }
-            for (Structure structure : RegistryHelper.mapVanillaRegistryTagList(Registries.STRUCTURE, structureTempData.structures(), registryAccess))
+            for (Holder<Structure> structure : RegistryHelper.mapVanillaRegistryTagList(Registries.STRUCTURE, structureTempData.structures(), registryAccess))
             {
                 if (structureTempData.isOffset())
                 {   ConfigSettings.STRUCTURE_OFFSETS.get(registryAccess).put(structure, structureTempData);
@@ -633,7 +633,7 @@ public class ConfigLoadingHandler
                 {   return;
                 }
             }
-            for (Biome biome : RegistryHelper.mapVanillaRegistryTagList(Registries.BIOME, spawnBiomeData.biomes(), registryAccess))
+            for (Holder<Biome> biome : RegistryHelper.mapVanillaRegistryTagList(Registries.BIOME, spawnBiomeData.biomes(), registryAccess))
             {   ConfigSettings.ENTITY_SPAWN_BIOMES.get(registryAccess).put(biome, spawnBiomeData);
             }
         });
