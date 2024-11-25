@@ -37,9 +37,7 @@ public class HearthTopBlock extends Block
                 .sound(SoundType.STONE)
                 .strength(2f)
                 .explosionResistance(10f)
-                .requiresCorrectToolForDrops()
-                .noOcclusion()
-                .dynamicShape();
+                .requiresCorrectToolForDrops();
     }
 
     public HearthTopBlock(Block.Properties properties)
