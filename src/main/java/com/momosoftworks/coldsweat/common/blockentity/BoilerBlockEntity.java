@@ -43,7 +43,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BoilerBlockEntity extends HearthBlockEntity implements MenuProvider, WorldlyContainer
+public class BoilerBlockEntity extends HearthBlockEntity
 {
     public static int[] WATERSKIN_SLOTS = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     public static int[] FUEL_SLOT = {0};
@@ -80,11 +80,6 @@ public class BoilerBlockEntity extends HearthBlockEntity implements MenuProvider
     @Override
     protected Component getDefaultName()
     {   return Component.translatable("container." + ColdSweat.MOD_ID + ".boiler");
-    }
-
-    @Override
-    public Component getDisplayName()
-    {   return this.getCustomName() != null ? this.getCustomName() : this.getDefaultName();
     }
 
     public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T te)
@@ -261,8 +256,8 @@ public class BoilerBlockEntity extends HearthBlockEntity implements MenuProvider
     }
 
     @Override
-    public int[] getSlotsForFace(Direction dir)
-    {   return dir.getAxis() == Direction.Axis.Y ? WATERSKIN_SLOTS : FUEL_SLOT;
+    public int[] getSlotsForFace(Direction side)
+    {   return side.getAxis() == Direction.Axis.Y ? WATERSKIN_SLOTS : FUEL_SLOT;
     }
 
     @Override
@@ -271,11 +266,6 @@ public class BoilerBlockEntity extends HearthBlockEntity implements MenuProvider
         if (slot == 0)
             return this.getItemFuel(stack) != 0;
         else return stack.is(ModItemTags.BOILER_VALID) || (CompatManager.isThirstLoaded() && CompatManager.hasWaterPurity(stack));
-    }
-
-    @Override
-    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction direction)
-    {   return true;
     }
 
     @Override
