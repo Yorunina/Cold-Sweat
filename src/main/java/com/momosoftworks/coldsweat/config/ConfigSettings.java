@@ -480,15 +480,15 @@ public class ConfigSettings
         INSULATION_ITEMS = addSyncedSetting("insulation_items", FastMultiMap::new, holder ->
         {   insulatorAdder.accept(ItemSettingsConfig.INSULATION_ITEMS, holder, Insulation.Slot.ITEM);
         },
-        (encoder) -> ConfigHelper.serializeMultimapRegistry(encoder, "InsulationItems", ModRegistries.INSULATOR_DATA, BuiltInRegistries.ITEM::getKey),
-        (decoder) -> ConfigHelper.deserializeMultimapRegistry(decoder, "InsulationItems", ModRegistries.INSULATOR_DATA, BuiltInRegistries.ITEM::get),
+        (encoder) -> ConfigHelper.serializeMultimapRegistry(encoder, "InsulationItems", ModRegistries.INSULATOR_DATA, item -> BuiltInRegistries.ITEM.getKey(item)),
+        (decoder) -> ConfigHelper.deserializeMultimapRegistry(decoder, "InsulationItems", ModRegistries.INSULATOR_DATA, rl -> BuiltInRegistries.ITEM.get(rl)),
         (saver) -> ConfigHelper.writeItemInsulations(saver, list -> ItemSettingsConfig.INSULATION_ITEMS.set(list)));
 
         INSULATING_ARMORS = addSyncedSetting("insulating_armors", FastMultiMap::new, holder ->
         {   insulatorAdder.accept(ItemSettingsConfig.INSULATING_ARMOR, holder, Insulation.Slot.ARMOR);
         },
-        (encoder) -> ConfigHelper.serializeMultimapRegistry(encoder, "InsulatingArmors", ModRegistries.INSULATOR_DATA, BuiltInRegistries.ITEM::getKey),
-        (decoder) -> ConfigHelper.deserializeMultimapRegistry(decoder, "InsulatingArmors", ModRegistries.INSULATOR_DATA, BuiltInRegistries.ITEM::get),
+        (encoder) -> ConfigHelper.serializeMultimapRegistry(encoder, "InsulatingArmors", ModRegistries.INSULATOR_DATA, item -> BuiltInRegistries.ITEM.getKey(item)),
+        (decoder) -> ConfigHelper.deserializeMultimapRegistry(decoder, "InsulatingArmors", ModRegistries.INSULATOR_DATA, rl -> BuiltInRegistries.ITEM.get(rl)),
         (saver) -> ConfigHelper.writeItemInsulations(saver, list -> ItemSettingsConfig.INSULATING_ARMOR.set(list)));
 
         INSULATING_CURIOS = addSyncedSetting("insulating_curios", FastMultiMap::new, holder ->
@@ -497,8 +497,8 @@ public class ConfigSettings
             {   insulatorAdder.accept(ItemSettingsConfig.INSULATING_CURIOS, holder, Insulation.Slot.CURIO);
             }
         },
-        (encoder) -> ConfigHelper.serializeMultimapRegistry(encoder, "InsulatingCurios", ModRegistries.INSULATOR_DATA, BuiltInRegistries.ITEM::getKey),
-        (decoder) -> ConfigHelper.deserializeMultimapRegistry(decoder, "InsulatingCurios", ModRegistries.INSULATOR_DATA, BuiltInRegistries.ITEM::get),
+        (encoder) -> ConfigHelper.serializeMultimapRegistry(encoder, "InsulatingCurios", ModRegistries.INSULATOR_DATA, item -> BuiltInRegistries.ITEM.getKey(item)),
+        (decoder) -> ConfigHelper.deserializeMultimapRegistry(decoder, "InsulatingCurios", ModRegistries.INSULATOR_DATA, rl -> BuiltInRegistries.ITEM.get(rl)),
         (saver) ->
         {   if (CompatManager.isCuriosLoaded())
             {   ConfigHelper.writeItemInsulations(saver, list -> ItemSettingsConfig.INSULATING_CURIOS.set(list));
@@ -568,8 +568,8 @@ public class ConfigSettings
             // Add entries
             holder.get().putAll(dataMap);
         },
-        (encoder) -> ConfigHelper.serializeMultimapRegistry(encoder, "FoodTemperatures", ModRegistries.FOOD_DATA, BuiltInRegistries.ITEM::getKey),
-        (decoder) -> ConfigHelper.deserializeMultimapRegistry(decoder, "FoodTemperatures", ModRegistries.FOOD_DATA, BuiltInRegistries.ITEM::get),
+        (encoder) -> ConfigHelper.serializeMultimapRegistry(encoder, "FoodTemperatures", ModRegistries.FOOD_DATA, item -> BuiltInRegistries.ITEM.getKey(item)),
+        (decoder) -> ConfigHelper.deserializeMultimapRegistry(decoder, "FoodTemperatures", ModRegistries.FOOD_DATA, rl -> BuiltInRegistries.ITEM.get(rl)),
         (saver) -> ConfigHelper.writeRegistryMultimap(saver,
                                                       food -> ConfigHelper.getTaggableListStrings(food.data().items().get(), Registries.ITEM),
                                                       food -> ListBuilder.begin(food.temperature(), food.data().components().write())
@@ -594,8 +594,8 @@ public class ConfigSettings
             // Add entries
             holder.get().putAll(dataMap);
         },
-        (encoder) -> ConfigHelper.serializeMultimapRegistry(encoder, "CarriedItemTemps", ModRegistries.CARRY_TEMP_DATA, BuiltInRegistries.ITEM::getKey),
-        (decoder) -> ConfigHelper.deserializeMultimapRegistry(decoder, "CarriedItemTemps", ModRegistries.CARRY_TEMP_DATA, BuiltInRegistries.ITEM::get),
+        (encoder) -> ConfigHelper.serializeMultimapRegistry(encoder, "CarriedItemTemps", ModRegistries.CARRY_TEMP_DATA, item -> BuiltInRegistries.ITEM.getKey(item)),
+        (decoder) -> ConfigHelper.deserializeMultimapRegistry(decoder, "CarriedItemTemps", ModRegistries.CARRY_TEMP_DATA, rl -> BuiltInRegistries.ITEM.get(rl)),
         (saver) ->
         {
             ConfigHelper.writeRegistryMultimap(saver,
