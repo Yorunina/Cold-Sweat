@@ -24,6 +24,7 @@
     "MixinBlockUpdate",
     "MixinCampfire",
     "MixinFreezingWater",
+    "MixinFreezingWater$FreezeTickSpeed",
     "MixinIce$AddDrops",
     "MixinIce$NoWaterOnBreak",
     "MixinInventoryOpenServer",
