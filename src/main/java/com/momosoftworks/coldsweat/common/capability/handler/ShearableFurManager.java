@@ -139,7 +139,7 @@ public class ShearableFurManager
         {   entity.getPersistentData().putInt("FurGrowthCooldown", entity.getPersistentData().getInt("FurGrowthCooldown") - 1);
         }
         // Entity is goat, current tick is a multiple of the regrow time, and random chance succeeds
-        if (!goat.level().isClientSide && goat.tickCount % furConfig.getA() == 0 && Math.random() < furConfig.getC())
+        if (!goat.level().isClientSide && goat.getAge() % Math.max(1, furConfig.getA()) == 0 && Math.random() < furConfig.getC())
         {
             IShearableCap cap = getFurCap(goat);
             // Growth cooldown has passed and goat is sheared
