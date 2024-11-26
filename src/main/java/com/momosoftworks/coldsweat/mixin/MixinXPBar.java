@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
-import org.spongepowered.asm.mixin.injection.Surrogate;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = Gui.class)
@@ -23,76 +22,49 @@ public class MixinXPBar
             (   from = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V"),
                 to   = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;width(Ljava/lang/String;)I")
             ))
-    public void renderExperienceBar1(GuiGraphics graphics, int x, CallbackInfo ci)
+    public void shiftExperienceBar(GuiGraphics graphics, int x, CallbackInfo ci)
     {
+        graphics.pose().pushPose();
         // Render XP bar
         if (ConfigSettings.CUSTOM_HOTBAR_LAYOUT.get())
-        {   graphics.pose().translate(0.0D, 4.0D, 0.0D);
+        {   graphics.pose().translate(0, 4, 0);
         }
     }
 
     @Inject(method = "renderExperienceBar",
             at = @At
             (   value = "INVOKE",
-                target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V"
+                target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I",
+                ordinal = 0
             ),
             slice = @Slice
             (   from = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;width(Ljava/lang/String;)I"),
                 to   = @At(value = "RETURN")
             ))
-    public void renderExperienceBar2(GuiGraphics graphics, int px, CallbackInfo ci)
+    public void experienceBarPop(GuiGraphics graphics, int px, CallbackInfo ci)
     {
-        // Render XP bar
-        if (ConfigSettings.CUSTOM_HOTBAR_LAYOUT.get())
-        {   graphics.pose().translate(0.0D, -4.0D, 0.0D);
-        }
+        graphics.pose().popPose();
     }
 
     @Mixin(Gui.class)
     public static class MixinItemLabel
     {
-        private static boolean MOVED_UP = false;
-
         @Inject(method = "renderSelectedItemName(Lnet/minecraft/client/gui/GuiGraphics;I)V",
-                at = @At(value = "HEAD"), remap = false)
-        public void renderItemNamePre(GuiGraphics graphics, int height, CallbackInfo ci)
+                at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V"), remap = false)
+        public void shiftItemName(GuiGraphics graphics, int height, CallbackInfo ci)
         {
-            if (!MOVED_UP && ConfigSettings.CUSTOM_HOTBAR_LAYOUT.get())
+            graphics.pose().pushPose();
+            if (ConfigSettings.CUSTOM_HOTBAR_LAYOUT.get())
             {   graphics.pose().translate(0, -4, 0);
-                MOVED_UP = true;
-            }
-        }
-
-        @Surrogate
-        @Inject(method = "renderSelectedItemName*",
-                at = @At(value = "HEAD"))
-        public void renderItemNamePre(GuiGraphics graphics, CallbackInfo ci)
-        {
-            if (!MOVED_UP && ConfigSettings.CUSTOM_HOTBAR_LAYOUT.get())
-            {   graphics.pose().translate(0, -4, 0);
-                MOVED_UP = true;
             }
         }
 
         @Inject(method = "renderSelectedItemName(Lnet/minecraft/client/gui/GuiGraphics;I)V",
-                at = @At("TAIL"), remap = false)
-        public void renderItemNamePost(GuiGraphics graphics, int height, CallbackInfo ci)
+                at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)I",
+                         shift = At.Shift.AFTER), remap = false)
+        public void itemNamePop(GuiGraphics graphics, int height, CallbackInfo ci)
         {
-            if (MOVED_UP && ConfigSettings.CUSTOM_HOTBAR_LAYOUT.get())
-            {   graphics.pose().translate(0, 4, 0);
-                MOVED_UP = false;
-            }
-        }
-
-        @Surrogate
-        @Inject(method = "renderSelectedItemName*",
-                at = @At("TAIL"))
-        public void renderItemNamePost(GuiGraphics graphics, CallbackInfo ci)
-        {
-            if (MOVED_UP && ConfigSettings.CUSTOM_HOTBAR_LAYOUT.get())
-            {   graphics.pose().translate(0, 4, 0);
-                MOVED_UP = false;
-            }
+            graphics.pose().popPose();
         }
     }
 }
