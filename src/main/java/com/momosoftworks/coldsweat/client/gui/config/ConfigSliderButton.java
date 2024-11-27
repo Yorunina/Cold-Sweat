@@ -29,8 +29,4 @@ public class ConfigSliderButton extends AbstractSliderButton
     public double getValue()
     {   return this.value;
     }
-
-    public void setMessagePercentage(MutableComponent message, double value, boolean offAtZero)
-    {   this.setMessage(message.append(": ").append(value > 0 || !offAtZero ? Component.literal((int) (value * 100) + "%") : Component.literal(CommonComponents.OPTION_OFF.getString())));
-    }
 }
