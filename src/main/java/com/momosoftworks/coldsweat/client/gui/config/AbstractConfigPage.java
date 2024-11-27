@@ -152,14 +152,13 @@ public abstract class AbstractConfigPage extends Screen
         // Make the button
         Button button = new ConfigButton(buttonX + xOffset, buttonY, buttonWidth, 20, label, button1 ->
         {
-            onClick.accept(button1);
             button1.setMessage(dynamicLabel.get());
+            onClick.accept(button1);
         })
         {
             @Override
             public boolean setsCustomDifficulty()
-            {
-                return setsCustomDifficulty;
+            {   return setsCustomDifficulty;
             }
         };
         button.active = shouldBeActive;
@@ -210,38 +209,34 @@ public abstract class AbstractConfigPage extends Screen
         // Make the input
         EditBox textBox = new EditBox(this.font, this.width / 2 + xOffset + labelOffset, this.height / 4 - 6 + yOffset, 51, 22, Component.literal(""))
         {
+            public void onEdit()
+            {
+                CSMath.tryCatch(() ->
+                {
+                    onEdited.accept(Double.parseDouble(this.getValue()));
+                    if (setsCustomDifficulty)
+                    {   ConfigSettings.DIFFICULTY.set(ConfigSettings.Difficulty.CUSTOM);
+                    }
+                });
+            }
+
             @Override
             public void insertText(String text)
             {
                 super.insertText(text);
-                CSMath.tryCatch(() ->
-                {
-                    if (setsCustomDifficulty)
-                        ConfigSettings.DIFFICULTY.set(ConfigSettings.Difficulty.CUSTOM);
-                    onEdited.accept(Double.parseDouble(this.getValue()));
-                });
+                this.onEdit();
             }
             @Override
             public void deleteWords(int i)
             {
                 super.deleteWords(i);
-                CSMath.tryCatch(() ->
-                {
-                    if (setsCustomDifficulty)
-                        ConfigSettings.DIFFICULTY.set(ConfigSettings.Difficulty.CUSTOM);
-                    onEdited.accept(Double.parseDouble(this.getValue()));
-                });
+                this.onEdit();
             }
             @Override
             public void deleteChars(int i)
             {
                 super.deleteChars(i);
-                CSMath.tryCatch(() ->
-                {
-                    if (setsCustomDifficulty)
-                        ConfigSettings.DIFFICULTY.set(ConfigSettings.Difficulty.CUSTOM);
-                    onEdited.accept(Double.parseDouble(this.getValue()));
-                });
+                this.onEdit();
             }
         };
 
@@ -402,11 +397,12 @@ public abstract class AbstractConfigPage extends Screen
             this.rightSideLength += ConfigScreen.OPTION_SIZE * 1.2;
     }
 
-    protected void addSliderButton(String id, Side side, Component label, double minVal, double maxVal,
+    protected void addSliderButton(String id, Side side, Supplier<Component> dynamicLabel, double minVal, double maxVal,
                                    BiConsumer<Double, ConfigSliderButton> onChanged, Consumer<ConfigSliderButton> onInit,
                                    boolean requireOP, boolean clientside,
                                    Component... tooltip)
     {
+        Component label = dynamicLabel.get();
         boolean shouldBeActive = !requireOP || this.minecraft.player == null || this.minecraft.player.hasPermissions(2);
         int buttonX = this.width / 2;
         int xOffset = side == Side.LEFT ? -179 : 56;
@@ -418,7 +414,9 @@ public abstract class AbstractConfigPage extends Screen
         {
             @Override
             protected void updateMessage()
-            {   onChanged.accept(CSMath.blend(minVal, maxVal, CSMath.truncate(this.value, 2), 0, 1), this);
+            {
+                this.setMessage(dynamicLabel.get());
+                onChanged.accept(CSMath.blend(minVal, maxVal, CSMath.truncate(this.value, 2), 0, 1), this);
             }
 
             @Override
@@ -607,5 +605,33 @@ public abstract class AbstractConfigPage extends Screen
     public void onClose()
     {   MINECRAFT.setScreen(this.parentScreen);
         ConfigScreen.saveConfig();
+    }
+
+    public MutableComponent getToggleButtonText(Component text, boolean on)
+    {   return Component.literal(text.getString() + ": " + (on ? ON : OFF));
+    }
+
+    public MutableComponent getSliderPercentageText(MutableComponent message, double value, double offAt)
+    {
+        return message.append(": ")
+                      .append(Double.compare(offAt, value) != 0
+                              ? Component.literal((int) (value * 100) + "%")
+                              : Component.literal(CommonComponents.OPTION_OFF.getString()));
+    }
+
+    public MutableComponent getSliderText(MutableComponent message, int value, int min, int max, int offAt)
+    {
+        return message.append(": ")
+                      .append((value > min || value < max) && value != offAt
+                              ? Component.literal(value + "")
+                              : Component.literal(CommonComponents.OPTION_OFF.getString()));
+    }
+
+    public MutableComponent getSliderText(MutableComponent message, double value, double min, double max, double offAt)
+    {
+        return message.append(": ")
+                .append((value > min || value < max) && Double.compare(value, offAt) != 0
+                        ? Component.literal(CSMath.truncate(value, 1) + "")
+                        : Component.literal(CommonComponents.OPTION_OFF.getString()));
     }
 }
