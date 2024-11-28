@@ -1,8 +1,11 @@
 package com.momosoftworks.coldsweat.config;
 
 import com.google.common.collect.Multimap;
+import com.google.gson.JsonElement;
 import com.mojang.datafixers.util.Either;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import com.momosoftworks.coldsweat.ColdSweat;
 import com.momosoftworks.coldsweat.api.event.core.registry.CreateRegistriesEvent;
@@ -24,6 +27,7 @@ import com.momosoftworks.coldsweat.util.serialization.RegistryHelper;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -64,7 +68,6 @@ public class ConfigLoadingHandler
     {
         ConfigSettings.clear();
         BlockTempRegistry.flush();
-        getDefaultConfigs(event.getServer());
 
         RegistryAccess registryAccess = event.getServer().registryAccess();
         Multimap<ResourceKey<Registry<?>>, Holder<?>> registries = new FastMultiMap<>();
@@ -190,24 +193,18 @@ public class ConfigLoadingHandler
         {
             ResourceKey<Registry<?>> key = (ResourceKey) entry.getValue().registry();
             Codec<?> codec = entry.getValue().codec();
-            registries.putAll(key, parseConfigData((ResourceKey) key, (Codec) codec));
+            registries.putAll(key, parseConfigData((ResourceKey) key, (Codec) codec, registryAccess));
         }
         return registries;
     }
 
     private static void logAndAddRegistries(RegistryAccess registryAccess, Multimap<ResourceKey<Registry<?>>, Holder<?>> registries)
     {
-        // Clear the static map
-        REMOVED_REGISTRIES.clear();
-        // Gather registry removals & add them to the static map
-        Set<Holder<RemoveRegistryData<?>>> removals = registryAccess.registryOrThrow(ModRegistries.REMOVE_REGISTRY_DATA).holders().collect(Collectors.toSet());
-        removals.addAll(parseConfigData(ModRegistries.REMOVE_REGISTRY_DATA, RemoveRegistryData.CODEC));
-        removals.forEach(holder ->
-        {
-            RemoveRegistryData<?> data = holder.value();
-            ResourceKey<Registry<?>> key = data.registry();
-            REMOVED_REGISTRIES.put(key, data);
-        });
+        // Ensure default registry entries load last
+        setDefaultRegistryPriority(registries);
+
+        // Load registry removals
+        loadRegistryRemovals(registryAccess);
 
         // Fire registry creation event
         CreateRegistriesEvent event = new CreateRegistriesEvent(registryAccess, registries);
@@ -220,20 +217,20 @@ public class ConfigLoadingHandler
          Add JSON data to the config settings
          */
         // insulators
-        addInsulatorConfigs(event.getInsulators(), registryAccess);
+        addInsulatorConfigs(event.getInsulators());
         logRegistryLoaded(String.format("Loaded %s insulators", event.getInsulators().size()), event.getInsulators());
         // fuels
-        addFuelConfigs(event.getFuels(), registryAccess);
+        addFuelConfigs(event.getFuels());
         logRegistryLoaded(String.format("Loaded %s fuels", event.getFuels().size()), event.getFuels());
         // foods
-        addFoodConfigs(event.getFoods(), registryAccess);
+        addFoodConfigs(event.getFoods());
         logRegistryLoaded(String.format("Loaded %s foods", event.getFoods().size()), event.getFoods());
         // carry temperatures
         addCarryTempConfigs(event.getCarryTemps());
         logRegistryLoaded(String.format("Loaded %s carried item temperatures", event.getCarryTemps().size()), event.getCarryTemps());
 
         // block temperatures
-        addBlockTempConfigs(event.getBlockTemps(), registryAccess);
+        addBlockTempConfigs(event.getBlockTemps());
         logRegistryLoaded(String.format("Loaded %s block temperatures", event.getBlockTemps().size()), event.getBlockTemps());
         // biome temperatures
         addBiomeTempConfigs(event.getBiomeTemps(), registryAccess);
@@ -249,17 +246,17 @@ public class ConfigLoadingHandler
         logRegistryLoaded(String.format("Loaded %s depth temperatures", event.getDepthTemps().size()), event.getDepthTemps());
 
         // mounts
-        addMountConfigs(event.getMounts(), registryAccess);
+        addMountConfigs(event.getMounts());
         logRegistryLoaded(String.format("Loaded %s insulated mounts", event.getMounts().size()), event.getMounts());
         // spawn biomes
         addSpawnBiomeConfigs(event.getSpawnBiomes(), registryAccess);
         logRegistryLoaded(String.format("Loaded %s entity spawn biomes", event.getSpawnBiomes().size()), event.getSpawnBiomes());
         // entity temperatures
-        addEntityTempConfigs(event.getEntityTemps(), registryAccess);
+        addEntityTempConfigs(event.getEntityTemps());
         logRegistryLoaded(String.format("Loaded %s entity temperatures", event.getEntityTemps().size()), event.getEntityTemps());
     }
 
-    private static void logRegistryLoaded(String message, Set<?> registry)
+    private static void logRegistryLoaded(String message, Collection<?> registry)
     {
         if (registry.isEmpty())
         {   message += ".";
@@ -280,12 +277,39 @@ public class ConfigLoadingHandler
         }
     }
 
+    private static void setDefaultRegistryPriority(Multimap<ResourceKey<Registry<?>>, Holder<?>> registries)
+    {
+        for (ResourceKey<Registry<?>> key : registries.keySet())
+        {
+            List<Holder<?>> sortedHolders = new ArrayList<>(registries.get(key));
+            sortedHolders.sort(Comparator.comparing(holder ->
+            {   return holder.unwrapKey().map(k -> k.location().getPath().equals("default") ? 1 : 0).orElse(0);
+            }));
+            registries.replaceValues(key, sortedHolders);
+        }
+    }
+
+    private static void loadRegistryRemovals(RegistryAccess registryAccess)
+    {
+        // Clear the static map
+        REMOVED_REGISTRIES.clear();
+        // Gather registry removals & add them to the static map
+        Set<Holder<RemoveRegistryData<?>>> removals = registryAccess.registryOrThrow(ModRegistries.REMOVE_REGISTRY_DATA).holders().collect(Collectors.toSet());
+        removals.addAll(parseConfigData(ModRegistries.REMOVE_REGISTRY_DATA, RemoveRegistryData.CODEC, registryAccess));
+        removals.forEach(holder ->
+        {
+            RemoveRegistryData<?> data = holder.value();
+            ResourceKey<Registry<?>> key = data.registry();
+            REMOVED_REGISTRIES.put(key, data);
+        });
+    }
+
     private static void removeRegistries(Multimap<ResourceKey<Registry<?>>, Holder<?>> registries)
     {
         ColdSweat.LOGGER.info("Handling registry removals...");
         for (Map.Entry<ResourceKey<Registry<?>>, Collection<RemoveRegistryData<?>>> entry : REMOVED_REGISTRIES.asMap().entrySet())
         {
-            removeEntries((Collection) entry.getValue(), (Collection) registries.get(entry.getKey()));
+            removeEntries((Collection) entry.getValue(), registries.get(entry.getKey()));
         }
     }
 
@@ -313,12 +337,7 @@ public class ConfigLoadingHandler
         return REMOVED_REGISTRIES.get((ResourceKey) registryName).stream().anyMatch(data -> ((RemoveRegistryData<T>) data).matches(entry));
     }
 
-    private static void getDefaultConfigs(MinecraftServer server)
-    {
-        DEFAULT_REGION = ConfigHelper.parseResource(server.getResourceManager(), ResourceLocation.fromNamespaceAndPath(ColdSweat.MOD_ID, "cold_sweat/world/temp_region/default.json"), DepthTempData.CODEC).orElseThrow();
-    }
-
-    private static void addInsulatorConfigs(Set<Holder<InsulatorData>> insulators, RegistryAccess registryAccess)
+    private static void addInsulatorConfigs(Collection<Holder<InsulatorData>> insulators)
     {
         insulators.forEach(holder ->
         {
@@ -358,7 +377,7 @@ public class ConfigLoadingHandler
         });
     }
 
-    private static void addFuelConfigs(Set<Holder<FuelData>> fuels, RegistryAccess registryAccess)
+    private static void addFuelConfigs(Collection<Holder<FuelData>> fuels)
     {
         fuels.forEach(holder ->
         {
@@ -393,7 +412,7 @@ public class ConfigLoadingHandler
         });
     }
 
-    private static void addFoodConfigs(Set<Holder<FoodData>> foods, RegistryAccess registryAccess)
+    private static void addFoodConfigs(Collection<Holder<FoodData>> foods)
     {
         foods.forEach(holder ->
         {
@@ -421,7 +440,7 @@ public class ConfigLoadingHandler
         });
     }
 
-    private static void addCarryTempConfigs(Set<Holder<ItemCarryTempData>> carryTemps)
+    private static void addCarryTempConfigs(Collection<Holder<ItemCarryTempData>> carryTemps)
     {
         carryTemps.forEach(holder ->
         {
@@ -449,7 +468,7 @@ public class ConfigLoadingHandler
         });
     }
 
-    private static void addBlockTempConfigs(Set<Holder<BlockTempData>> holders, RegistryAccess registryAccess)
+    private static void addBlockTempConfigs(Collection<Holder<BlockTempData>> holders)
     {
         List<BlockTempData> blockTemps = new ArrayList<>(holders.stream().map(Holder::value).toList());
         // Handle entries removed by configs
@@ -497,7 +516,7 @@ public class ConfigLoadingHandler
         });
     }
 
-    private static void addBiomeTempConfigs(Set<Holder<BiomeTempData>> biomeTemps, RegistryAccess registryAccess)
+    private static void addBiomeTempConfigs(Collection<Holder<BiomeTempData>> biomeTemps, RegistryAccess registryAccess)
     {
         biomeTemps.forEach(holder ->
         {
@@ -522,7 +541,7 @@ public class ConfigLoadingHandler
         });
     }
 
-    private static void addDimensionTempConfigs(Set<Holder<DimensionTempData>> dimensionTemps, RegistryAccess registryAccess)
+    private static void addDimensionTempConfigs(Collection<Holder<DimensionTempData>> dimensionTemps, RegistryAccess registryAccess)
     {
         dimensionTemps.forEach(holder ->
         {
@@ -548,7 +567,7 @@ public class ConfigLoadingHandler
         });
     }
 
-    private static void addStructureTempConfigs(Set<Holder<StructureTempData>> structureTemps, RegistryAccess registryAccess)
+    private static void addStructureTempConfigs(Collection<Holder<StructureTempData>> structureTemps, RegistryAccess registryAccess)
     {
         structureTemps.forEach(holder ->
         {
@@ -573,15 +592,8 @@ public class ConfigLoadingHandler
         });
     }
 
-    private static DepthTempData DEFAULT_REGION = null;
-
-    private static void addDepthTempConfigs(Set<Holder<DepthTempData>> depthTemps)
+    private static void addDepthTempConfigs(Collection<Holder<DepthTempData>> depthTemps)
     {
-        // If other depth temps are being registered, remove the default one
-        if (depthTemps.size() > 2 || depthTemps.stream().noneMatch(temp -> temp.value().equals(DEFAULT_REGION)))
-        {   ConfigSettings.DEPTH_REGIONS.get().remove(DEFAULT_REGION);
-            depthTemps.removeIf(holder -> holder.value().equals(DEFAULT_REGION));
-        }
         // Add the depth temps to the config
         for (Holder<DepthTempData> holder : depthTemps)
         {
@@ -598,7 +610,7 @@ public class ConfigLoadingHandler
         }
     }
 
-    private static void addMountConfigs(Set<Holder<MountData>> mounts, RegistryAccess registryAccess)
+    private static void addMountConfigs(Collection<Holder<MountData>> mounts)
     {
         mounts.forEach(holder ->
         {
@@ -618,7 +630,7 @@ public class ConfigLoadingHandler
         });
     }
 
-    private static void addSpawnBiomeConfigs(Set<Holder<SpawnBiomeData>> spawnBiomes, RegistryAccess registryAccess)
+    private static void addSpawnBiomeConfigs(Collection<Holder<SpawnBiomeData>> spawnBiomes, RegistryAccess registryAccess)
     {
         spawnBiomes.forEach(holder ->
         {
@@ -637,7 +649,7 @@ public class ConfigLoadingHandler
         });
     }
 
-    private static void addEntityTempConfigs(Set<Holder<EntityTempData>> entityTemps, RegistryAccess registryAccess)
+    private static void addEntityTempConfigs(Collection<Holder<EntityTempData>> entityTemps)
     {
         entityTemps.forEach(holder ->
         {
@@ -660,9 +672,10 @@ public class ConfigLoadingHandler
         });
     }
 
-    private static <T> Set<Holder<T>> parseConfigData(ResourceKey<Registry<T>> registry, Codec<T> codec)
+    private static <T> List<Holder<T>> parseConfigData(ResourceKey<Registry<T>> registry, Codec<T> codec, RegistryAccess registryAccess)
     {
-        Set<Holder<T>> output = new HashSet<>();
+        List<Holder<T>> output = new ArrayList<>();
+        DynamicOps<JsonElement> registryOps = RegistryOps.create(JsonOps.INSTANCE, registryAccess);
 
         Path coldSweatDataPath = FMLPaths.CONFIGDIR.get().resolve("coldsweat/data").resolve(registry.location().getPath());
         File jsonDirectory = coldSweatDataPath.toFile();
@@ -676,12 +689,13 @@ public class ConfigLoadingHandler
             {
                 try (FileReader reader = new FileReader(file))
                 {
-                    codec.parse(JsonOps.INSTANCE, GsonHelper.parse(reader))
+                    codec.decode(registryOps, GsonHelper.parse(reader))
                             .resultOrPartial(ColdSweat.LOGGER::error)
+                            .map(Pair::getFirst)
                             .ifPresent(insulator -> output.add(Holder.direct(insulator)));
                 }
                 catch (Exception e)
-                {   ColdSweat.LOGGER.error(String.format("Failed to parse JSON config setting in %s: %s", registry.location(), file.getName()), e);
+                {   ColdSweat.LOGGER.error("Failed to parse JSON config setting in {}: {}", registry.location(), file.getName(), e);
                 }
             }
         }

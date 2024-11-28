@@ -131,7 +131,7 @@ public class FastMultiMap<K, V> implements Multimap<K, V>
         Set<V> oldValues = internal.get(key);
         if (oldValues == null)
         {
-            oldValues = new HashSet<>();
+           oldValues = new LinkedHashSet<>();
         }
         else
         {
@@ -155,7 +155,7 @@ public class FastMultiMap<K, V> implements Multimap<K, V>
         {
             totalSize -= removed.size();
         }
-        return removed != null ? removed : new HashSet<>();
+        return removed != null ? removed : new LinkedHashSet<>();
     }
 
     @Override
