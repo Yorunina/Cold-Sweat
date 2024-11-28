@@ -1,7 +1,5 @@
 package com.momosoftworks.coldsweat.client.particle;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.ParticleStatus;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;

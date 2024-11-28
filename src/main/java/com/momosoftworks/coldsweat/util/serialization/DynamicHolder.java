@@ -6,8 +6,6 @@ import com.momosoftworks.coldsweat.util.exceptions.SerializationException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.util.thread.EffectiveSide;
 
 import java.util.function.*;

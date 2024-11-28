@@ -1,18 +1,7 @@
 package com.momosoftworks.coldsweat.mixin;
 
-import com.momosoftworks.coldsweat.util.registries.ModEffects;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static net.minecraft.world.level.block.entity.BeaconBlockEntity.BEACON_EFFECTS;
 
 @Mixin(BeaconBlockEntity.class)
 public class MixinBeaconEffects

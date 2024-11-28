@@ -1,6 +1,5 @@
 package com.momosoftworks.coldsweat.api.registry;
 
-import com.google.common.collect.Multimap;
 import com.momosoftworks.coldsweat.ColdSweat;
 import com.momosoftworks.coldsweat.api.temperature.block_temp.BlockTemp;
 import com.momosoftworks.coldsweat.api.temperature.block_temp.BlockTempConfig;

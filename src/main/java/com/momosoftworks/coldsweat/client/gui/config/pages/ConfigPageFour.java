@@ -3,7 +3,6 @@ package com.momosoftworks.coldsweat.client.gui.config.pages;
 import com.momosoftworks.coldsweat.client.gui.config.AbstractConfigPage;
 import com.momosoftworks.coldsweat.client.gui.config.ConfigScreen;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 

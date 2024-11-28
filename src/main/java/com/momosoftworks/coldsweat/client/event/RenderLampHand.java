@@ -25,8 +25,6 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.lang.Math;
-
 @Mod.EventBusSubscriber(Dist.CLIENT)
 public class RenderLampHand
 {

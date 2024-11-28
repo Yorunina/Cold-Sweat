@@ -2,9 +2,7 @@ package com.momosoftworks.coldsweat.client.gui.config;
 
 import com.momosoftworks.coldsweat.util.math.CSMath;
 import net.minecraft.client.gui.components.AbstractSliderButton;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 
 public class ConfigSliderButton extends AbstractSliderButton
 {

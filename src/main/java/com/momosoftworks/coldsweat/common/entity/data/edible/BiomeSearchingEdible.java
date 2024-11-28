@@ -14,7 +14,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.function.BiPredicate;
-import java.util.function.Predicate;
 
 public abstract class BiomeSearchingEdible extends Edible
 {

@@ -1,8 +1,6 @@
 package com.momosoftworks.coldsweat.api.temperature.block_temp;
 
-import com.momosoftworks.coldsweat.api.util.Temperature;
 import net.minecraft.core.BlockPos;
-import com.momosoftworks.coldsweat.util.math.CSMath;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractFurnaceBlock;

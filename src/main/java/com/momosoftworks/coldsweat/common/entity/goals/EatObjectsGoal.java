@@ -5,7 +5,6 @@ import com.momosoftworks.coldsweat.common.entity.data.edible.ChameleonEdibles;
 import com.momosoftworks.coldsweat.common.entity.data.edible.Edible;
 import com.momosoftworks.coldsweat.core.event.TaskScheduler;
 import com.momosoftworks.coldsweat.util.registries.ModSounds;
-import com.momosoftworks.coldsweat.util.serialization.NBTHelper;
 import com.momosoftworks.coldsweat.util.world.WorldHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -22,7 +21,6 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public class EatObjectsGoal extends Goal
 {

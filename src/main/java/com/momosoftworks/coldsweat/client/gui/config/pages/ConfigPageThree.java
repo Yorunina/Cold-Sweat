@@ -5,7 +5,6 @@ import com.momosoftworks.coldsweat.client.gui.config.ConfigScreen;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 import javax.annotation.Nullable;

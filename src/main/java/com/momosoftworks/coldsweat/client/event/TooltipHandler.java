@@ -15,7 +15,6 @@ import com.momosoftworks.coldsweat.common.capability.handler.ItemInsulationManag
 import com.momosoftworks.coldsweat.common.item.SoulspringLampItem;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
 import com.momosoftworks.coldsweat.data.codec.impl.ConfigData;
-import com.momosoftworks.coldsweat.data.codec.util.AttributeModifierMap;
 import com.momosoftworks.coldsweat.core.network.ColdSweatPacketHandler;
 import com.momosoftworks.coldsweat.core.network.message.SyncItemPredicatesMessage;
 import com.momosoftworks.coldsweat.data.codec.configuration.FoodData;
@@ -28,7 +27,6 @@ import com.momosoftworks.coldsweat.util.math.CSMath;
 import com.momosoftworks.coldsweat.util.math.FastMap;
 import com.momosoftworks.coldsweat.util.registries.ModAttributes;
 import com.momosoftworks.coldsweat.util.registries.ModItems;
-import com.momosoftworks.coldsweat.util.serialization.DynamicHolder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
@@ -49,7 +47,6 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
-import net.minecraft.world.item.Wearable;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.client.event.ScreenEvent;
@@ -58,7 +55,6 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
 

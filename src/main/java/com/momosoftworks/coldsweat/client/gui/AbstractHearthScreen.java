@@ -8,7 +8,6 @@ import com.momosoftworks.coldsweat.common.event.HearthSaveDataHandler;
 import com.momosoftworks.coldsweat.core.network.ColdSweatPacketHandler;
 import com.momosoftworks.coldsweat.core.network.message.DisableHearthParticlesMessage;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -19,7 +18,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import net.minecraftforge.network.NetworkDirection;
 
 import java.lang.reflect.Field;
 import java.util.List;

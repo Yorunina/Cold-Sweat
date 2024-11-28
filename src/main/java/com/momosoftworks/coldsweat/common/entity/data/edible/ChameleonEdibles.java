@@ -1,6 +1,5 @@
 package com.momosoftworks.coldsweat.common.entity.data.edible;
 
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.*;

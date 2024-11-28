@@ -1,8 +1,6 @@
 package com.momosoftworks.coldsweat.common.container;
 
-import com.mojang.datafixers.util.Pair;
 import com.momosoftworks.coldsweat.api.event.common.insulation.InsulateItemEvent;
-import com.momosoftworks.coldsweat.api.insulation.StaticInsulation;
 import com.momosoftworks.coldsweat.common.capability.insulation.IInsulatableCap;
 import com.momosoftworks.coldsweat.common.capability.handler.ItemInsulationManager;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
@@ -39,9 +37,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
-import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class SewingContainer extends AbstractContainerMenu
 {
