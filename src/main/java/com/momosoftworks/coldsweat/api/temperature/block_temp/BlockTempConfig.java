@@ -6,10 +6,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
 
 public abstract class BlockTempConfig extends BlockTemp
 {

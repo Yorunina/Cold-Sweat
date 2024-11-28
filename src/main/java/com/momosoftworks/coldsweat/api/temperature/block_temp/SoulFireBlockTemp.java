@@ -1,7 +1,6 @@
 package com.momosoftworks.coldsweat.api.temperature.block_temp;
 
 import com.momosoftworks.coldsweat.config.ConfigSettings;
-import com.momosoftworks.coldsweat.util.math.CSMath;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;

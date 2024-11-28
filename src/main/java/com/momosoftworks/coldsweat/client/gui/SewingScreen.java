@@ -1,7 +1,6 @@
 package com.momosoftworks.coldsweat.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -9,8 +8,6 @@ import net.minecraft.resources.ResourceLocation;
 import com.momosoftworks.coldsweat.ColdSweat;
 import com.momosoftworks.coldsweat.common.container.SewingContainer;
 import net.minecraft.world.entity.player.Inventory;
-
-import javax.annotation.Nonnull;
 
 public class SewingScreen extends AbstractContainerScreen<SewingContainer>
 {

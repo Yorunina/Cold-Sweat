@@ -5,7 +5,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import com.momosoftworks.coldsweat.util.math.CSMath;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 
 public class NetherPortalBlockTemp extends BlockTemp

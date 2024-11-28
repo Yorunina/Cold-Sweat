@@ -8,9 +8,6 @@ import com.momosoftworks.coldsweat.data.codec.configuration.BlockTempData;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Fired when the {@link BlockTemp} registry is being built ({@link BlockTempRegistry}). <br>
  * The event is fired during {@link net.minecraftforge.event.level.LevelEvent.Load}. <br>

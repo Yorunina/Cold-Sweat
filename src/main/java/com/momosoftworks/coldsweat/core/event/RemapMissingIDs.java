@@ -1,7 +1,6 @@
 package com.momosoftworks.coldsweat.core.event;
 
 import com.momosoftworks.coldsweat.ColdSweat;
-import com.momosoftworks.coldsweat.util.registries.ModItems;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 
