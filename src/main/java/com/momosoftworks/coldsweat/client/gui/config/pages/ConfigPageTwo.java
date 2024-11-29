@@ -47,24 +47,24 @@ public class ConfigPageTwo extends AbstractConfigPage
                              false, false, true, Component.translatable("cold_sweat.config.temp_smoothing.desc"));
 
         // Distortion Effects
-        this.addButton("distortion_effects", Side.LEFT, () -> Component.translatable("cold_sweat.config.distortion.name").append(": ").append(ConfigSettings.DISTORTION_EFFECTS.get() ? ON : OFF),
+        this.addButton("distortion_effects", Side.LEFT, () -> getToggleButtonText(Component.translatable("cold_sweat.config.distortion.name"), ConfigSettings.DISTORTION_EFFECTS.get()),
                 button ->
                 {   ConfigSettings.DISTORTION_EFFECTS.set(!ConfigSettings.DISTORTION_EFFECTS.get());
                 },
                 false, false, true, Component.translatable("cold_sweat.config.distortion.desc"));
 
         // Icon Bobbing
-        this.addButton("icon_bobbing", Side.LEFT, () -> Component.translatable("cold_sweat.config.icon_bobbing.name").append(": ").append(ConfigSettings.ICON_BOBBING.get() ? ON : OFF),
+        this.addButton("icon_bobbing", Side.LEFT, () -> getToggleButtonText(Component.translatable("cold_sweat.config.icon_bobbing.name"), ConfigSettings.ICON_BOBBING.get()),
                 button -> ConfigSettings.ICON_BOBBING.set(!ConfigSettings.ICON_BOBBING.get()),
                 false, false, true, Component.translatable("cold_sweat.config.icon_bobbing.desc"));
 
         // High Contrast
-        this.addButton("high_contrast", Side.LEFT, () -> Component.translatable("cold_sweat.config.high_contrast.name").append(": ").append(ConfigSettings.HIGH_CONTRAST.get() ? ON : OFF),
+        this.addButton("high_contrast", Side.LEFT, () -> getToggleButtonText(Component.translatable("cold_sweat.config.high_contrast.name"), ConfigSettings.HIGH_CONTRAST.get()),
                 button -> ConfigSettings.HIGH_CONTRAST.set(!ConfigSettings.HIGH_CONTRAST.get()),
                 false, false, true, Component.translatable("cold_sweat.config.high_contrast.desc"));
 
         // Show Water Effect
-        this.addButton("show_water_effect", Side.LEFT, () -> Component.translatable("cold_sweat.config.show_water_effect.name").append(": ").append(ConfigSettings.SHOW_WATER_EFFECT.get() ? ON : OFF),
+        this.addButton("show_water_effect", Side.LEFT, () -> getToggleButtonText(Component.translatable("cold_sweat.config.show_water_effect.name"), ConfigSettings.SHOW_WATER_EFFECT.get()),
                 button -> ConfigSettings.SHOW_WATER_EFFECT.set(!ConfigSettings.SHOW_WATER_EFFECT.get()),
                 false, false, true, Component.translatable("cold_sweat.config.show_water_effect.desc"));
 
@@ -102,9 +102,9 @@ public class ConfigPageTwo extends AbstractConfigPage
 
         this.addDirectionPanel("gauge_directions", Side.RIGHT, Component.translatable("cold_sweat.config.world_temp_location.name"),
                 amount -> ConfigSettings.WORLD_GAUGE_POS.set(new Vec2i(ConfigSettings.WORLD_GAUGE_POS.get().x() + amount * ConfigScreen.SHIFT_AMOUNT.get(),
-                                                                     ConfigSettings.WORLD_GAUGE_POS.get().y())),
+                                                                          ConfigSettings.WORLD_GAUGE_POS.get().y())),
                 amount -> ConfigSettings.WORLD_GAUGE_POS.set(new Vec2i(ConfigSettings.WORLD_GAUGE_POS.get().x(),
-                                                                     ConfigSettings.WORLD_GAUGE_POS.get().y() + amount * ConfigScreen.SHIFT_AMOUNT.get())),
+                                                                          ConfigSettings.WORLD_GAUGE_POS.get().y() + amount * ConfigScreen.SHIFT_AMOUNT.get())),
                 () ->
                 {   ConfigSettings.WORLD_GAUGE_POS.set(new Vec2i(0, 0));
                 },
@@ -116,12 +116,12 @@ public class ConfigPageTwo extends AbstractConfigPage
                                           Component.translatable("cold_sweat.config.offset_shift.name").withStyle(ChatFormatting.GRAY));
 
         // Custom Hotbar
-        this.addButton("custom_hotbar", Side.RIGHT, () -> Component.translatable("cold_sweat.config.custom_hotbar.name").append(": ").append(ConfigSettings.CUSTOM_HOTBAR_LAYOUT.get() ? ON : OFF),
+        this.addButton("custom_hotbar", Side.RIGHT, () -> getToggleButtonText(Component.translatable("cold_sweat.config.custom_hotbar.name"), ConfigSettings.CUSTOM_HOTBAR_LAYOUT.get()),
                 button -> ConfigSettings.CUSTOM_HOTBAR_LAYOUT.set(!ConfigSettings.CUSTOM_HOTBAR_LAYOUT.get()),
                 false, false, true, Component.translatable("cold_sweat.config.custom_hotbar.desc"));
 
         // Move body temp icon
-        this.addButton("move_body_icon", Side.RIGHT, () -> Component.translatable("cold_sweat.config.move_body_icon.name").append(": ").append(ConfigSettings.MOVE_BODY_ICON_WHEN_ADVANCED.get() ? ON : OFF),
+        this.addButton("move_body_icon", Side.RIGHT, () -> getToggleButtonText(Component.translatable("cold_sweat.config.move_body_icon.name"), ConfigSettings.MOVE_BODY_ICON_WHEN_ADVANCED.get()),
                 button -> ConfigSettings.MOVE_BODY_ICON_WHEN_ADVANCED.set(!ConfigSettings.MOVE_BODY_ICON_WHEN_ADVANCED.get()),
                 false, false, true, Component.translatable("cold_sweat.config.move_body_icon.desc"));
 
