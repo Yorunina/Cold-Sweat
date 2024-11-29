@@ -13,15 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinXPBar
 {
     @Inject(method = "renderExperienceBar",
-            at = @At
-            (   value = "INVOKE",
-                target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
-                shift = At.Shift.AFTER
-            ),
-            slice = @Slice
-            (   from = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V"),
-                to   = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;width(Ljava/lang/String;)I")
-            ))
+            at = @At(value = "INVOKE",
+                     target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I",
+                     ordinal = 0))
     public void shiftExperienceBar(GuiGraphics graphics, int x, CallbackInfo ci)
     {
         graphics.pose().pushPose();
@@ -34,7 +28,7 @@ public class MixinXPBar
     @Inject(method = "renderExperienceBar",
             at = @At
             (   value = "INVOKE",
-                target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I",
+                target = "Lnet/minecraft/util/profiling/ProfilerFiller;pop()V",
                 ordinal = 0
             ),
             slice = @Slice
@@ -50,7 +44,7 @@ public class MixinXPBar
     public static class MixinItemLabel
     {
         @Inject(method = "renderSelectedItemName(Lnet/minecraft/client/gui/GuiGraphics;I)V",
-                at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V"), remap = false)
+                at = @At(value = "HEAD"), remap = false)
         public void shiftItemName(GuiGraphics graphics, int height, CallbackInfo ci)
         {
             graphics.pose().pushPose();
@@ -60,8 +54,7 @@ public class MixinXPBar
         }
 
         @Inject(method = "renderSelectedItemName(Lnet/minecraft/client/gui/GuiGraphics;I)V",
-                at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)I",
-                         shift = At.Shift.AFTER), remap = false)
+                at = @At(value = "TAIL"), remap = false)
         public void itemNamePop(GuiGraphics graphics, int height, CallbackInfo ci)
         {
             graphics.pose().popPose();
