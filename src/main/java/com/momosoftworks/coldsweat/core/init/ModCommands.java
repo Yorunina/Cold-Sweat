@@ -3,6 +3,7 @@ package com.momosoftworks.coldsweat.core.init;
 import com.mojang.brigadier.CommandDispatcher;
 import com.momosoftworks.coldsweat.ColdSweat;
 import com.momosoftworks.coldsweat.common.command.BaseCommand;
+import com.momosoftworks.coldsweat.common.command.argument.AttributeOperationArgument;
 import com.momosoftworks.coldsweat.common.command.argument.TempAttributeTraitArgument;
 import com.momosoftworks.coldsweat.common.command.argument.TempModifierTraitArgument;
 import com.momosoftworks.coldsweat.common.command.argument.TemperatureTraitArgument;
@@ -48,6 +49,9 @@ public class ModCommands
     public static final DeferredHolder<ArgumentTypeInfo<?, ?>, ArgumentTypeInfo<?, ?>> TEMPERATURE_TYPE =
             ARGUMENTS.register("temperature_type", () -> ArgumentTypeInfos.registerByClass(TemperatureTraitArgument.class, new TemperatureTraitArgument.Info()));
 
-    public static final DeferredHolder<ArgumentTypeInfo<?, ?>, ArgumentTypeInfo<?, ?>> ABILITY_OR_TEMP_TYPE =
-            ARGUMENTS.register("ability_or_temp_type", () -> ArgumentTypeInfos.registerByClass(TempAttributeTraitArgument.class, new TempAttributeTraitArgument.Info()));
+    public static final DeferredHolder<ArgumentTypeInfo<?, ?>, ArgumentTypeInfo<?, ?>> ATTRIBUTE_TRAIT_TYPE =
+            ARGUMENTS.register("attribute_trait_type", () -> ArgumentTypeInfos.registerByClass(TempAttributeTraitArgument.class, new TempAttributeTraitArgument.Info()));
+
+    public static final DeferredHolder<ArgumentTypeInfo<?, ?>, ArgumentTypeInfo<?, ?>> MODIFIER_OPERATION =
+            ARGUMENTS.register("attribute_operation_type", () -> ArgumentTypeInfos.registerByClass(AttributeOperationArgument.class, new AttributeOperationArgument.Info()));
 }
