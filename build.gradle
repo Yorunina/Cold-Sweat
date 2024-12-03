@@ -160,12 +160,12 @@ dependencies {
     implementation fg.deobf("curse.maven:serene-seasons-291874:5790653")
     implementation fg.deobf("curse.maven:spoiled-364918:4803042")
 
-    implementation         ("org.valkyrienskies.core:api:${valk_skies_api_version}")
-    implementation         ("org.valkyrienskies.core:impl:${valk_skies_api_version}")
-    implementation         ("org.valkyrienskies.core:api-game:${valk_skies_api_version}")
-    implementation         ("org.valkyrienskies.core:util:${valk_skies_api_version}")
-    implementation fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:2.3.0-beta.5+bcda04a482")
-    implementation fg.deobf("curse.maven:eureka-ships-654384:5321630")
+    compileOnly         ("org.valkyrienskies.core:api:${valk_skies_api_version}")
+    compileOnly         ("org.valkyrienskies.core:impl:${valk_skies_api_version}")
+    compileOnly         ("org.valkyrienskies.core:api-game:${valk_skies_api_version}")
+    compileOnly         ("org.valkyrienskies.core:util:${valk_skies_api_version}")
+    compileOnly fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:2.3.0-beta.5+bcda04a482")
+    compileOnly fg.deobf("curse.maven:eureka-ships-654384:5321630")
 
     implementation fg.deobf("dev.latvian.mods:kubejs-forge:${kubejs_version}")
     implementation fg.deobf("dev.latvian.mods:rhino-forge:${rhino_version}")
