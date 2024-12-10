@@ -25,6 +25,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.registries.DataPackRegistryEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -91,6 +92,10 @@ public class ColdSweat
             event.dataPackRegistry(ModRegistries.ENTITY_TEMP_DATA, EntityTempData.CODEC);
             event.dataPackRegistry(ModRegistries.REMOVE_REGISTRY_DATA, RemoveRegistryData.CODEC);
         });
+    }
+
+    public static String getVersion()
+    {   return FMLLoader.getLoadingModList().getModFileById(ColdSweat.MOD_ID).versionString();
     }
 
     public void commonSetup(final FMLCommonSetupEvent event)
