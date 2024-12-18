@@ -37,7 +37,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.tags.ITag;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.io.IOException;
@@ -71,7 +70,7 @@ public class ConfigHelper
             {
                 ResourceLocation id = new ResourceLocation(objString);
                 Optional<Holder.Reference<T>> obj = reg.getHolder(ResourceKey.create(registry, id));
-                if (obj.isEmpty())
+                if (!reg.containsKey(id) || obj.isEmpty())
                 {
                     ColdSweat.LOGGER.error("Error parsing config: \"{}\" does not exist", objString);
                     continue;
@@ -100,12 +99,12 @@ public class ConfigHelper
             else
             {
                 ResourceLocation id = new ResourceLocation(objString);
-                T obj = registry.getValue(id);
-                if (obj == null)
+                if (!registry.containsKey(id))
                 {
                     ColdSweat.LOGGER.error("Error parsing config: \"{}\" does not exist", objString);
                     continue;
                 }
+                T obj = registry.getValue(id);
                 registryList.add(Either.right(obj));
             }
         }
