@@ -30,6 +30,7 @@
     "MixinIce$NoWaterOnBreak",
     "MixinInventoryOpenServer",
     "MixinLivingLoad",
+    "MixinMenuChanged",
     "MixinMinecart",
     "MixinPreServerLoad",
     "MixinSmithingRecipe",

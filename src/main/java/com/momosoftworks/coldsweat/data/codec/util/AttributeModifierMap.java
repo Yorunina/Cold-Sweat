@@ -2,7 +2,6 @@ package com.momosoftworks.coldsweat.data.codec.util;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 import com.mojang.serialization.Codec;
 import com.momosoftworks.coldsweat.util.math.FastMultiMap;
 import com.momosoftworks.coldsweat.util.serialization.NbtSerializable;
@@ -11,7 +10,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
@@ -71,6 +69,10 @@ public class AttributeModifierMap implements NbtSerializable
 
     public boolean isEmpty()
     {   return map.isEmpty();
+    }
+
+    public void clear()
+    {   map.clear();
     }
 
     @Override
