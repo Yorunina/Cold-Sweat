@@ -1,6 +1,5 @@
 package com.momosoftworks.coldsweat.core.init;
 
-import com.mojang.datafixers.util.Either;
 import com.momosoftworks.coldsweat.ColdSweat;
 import com.momosoftworks.coldsweat.api.event.client.InsulatorTabBuildEvent;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
@@ -32,7 +31,7 @@ public class CreativeTabInit
                         ModItems.WATERSKIN.getDefaultInstance(),
                         ObjectBuilder.build(() ->
                         {   ItemStack stack = ModItems.FILLED_WATERSKIN.getDefaultInstance();
-                            stack = CompatManager.setWaterPurity(stack, 3);
+                            stack = CompatManager.Thirst.setWaterPurity(stack, 3);
                             return stack;
                         }),
                         ModItems.FUR.getDefaultInstance(),

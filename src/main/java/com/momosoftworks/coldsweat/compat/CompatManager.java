@@ -49,6 +49,10 @@ import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.joml.Vector3d;
+import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import sereneseasons.api.season.SeasonChangedEvent;
 import sereneseasons.season.SeasonHooks;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -192,127 +196,191 @@ public class CompatManager
     {   return VALKYRIEN_SKIES_LOADED;
     }
 
-    public static boolean hasCurio(Player player, Item curio)
-    {   return CURIOS_LOADED && CuriosApi.getCuriosInventory(player).resolve().map(cap -> cap.findFirstCurio(curio)).map(Optional::isPresent).orElse(false);
-    }
-
-    public static List<ItemStack> getCurios(LivingEntity entity)
+    public static abstract class Curios
     {
-        if (!CURIOS_LOADED) return new ArrayList<>();
-        return entity.getCapability(CuriosCapability.INVENTORY)
-                     .map(ICuriosItemHandler::getEquippedCurios)
-                     .map(stacks ->
-                     {
-                         List<ItemStack> list = new ArrayList<>();
-                         for (int i = 0; i < stacks.getSlots(); i++)
-                         {   list.add(stacks.getStackInSlot(i));
-                         }
-                         return list;
-                     }).orElse(new ArrayList<>());
-    }
-
-    public static boolean hasOzzyLiner(ItemStack stack)
-    {   return false;
-        //return ARMOR_UNDERWEAR_LOADED && Armory.getXLining(stack).has(Armory.XLining.TEMPERATURE_REGULATOR);
-    }
-    public static boolean hasOttoLiner(ItemStack stack)
-    {   return false;
-        //return ARMOR_UNDERWEAR_LOADED && Armory.getXLining(stack).has(Armory.XLining.ANTIFREEZE_SHIELD);
-    }
-    public static boolean hasOllieLiner(ItemStack stack)
-    {   return false;
-        //return ARMOR_UNDERWEAR_LOADED && Armory.getXLining(stack).has(Armory.XLining.ANTIBURN_SHIELD);
-    }
-
-    public static boolean isWerewolf(Player player)
-    {   return WEREWOLVES_LOADED && WerewolfPlayer.getOpt(player).filter(w -> w.getLevel() > 0).map(w -> w.getForm().isTransformed()).orElse(false);
-    }
-
-    public static boolean isRainstormAt(Level level, BlockPos pos)
-    {
-        if (WEATHER_LOADED)
-        {
-            WeatherManagerServer weatherManager = ServerTickHandler.getWeatherManagerFor(level.dimension());
-            if (weatherManager == null) return false;
-            StormObject rainStorm = weatherManager.getClosestStormAny(new Vec3(pos.getX(), pos.getY(), pos.getZ()), 250);
-            if (rainStorm == null) return false;
-
-            if (WorldHelper.canSeeSky(level, pos, 60) && rainStorm.isPrecipitating() && rainStorm.levelTemperature > 0.0f
-            && Math.sqrt(Math.pow(pos.getX() - rainStorm.pos.x, 2) + Math.pow(pos.getX() - rainStorm.pos.x, 2)) < rainStorm.getSize())
-            {   return true;
-            }
+        public static boolean hasCurio(Player player, Item curio)
+        {   return CURIOS_LOADED && CuriosApi.getCuriosInventory(player).resolve().map(cap -> cap.findFirstCurio(curio)).map(Optional::isPresent).orElse(false);
         }
-        return false;
+
+        public static List<ItemStack> getCurios(LivingEntity entity)
+        {
+            if (!CURIOS_LOADED) return new ArrayList<>();
+            return entity.getCapability(CuriosCapability.INVENTORY)
+                         .map(ICuriosItemHandler::getEquippedCurios)
+                         .map(stacks ->
+                         {
+                             List<ItemStack> list = new ArrayList<>();
+                             for (int i = 0; i < stacks.getSlots(); i++)
+                             {   list.add(stacks.getStackInSlot(i));
+                             }
+                             return list;
+                         }).orElse(new ArrayList<>());
+        }
     }
 
-    public static Object getClosestStorm(Level level, BlockPos pos)
+    public static class ArmorUnderwear
     {
-        if (WEATHER_LOADED)
-        {
-            WeatherManagerServer weatherManager = ServerTickHandler.getWeatherManagerFor(level.dimension());
-            if (weatherManager == null) return null;
+        public static boolean hasOzzyLiner(ItemStack stack)
+        {   return false;
+            //return ARMOR_UNDERWEAR_LOADED && Armory.getXLining(stack).has(Armory.XLining.TEMPERATURE_REGULATOR);
+        }
 
-            double distance = Double.MAX_VALUE;
-            WeatherObject closestStorm = null;
-            for (WeatherObject stormObject : weatherManager.getStormObjects())
+        public static boolean hasOttoLiner(ItemStack stack)
+        {   return false;
+            //return ARMOR_UNDERWEAR_LOADED && Armory.getXLining(stack).has(Armory.XLining.ANTIFREEZE_SHIELD);
+        }
+
+        public static boolean hasOllieLiner(ItemStack stack)
+        {   return false;
+            //return ARMOR_UNDERWEAR_LOADED && Armory.getXLining(stack).has(Armory.XLining.ANTIBURN_SHIELD);
+        }
+    }
+
+    public static abstract class Werewolves
+    {
+        public static boolean isWerewolf(Player player)
+        {   return WEREWOLVES_LOADED && WerewolfPlayer.getOpt(player).filter(w -> w.getLevel() > 0).map(w -> w.getForm().isTransformed()).orElse(false);
+        }
+    }
+
+    public static abstract class Weather2
+    {
+        public static boolean isRainstormAt(Level level, BlockPos pos)
+        {
+            if (WEATHER_LOADED)
             {
-                double newDistance = stormObject.pos.distanceTo(new Vec3(pos.getX(), pos.getY(), pos.getZ()));
-                if (newDistance < distance)
-                {   distance = newDistance;
-                    closestStorm = stormObject;
+                WeatherManagerServer weatherManager = ServerTickHandler.getWeatherManagerFor(level.dimension());
+                if (weatherManager == null) return false;
+                StormObject rainStorm = weatherManager.getClosestStormAny(new Vec3(pos.getX(), pos.getY(), pos.getZ()), 250);
+                if (rainStorm == null) return false;
+
+                if (WorldHelper.canSeeSky(level, pos, 60) && rainStorm.isPrecipitating() && rainStorm.levelTemperature > 0.0f
+                && Math.sqrt(Math.pow(pos.getX() - rainStorm.pos.x, 2) + Math.pow(pos.getX() - rainStorm.pos.x, 2)) < rainStorm.getSize())
+                {   return true;
                 }
             }
-            return closestStorm;
+            return false;
         }
-        return null;
-    }
 
-    public static boolean isColdEnoughToSnow(Level level, BlockPos pos)
-    {
-        return SEASONS_LOADED && SeasonHooks.coldEnoughToSnowSeasonal(level, level.getBiome(pos), pos);
-    }
-
-    public static boolean hasWaterPurity(ItemStack stack)
-    {
-        if (THIRST_LOADED)
-        {   return WaterPurity.hasPurity(stack);
-        }
-        return false;
-    }
-
-    public static int getWaterPurity(ItemStack stack)
-    {
-        if (THIRST_LOADED)
-        {   return WaterPurity.getPurity(stack);
-        }
-        return 0;
-    }
-
-    public static ItemStack setWaterPurity(ItemStack stack, int purity)
-    {
-        if (THIRST_LOADED)
-        {   return WaterPurity.addPurity(stack, purity);
-        }
-        return stack;
-    }
-
-    public static ItemStack setWaterPurity(ItemStack item, BlockPos pos, Level level)
-    {
-        if (THIRST_LOADED)
-        {   return WaterPurity.addPurity(item, pos, level);
-        }
-        return item;
-    }
-
-    public static int getLegendaryTTStartIndex(List<Either<FormattedText, TooltipComponent>> tooltip)
-    {
-        if (isIcebergLoaded())
+        public static Object getClosestStorm(Level level, BlockPos pos)
         {
-            int index = CSMath.getIndexOf(tooltip, element -> element.right().map(component -> component instanceof Tooltips.TitleBreakComponent).orElse(false));
-            if (index == -1) return 0;
-            return index;
+            if (WEATHER_LOADED)
+            {
+                WeatherManagerServer weatherManager = ServerTickHandler.getWeatherManagerFor(level.dimension());
+                if (weatherManager == null) return null;
+
+                double distance = Double.MAX_VALUE;
+                WeatherObject closestStorm = null;
+                for (WeatherObject stormObject : weatherManager.getStormObjects())
+                {
+                    double newDistance = stormObject.pos.distanceTo(new Vec3(pos.getX(), pos.getY(), pos.getZ()));
+                    if (newDistance < distance)
+                    {   distance = newDistance;
+                        closestStorm = stormObject;
+                    }
+                }
+                return closestStorm;
+            }
+            return null;
         }
-        return 0;
+    }
+
+    public static abstract class SereneSeasons
+    {
+        public static boolean isColdEnoughToSnow(Level level, BlockPos pos)
+        {
+            return SEASONS_LOADED && SeasonHooks.coldEnoughToSnowSeasonal(level, level.getBiome(pos), pos);
+        }
+    }
+
+    public static abstract class Thirst
+    {
+        public static boolean hasWaterPurity(ItemStack stack)
+        {
+            if (THIRST_LOADED)
+            {   return WaterPurity.hasPurity(stack);
+            }
+            return false;
+        }
+
+        public static int getWaterPurity(ItemStack stack)
+        {
+            if (THIRST_LOADED)
+            {   return WaterPurity.getPurity(stack);
+            }
+            return 0;
+        }
+
+        public static ItemStack setWaterPurity(ItemStack stack, int purity)
+        {
+            if (THIRST_LOADED)
+            {   return WaterPurity.addPurity(stack, purity);
+            }
+            return stack;
+        }
+
+        public static ItemStack setWaterPurity(ItemStack item, BlockPos pos, Level level)
+        {
+            if (THIRST_LOADED)
+            {   return WaterPurity.addPurity(item, pos, level);
+            }
+            return item;
+        }
+    }
+
+    public static abstract class LegendaryTooltips
+    {
+        public static int getTooltipStartIndex(List<Either<FormattedText, TooltipComponent>> tooltip)
+        {
+            if (isIcebergLoaded())
+            {
+                int index = CSMath.getIndexOf(tooltip, element -> element.right().map(component -> component instanceof Tooltips.TitleBreakComponent).orElse(false));
+                if (index == -1) return 0;
+                return index;
+            }
+            return 0;
+        }
+    }
+
+    public static abstract class Valkyrien
+    {
+        public static Vec3 translateToShipCoords(Vec3 pos, Ship ship)
+        {
+            if (ship != null)
+            {
+                Vector3d posVec = VectorConversionsMCKt.toJOML(pos);
+                ship.getWorldToShip().transformPosition(posVec);
+                return VectorConversionsMCKt.toMinecraft(posVec);
+            }
+            return pos;
+        }
+
+        /**
+         * If any ship is managing the given position, translate the position to the corresponding coordinates in the shipyard
+         */
+        public static Vec3 transformIfShipPos(Level level, Vec3 pos)
+        {
+            if (VALKYRIEN_SKIES_LOADED)
+            {
+                List<Vector3d> shipTransforms = VSGameUtilsKt.transformToNearbyShipsAndWorld(level, pos.x, pos.y, pos.z, 1);
+                if (shipTransforms.isEmpty()) return pos;
+                Vector3d shipCoords = shipTransforms.get(0);
+                return VectorConversionsMCKt.toMinecraft(shipCoords);
+            }
+            return pos;
+        }
+
+        public static BlockPos transformIfShipPos(Level level, BlockPos pos)
+        {
+            if (VALKYRIEN_SKIES_LOADED)
+            {
+                List<Vector3d> shipTransforms = VSGameUtilsKt.transformToNearbyShipsAndWorld(level, pos.getX(), pos.getY(), pos.getZ(), 1);
+                if (shipTransforms.isEmpty()) return pos;
+                Vector3d shipCoords = shipTransforms.get(0);
+                return BlockPos.containing(VectorConversionsMCKt.toMinecraft(shipCoords));
+            }
+            return pos;
+        }
     }
 
     /* Compat Events */
@@ -384,7 +452,7 @@ public class CompatManager
                 int liners = 0;
                 for (ItemStack stack : event.getEntity().getArmorSlots())
                 {
-                    if (isDamageCold ? hasOttoLiner(stack) : hasOllieLiner(stack))
+                    if (isDamageCold ? ArmorUnderwear.hasOttoLiner(stack) : ArmorUnderwear.hasOllieLiner(stack))
                         liners++;
                 }
                 // Cancel the event if full liners
