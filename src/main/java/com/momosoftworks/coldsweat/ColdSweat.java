@@ -1,5 +1,6 @@
 package com.momosoftworks.coldsweat;
 
+import com.mojang.serialization.Codec;
 import com.momosoftworks.coldsweat.common.capability.insulation.ItemInsulationCap;
 import com.momosoftworks.coldsweat.common.capability.shearing.ShearableFurCap;
 import com.momosoftworks.coldsweat.common.capability.temperature.EntityTempCap;
@@ -11,10 +12,10 @@ import com.momosoftworks.coldsweat.core.advancement.trigger.ModAdvancementTrigge
 import com.momosoftworks.coldsweat.core.init.*;
 import com.momosoftworks.coldsweat.core.network.ColdSweatPacketHandler;
 import com.momosoftworks.coldsweat.data.ModRegistries;
-import com.momosoftworks.coldsweat.data.codec.configuration.*;
 import com.momosoftworks.coldsweat.compat.CompatManager;
 import com.momosoftworks.coldsweat.util.registries.ModEntities;
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraftforge.common.MinecraftForge;
@@ -78,19 +79,9 @@ public class ColdSweat
         // Setup JSON data-driven handlers
         bus.addListener((DataPackRegistryEvent.NewRegistry event) ->
         {
-            event.dataPackRegistry(ModRegistries.FUEL_DATA, FuelData.CODEC);
-            event.dataPackRegistry(ModRegistries.FOOD_DATA, FoodData.CODEC);
-            event.dataPackRegistry(ModRegistries.INSULATOR_DATA, InsulatorData.CODEC);
-            event.dataPackRegistry(ModRegistries.BLOCK_TEMP_DATA, BlockTempData.CODEC);
-            event.dataPackRegistry(ModRegistries.BIOME_TEMP_DATA, BiomeTempData.CODEC);
-            event.dataPackRegistry(ModRegistries.DIMENSION_TEMP_DATA, DimensionTempData.CODEC);
-            event.dataPackRegistry(ModRegistries.STRUCTURE_TEMP_DATA, StructureTempData.CODEC);
-            event.dataPackRegistry(ModRegistries.MOUNT_DATA, MountData.CODEC);
-            event.dataPackRegistry(ModRegistries.ENTITY_SPAWN_BIOME_DATA, SpawnBiomeData.CODEC);
-            event.dataPackRegistry(ModRegistries.DEPTH_TEMP_DATA, DepthTempData.CODEC);
-            event.dataPackRegistry(ModRegistries.CARRY_TEMP_DATA, ItemCarryTempData.CODEC);
-            event.dataPackRegistry(ModRegistries.ENTITY_TEMP_DATA, EntityTempData.CODEC);
-            event.dataPackRegistry(ModRegistries.REMOVE_REGISTRY_DATA, RemoveRegistryData.CODEC);
+            for (ModRegistries.RegistryHolder<?> holder : ModRegistries.getRegistries().values())
+            {   event.dataPackRegistry((ResourceKey) holder.registry(), (Codec) holder.codec());
+            }
         });
     }
 
