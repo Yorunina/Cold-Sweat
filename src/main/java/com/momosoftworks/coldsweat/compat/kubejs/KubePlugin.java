@@ -13,49 +13,13 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 public class KubePlugin extends KubeJSPlugin
 {
     @Override
-    public void registerEvents()
-    {
-        KubeEventHandlers.COLD_SWEAT.register();
-        KubeEventHandlers.init();
-        MinecraftForge.EVENT_BUS.register(KubePlugin.class);
+    public void registerEvents() {
+        KubeEventHandlers.COLD_SWEAT_GROUP.register();
     }
 
     @Override
     public void registerBindings(BindingsEvent event)
     {
-        event.add("coldsweat", new KubeBindings());
-    }
-
-    @SubscribeEvent
-    public static void fireRegistries(CreateRegistriesEvent event)
-    {
-        KubeEventSignatures.REGISTRIES.invoker().buildRegistries();
-    }
-
-    @SubscribeEvent
-    public static void onTempChanged(TemperatureChangedEvent event)
-    {
-        EventResult result = KubeEventSignatures.TEMPERATURE_CHANGED.invoker().onTemperatureChanged(event);
-        if (result.isFalse())
-        {   event.setCanceled(true);
-        }
-    }
-
-    @SubscribeEvent
-    public static void onItemInsulated(InsulateItemEvent event)
-    {
-        EventResult result = KubeEventSignatures.INSULATE_ITEM.invoker().insulateItem(event);
-        if (result.isFalse())
-        {   event.setCanceled(true);
-        }
-    }
-
-    @SubscribeEvent
-    public static void onModifierAdded(TempModifierEvent.Add event)
-    {
-        EventResult result = KubeEventSignatures.ADD_MODIFIER.invoker().addModifier(event);
-        if (result.isFalse())
-        {   event.setCanceled(true);
-        }
+        event.add("ColdSweat", new KubeBindings());
     }
 }

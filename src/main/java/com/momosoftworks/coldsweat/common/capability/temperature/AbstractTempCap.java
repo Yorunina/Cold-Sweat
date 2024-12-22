@@ -4,6 +4,8 @@ import com.momosoftworks.coldsweat.api.temperature.modifier.TempModifier;
 import com.momosoftworks.coldsweat.api.util.Temperature;
 import com.momosoftworks.coldsweat.api.util.Temperature.Trait;
 import com.momosoftworks.coldsweat.common.capability.handler.EntityTempManager;
+import com.momosoftworks.coldsweat.compat.kubejs.KubeEventHandlers;
+import com.momosoftworks.coldsweat.compat.kubejs.TempChangedEventJS;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
 import com.momosoftworks.coldsweat.core.advancement.trigger.ModAdvancementTriggers;
 import com.momosoftworks.coldsweat.util.math.CSMath;
@@ -93,7 +95,9 @@ public class AbstractTempCap implements ITemperatureCap
         double oldTemp = this.getTrait(trait);
         this.setTrait(trait, value);
         if (entity.tickCount > 5 && oldTemp != value && entity instanceof ServerPlayer player)
-        {   ModAdvancementTriggers.TEMPERATURE_CHANGED.trigger(player, this.getTraits());
+        {
+            KubeEventHandlers.TEMP_CHANGED_EVENT.post(new TempChangedEventJS(this, entity, trait, value, oldTemp));
+            ModAdvancementTriggers.TEMPERATURE_CHANGED.trigger(player, this.getTraits());
         }
     }
 
