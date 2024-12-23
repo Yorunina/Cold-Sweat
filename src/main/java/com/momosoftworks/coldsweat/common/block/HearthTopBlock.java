@@ -8,22 +8,21 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class HearthTopBlock extends SmokestackBlock
 {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final BooleanProperty UP = BlockStateProperties.UP;
+    public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
 
     public static Properties getProperties()
     {
@@ -37,7 +36,7 @@ public class HearthTopBlock extends SmokestackBlock
 
     public HearthTopBlock(Block.Properties properties)
     {   super(properties);
-        this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
+        this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH).setValue(UP, false).setValue(DOWN, false));
     }
 
     @SuppressWarnings("deprecation")
@@ -62,24 +61,5 @@ public class HearthTopBlock extends SmokestackBlock
     @Override
     public ItemStack getCloneItemStack(BlockGetter getter, BlockPos pos, BlockState state)
     {   return new ItemStack(ItemInit.HEARTH.get());
-    }
-
-    @Override
-    public BlockState rotate(BlockState state, Rotation direction)
-    {   return state.setValue(FACING, direction.rotate(state.getValue(FACING)));
-    }
-
-    public BlockState mirror(BlockState state, Mirror mirror)
-    {   return state.rotate(mirror.getRotation(state.getValue(FACING)));
-    }
-
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
-    {   builder.add(FACING);
-    }
-
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context)
-    {   return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 }
